@@ -38,10 +38,11 @@ A complete e-commerce solution with admin dashboard, built with Next.js, Firebas
 - Firebase Storage (Image hosting)
 - Firebase Hosting (Deployment)
 
-![Admin Side Dashboard Preview:](https://lacheen-co.vercel.app/images/dashboard/dashboard1.png)
-![Dashboard Preview:](https://lacheen-co.vercel.app/images/dashboard/dashboard2.png)
-![Dashboard Preview:](https://lacheen-co.vercel.app/images/dashboard/dashboard3.png)
-![Dashboard Preview:](https://lacheen-co.vercel.app/images/dashboard/dashboard4.png)
+
+<img width="500" alt="dashboard1" src="https://github.com/user-attachments/assets/02d3395b-2696-4f0c-bda1-abb76293074b" />
+<img width="500" alt="dashboard2" src="https://github.com/user-attachments/assets/63d15a2b-b6b7-4bcf-a856-aaf132a4b3ef" />
+<img width="500" alt="dashboard3" src="https://github.com/user-attachments/assets/c449826e-c618-4780-8dad-c0f59cc5ea33" />
+<img width="500" alt="dashboard4" src="https://github.com/user-attachments/assets/68f78174-e9cf-4603-943e-26a00cd8e008" />
 
 
 
