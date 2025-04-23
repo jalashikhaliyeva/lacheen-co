@@ -1,4 +1,4 @@
-<img width="1469" alt="dashboard4" src="https://github.com/user-attachments/assets/56ace24a-e136-44fd-90f6-4499f2119b04" /># 🛍️ Lacheen-co - End-to-End E-commerce Platform
+# 🛍️ Lacheen-co - End-to-End E-commerce Platform
 ### My Custom UX/UI Design & Full Stack Implementation
 
 It's a project where I single-handedly crafted the UX/UI from scratch—without any pre-existing designs—while architecting both the Firebase-powered backend and React-based frontend to deliver a seamless shopping experience with robust admin controls
