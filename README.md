@@ -3,7 +3,7 @@
 
 It's a project where I single-handedly crafted the UX/UI from scratch—without any pre-existing designs—while architecting both the Firebase-powered backend and React-based frontend to deliver a seamless shopping experience with robust admin controls
 
-A complete e-commerce solution with admin dashboard, built with React, Firebase, and modern web technologies.
+A complete e-commerce solution with admin dashboard, built with Next.js, Firebase, and modern web technologies.
 
 ## ✨ Features
 
@@ -27,7 +27,7 @@ A complete e-commerce solution with admin dashboard, built with React, Firebase,
 ##  Tech Stack
 
 **Frontend:**
-- React.js
+- Next.js
 - Redux (State management)
 - Tailwind CSS (Styling)
 - React Router (Navigation)
