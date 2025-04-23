@@ -1,4 +1,4 @@
-# 🛍️ Lacheen-co - End-to-End E-commerce Platform
+<img width="1469" alt="dashboard4" src="https://github.com/user-attachments/assets/56ace24a-e136-44fd-90f6-4499f2119b04" /># 🛍️ Lacheen-co - End-to-End E-commerce Platform
 ### My Custom UX/UI Design & Full Stack Implementation
 
 It's a project where I single-handedly crafted the UX/UI from scratch—without any pre-existing designs—while architecting both the Firebase-powered backend and React-based frontend to deliver a seamless shopping experience with robust admin controls
@@ -38,7 +38,13 @@ A complete e-commerce solution with admin dashboard, built with Next.js, Firebas
 - Firebase Storage (Image hosting)
 - Firebase Hosting (Deployment)
 
-![Description of image](https://lacheen-co.vercel.app/images/12.jpg)
+![Admin Side Dashboard Preview:](https://lacheen-co.vercel.app/images/dashboard/dashboard1.png)
+![Dashboard Preview:](https://lacheen-co.vercel.app/images/dashboard/dashboard2.png)
+![Dashboard Preview:](https://lacheen-co.vercel.app/images/dashboard/dashboard3.png)
+![Dashboard Preview:](https://lacheen-co.vercel.app/images/dashboard/dashboard4.png)
+
+
+
 
 
 
