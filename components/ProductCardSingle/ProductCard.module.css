@@ -1,0 +1,16 @@
+/* In your global CSS */
+/* .product-card-image {
+    height: 350px;
+  }
+   */
+@media (max-width: 768px) {
+    .card {
+        height: 300px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        height: 200px !important;
+    }
+}

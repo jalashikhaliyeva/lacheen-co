@@ -1,0 +1,69 @@
+/* components/Container.module.css */
+/* .container {
+  max-width: 1350px;
+  margin: 0 auto;
+} */
+
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+  /* Adds some padding for smaller screens */
+}
+
+/* For screens larger than 640px (sm) */
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+/* For screens larger than 768px (md) */
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+/* For screens larger than 768px (md) */
+@media (min-width: 868px) {
+  .container {
+    max-width: 868px;
+  }
+}
+
+/* For screens larger than 1024px (lg) */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+/* For screens larger than 1024px (lg) */
+@media (min-width: 1224px) {
+  .container {
+    max-width: 1224px;
+  }
+}
+
+/* For screens larger than 1280px (xl) */
+@media (min-width: 1380px) {
+  .container {
+    max-width: 1380px;
+  }
+}
+
+/* For screens larger than 1536px (2xl) */
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1450px;
+    /* Max width matches your original requirement */
+  }
+}
+
+@media (min-width: 1736px) {
+  .container {
+    max-width: 1700px;
+    /* Max width matches your original requirement */
+  }
+}

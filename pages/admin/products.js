@@ -1,0 +1,102 @@
+import React, { useEffect, useState } from "react";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import AdminLayout from "@/components/AdminLayout";
+import Container from "@/components/Container";
+import WomenShoesTable from "@/components/ProductsTable";
+import { fetchProducts } from "@/firebase/services/firebaseProductsService";
+import Spinner from "@/components/Spinner";
+import { useRouter } from "next/router";
+import Breadcrumbs from "@/components/Breadcrumbs";
+
+function Products() {
+  const [products, setProducts] = useState(null);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [categoryName, setCategoryName] = useState("");
+  const router = useRouter();
+  const { query } = router;
+
+  useEffect(() => {
+    fetchProducts()
+      .then((productsArray) => {
+        setProducts(productsArray);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch products:", error);
+        setProducts([]);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!products) return;
+
+    let filtered = [...products];
+    let filterType = "all";
+
+    if (query.filter === "new") {
+      filtered = products.filter((product) => product.is_new === true);
+      filterType = "new";
+    } else if (query.filter === "notupdated") {
+      filtered = products.filter(
+        (product) => !product.lastUpdated || product.needsUpdate
+      );
+      filterType = "notupdated";
+    } else if (query.category) {
+      filtered = products.filter(
+        (product) => product.category_id === query.category
+      );
+      filterType = `category-${query.category}`;
+      // You might want to fetch the category name here if you want to display it
+      // setCategoryName(categoryNameFromSomewhere);
+    }
+
+    setFilteredProducts(filtered);
+    setActiveFilter(filterType);
+  }, [products, query]);
+
+  if (products === null) {
+    return (
+      <ProtectedRoute>
+        <AdminLayout>
+          <Container>
+            <Spinner />
+          </Container>
+        </AdminLayout>
+      </ProtectedRoute>
+    );
+  }
+
+  return (
+    <ProtectedRoute>
+      <AdminLayout>
+        <div className="bg-bodyGray">
+          <Container>
+            <div className="pt-7">
+              <Breadcrumbs />
+              {/* Your page content goes here */}
+            </div>
+
+            {filteredProducts.length === 0 && activeFilter !== "all" ? (
+              <div className="p-8 text-center">
+                <h3 className="text-xl font-medium">
+                  {activeFilter.startsWith("category")
+                    ? `No products found in this category`
+                    : `No ${activeFilter} products found`}
+                </h3>
+              </div>
+            ) : (
+              <WomenShoesTable
+                mockProducts={
+                  filteredProducts.length > 0 ? filteredProducts : products
+                }
+                activeFilter={activeFilter}
+              />
+            )}
+          </Container>
+        </div>
+      </AdminLayout>
+    </ProtectedRoute>
+  );
+}
+
+export default Products;
