@@ -38,7 +38,7 @@ A complete e-commerce solution with admin dashboard, built with Next.js, Firebas
 - Firebase Storage (Image hosting)
 - Firebase Hosting (Deployment)
 
-![Description of image](/images/illustration.jpg)
+![Description of image](https://lacheen-co.vercel.app/images/12.jpg)
 
 
 
