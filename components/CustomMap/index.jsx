@@ -35,9 +35,7 @@ const tileProviders = [
       '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   },
 ];
-
 const selectedTileProvider = tileProviders[1];
-
 const locations = [
   {
     name: "Koroğlu Parkı",
@@ -50,7 +48,6 @@ const locations = [
     position: [40.3775, 49.845],
   },
 ];
-
 const CustomIcon = ({ size = 32, color = "#FF0000" }) => {
   return L.divIcon({
     html: `
@@ -64,7 +61,6 @@ const CustomIcon = ({ size = 32, color = "#FF0000" }) => {
     popupAnchor: [0, -size / 2],
   });
 };
-
 const CustomMap = () => {
   return (
     <MapContainer

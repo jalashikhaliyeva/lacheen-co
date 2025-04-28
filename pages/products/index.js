@@ -1,4 +1,4 @@
-// # Client-side product routes 
+// # Client-side product routes
 import Header from "@/components/Header";
 import NavList from "@/components/NavList";
 import { useState } from "react";
@@ -15,7 +15,7 @@ import ProductList from "@/components/ProductsList";
 
 export default function Products() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const [layout, setLayout] = useState("grid2");
   return (
     <div className="relative">
       <div
@@ -30,8 +30,8 @@ export default function Products() {
       <main>
         <Header />
         <NavList onMenuToggle={setIsMenuOpen} />
-       
-        <ProductList />
+        <ProductsListHeader layout={layout} setLayout={setLayout} />
+        <ProductList layout={layout} />
         <Footer />
       </main>
     </div>

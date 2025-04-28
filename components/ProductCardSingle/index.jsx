@@ -13,6 +13,7 @@ function ProductCardSingle({
   isInWishlist,
   onToggleWishlist,
   imageHeight = 350,
+  imageHeightClass = "h-[350px]",
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -77,10 +78,7 @@ function ProductCardSingle({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`${style.card} relative cursor-pointer  aspect-square w-full overflow-hidden`}
-        style={{
-          height: `${imageHeight}px`,
-        }}
+        className={`${style.card} relative cursor-pointer aspect-square w-full overflow-hidden ${imageHeightClass}`}
         onMouseDown={handleDragStart}
         onMouseMove={handleDragMove}
         onMouseUp={handleDragEnd}
@@ -184,8 +182,8 @@ function ProductCardSingle({
       </div>
 
       <div className="mt-4 text-start font-gilroy">
-        <h3 className="font-gilroy">{product.name}</h3>
-        <p className="font-gilroy text-sm text-neutral-700">{`${product.price} ₼`}</p>
+        <h3 className="font-gilroy text-sm md:text-lg">{product.name}</h3>
+        <p className="font-gilroy md:text-sm text-xs text-neutral-700">{`${product.price} ₼`}</p>
       </div>
     </div>
   );

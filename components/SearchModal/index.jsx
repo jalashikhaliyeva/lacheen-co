@@ -1,14 +1,9 @@
-// components/SearchModal.jsx
-// This component renders a full-screen search modal with smooth animations using Framer Motion.
-
-import { useEffect, useState } from "react"; // React hooks for lifecycle and state
-import { createPortal } from "react-dom"; // For rendering outside the main DOM tree
-import { useRouter } from "next/router"; // Next.js router for navigation
-import Image from "next/image"; // Optimized image component
-import { IoClose } from "react-icons/io5"; // Close icon
-import { TfiSearch } from "react-icons/tfi"; // Search icon inside input
-import { AnimatePresence, motion } from "framer-motion"; // Framer Motion components for animations
-import TrendingNow from "../TrendingNow";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { useRouter } from "next/router";
+import Image from "next/image";
+import { IoClose } from "react-icons/io5";
+import { AnimatePresence, motion } from "framer-motion";
 import TrendingInitSearch from "../TrendingInitSearch";
 
 export default function SearchModal({ isOpen, onClose }) {
@@ -17,7 +12,17 @@ export default function SearchModal({ isOpen, onClose }) {
   // Controlled input value for search query
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
-
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    // Cleanup
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
   // Run once on mount: flag that client is ready
   useEffect(() => {
     setMounted(true);
@@ -46,7 +51,6 @@ export default function SearchModal({ isOpen, onClose }) {
             transition={{ duration: 0.6 }} // Duration of fade
           />
 
-        
           <motion.div
             className="fixed inset-0 z-50 flex items-start justify-center"
             initial={{ y: "-100%", opacity: 0 }} // Start above viewport, invisible
@@ -58,7 +62,7 @@ export default function SearchModal({ isOpen, onClose }) {
             {/* Modal content box now full width */}
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative bg-white w-full max-w-full  md:h-[700px] rounded-none shadow-lg overflow-hidden"
+              className="relative bg-white w-full max-w-full  md:h-[700px] rounded-none shadow-lg overflow-y-auto"
             >
               {/* Close button in top-right corner */}
               <button

@@ -4,8 +4,6 @@ import Footer from "@/components/Footer";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import ContactDatas from "@/components/ContactDatas";
-
-// Dynamically import the Map component to avoid SSR issues with Leaflet
 const MapWithNoSSR = dynamic(() => import("@/components/CustomMap"), {
   ssr: false,
 });
@@ -36,19 +34,7 @@ export default function Contact() {
 
           <ContactDatas />
 
-          {/* <div className="mt-8 grid md:grid-cols-2 gap-8">
-            <div className="bg-gray-100 p-6 rounded-lg">
-              <h2 className="text-xl font-semibold mb-2">Koroğlu Parkı</h2>
-              <p className="text-gray-700">Anvar Gasimzadeh 56c, Nasimi ray. Ganclik</p>
-              <p className="text-gray-700">Baku 1122, Azerbaijan</p>
-            </div>
-            
-            <div className="bg-gray-100 p-6 rounded-lg">
-              <h2 className="text-xl font-semibold mb-2">Michael Refili St</h2>
-              <p className="text-gray-700">9RMW+87Q, Michael Refili St</p>
-              <p className="text-gray-700">Baku, Azerbaijan</p>
-            </div>
-          </div> */}
+
         </div>
 
         <Footer />

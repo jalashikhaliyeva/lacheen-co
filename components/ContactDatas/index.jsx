@@ -1,14 +1,8 @@
 import React, { useState } from "react";
-import { FiPhone } from "react-icons/fi";
-import { CiLocationOn } from "react-icons/ci";
-import Container from "../Container";
 import { PiPhoneCallThin } from "react-icons/pi";
-import {
-  AiOutlineWhatsApp,
-  AiOutlinePlus,
-  AiOutlineMinus,
-} from "react-icons/ai";
-import { HiOutlineLocationMarker } from "react-icons/hi";
+import { CiLocationOn } from "react-icons/ci";
+import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
+import Container from "../Container";
 
 function ContactDatas() {
   const [activeIndex, setActiveIndex] = useState(null);
@@ -48,10 +42,12 @@ function ContactDatas() {
   return (
     <>
       <Container>
-        <div className="flex justify-between gap-20 items-start divide-x  font-gilroy mt-16 ">
-          <div className="flex flex-col gap-10 w-1/2">
+        <div className="flex flex-col lg:flex-row justify-between lg:gap-20 gap-12 items-start lg:divide-x font-gilroy mt-16">
+          <div className="flex flex-col gap-10 lg:w-1/2 w-full">
             <div className="flex flex-col gap-4">
-              <h1 className="font-normal uppercase text-2xl">Call us</h1>
+              <h1 className="font-normal uppercase text-xl md:text-2xl">
+                Call us
+              </h1>
               <p className="text-neutral-500 text-sm max-w-[450px]">
                 Have questions about our shoe collection or need style advice?
                 Our friendly customer service team is ready to assist you with
@@ -59,22 +55,25 @@ function ContactDatas() {
               </p>
 
               <div className="flex items-center gap-2">
-                <div className="rounded-full w-10 h-10  flex items-center justify-center">
+                <div className="rounded-full w-10 h-10 flex items-center justify-center">
                   <PiPhoneCallThin className="text-3xl text-pink-900" />
                 </div>
                 <p className="text-base text-pink-800">+994 51 777 72 85</p>
               </div>
             </div>
+
             <div className="flex flex-col gap-4">
-              <h1 className="font-normal uppercase text-2xl">Visit us</h1>
-              <p className="text-neutral-500 text-sm  max-w-[450px]">
+              <h1 className="font-normal uppercase text-xl md:text-2xl">
+                Visit us
+              </h1>
+              <p className="text-neutral-500 text-sm max-w-[450px]">
                 Experience our latest shoe collections in person at our
                 comfortable retail stores. Our knowledgeable staff will help you
                 find the perfect fit and style for any occasion.
               </p>
 
               <div className="flex items-center gap-2">
-                <div className="rounded-full w-10 h-10  flex items-center justify-center">
+                <div className="rounded-full w-10 h-10 flex items-center justify-center">
                   <CiLocationOn className="text-2xl text-pink-800" />
                 </div>
                 <p className="text-base max-w-[350px] text-pink-800">
@@ -82,8 +81,9 @@ function ContactDatas() {
                   1122
                 </p>
               </div>
+
               <div className="flex items-center gap-4">
-                <div className="rounded-full w-10 h-10  flex items-center justify-center">
+                <div className="rounded-full w-10 h-10 flex items-center justify-center">
                   <CiLocationOn className="text-2xl text-pink-800" />
                 </div>
                 <p className="text-base text-pink-800">
@@ -93,13 +93,11 @@ function ContactDatas() {
             </div>
           </div>
 
-          <div className="w-1/2">
-            <h1 className="font-normal uppercase text-2xl mb-6">
+          <div className="lg:w-1/2 w-full lg:pl-8">
+            <h1 className="font-normal uppercase text-xl md:text-2xl mb-6">
               Frequently Asked Questions
             </h1>
             <div className="space-y-0">
-              {" "}
-              {/* Removed container border */}
               {faqItems.map((item, index) => (
                 <div
                   key={index}
