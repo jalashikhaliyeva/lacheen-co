@@ -131,7 +131,7 @@ function Header() {
                 width={180}
                 height={120}
                 alt="logo lacheen"
-                className="w-[90px] object-cover ml-2"
+                className="w-[130px] object-cover ml-2"
                 quality={100}
                 priority
               />
@@ -143,28 +143,28 @@ function Header() {
               className="focus:outline-none"
               aria-label="Search"
             >
-              <CiSearch className="text-base" />
+              <CiSearch className="text-xl" />
             </button>
             <button
               onClick={() => router.push({ pathname: "/wishlist" })}
               className="focus:outline-none"
               aria-label="Wishlist"
             >
-              <PiHeartLight className="text-base" />
+              <PiHeartLight className="text-xl" />
             </button>
             <button
               onClick={() => router.push({ pathname: "/login" })}
               className="focus:outline-none"
               aria-label="Account"
             >
-              <PiUserLight className="text-base" />
+              <PiUserLight className="text-xl" />
             </button>
             <button
               onClick={() => router.push({ pathname: "/basket" })}
               className="focus:outline-none"
               aria-label="Basket"
             >
-              <PiBasketLight className="text-base" />
+              <PiBasketLight className="text-xl" />
             </button>
           </div>
         </div>

@@ -5,8 +5,9 @@ import { GrFormPrevious } from "react-icons/gr";
 import Image from "next/image";
 import styles from "./embla.module.css";
 import Container from "../Container";
-
-// 🔒 100 % STATIC CONTENT ---------------------------------------------
+import { GoArrowLeft, GoArrowRight } from "react-icons/go";
+import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
+import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 const slides = [
   {
     id: 1,
@@ -44,12 +45,11 @@ const slides = [
     image: "/images/IMG_2929.jpg",
   },
   {
-    id: 8, // Fixed duplicate ID (was 7 before)
+    id: 8,
     name: "Minimalist Beauty",
     image: "/images/IMG_7769.jpg",
   },
 ];
-// ---------------------------------------------------------------------
 
 const SliderEmbla = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -63,7 +63,6 @@ const SliderEmbla = () => {
   const [scrollSnaps, setScrollSnaps] = useState([]);
   const [showDots, setShowDots] = useState(slides.length > 3);
 
-  // ----------------- Helpers -----------------
   const scrollPrev = useCallback(
     () => emblaApi && emblaApi.scrollPrev(),
     [emblaApi]
@@ -84,7 +83,6 @@ const SliderEmbla = () => {
     setNextBtnEnabled(emblaApi.canScrollNext());
   }, [emblaApi]);
 
-  // --------------- Init listeners ---------------
   useEffect(() => {
     if (!emblaApi) return;
     setScrollSnaps(emblaApi.scrollSnapList());
@@ -92,7 +90,6 @@ const SliderEmbla = () => {
     onSelect(); // initial state
   }, [emblaApi, onSelect]);
 
-  // --------------- Auto‑play --------------------
   useEffect(() => {
     if (!emblaApi) return;
     const id = setInterval(() => {
@@ -101,11 +98,27 @@ const SliderEmbla = () => {
     return () => clearInterval(id);
   }, [emblaApi]);
 
-  // =============== RENDER =======================
   return (
     <div className={`mt-4 md:mt-10 ${styles.embla}`}>
       <Container>
-        <h1 className="pb-3 font-gilroy text-xl md:text-2xl">Must-Haves</h1>
+        <div className="flex justify-between w-full">
+          <h1 className="pb-3 font-gilroy text-xl md:text-2xl">Must-Haves</h1>
+          <div className="flex items-center  gap-3">
+            {prevBtnEnabled && (
+              <BsArrowLeft
+                onClick={scrollPrev}
+                className="cursor-pointer text-lg md:text-2xl text-neutral-500"
+              />
+            )}
+
+            {nextBtnEnabled && (
+              <BsArrowRight
+                onClick={scrollNext}
+                className="cursor-pointer text-lg md:text-2xl text-neutral-500"
+              />
+            )}
+          </div>
+        </div>
       </Container>
       <div className={styles.embla__viewport} ref={emblaRef}>
         <div className={`${styles.embla__container} flex`}>
@@ -137,7 +150,7 @@ const SliderEmbla = () => {
         </div>
       </div>
 
-      {prevBtnEnabled && (
+      {/* {prevBtnEnabled && (
         <button
           className={`${styles.embla__button} ${styles["embla__button--prev"]}`}
           onClick={scrollPrev}
@@ -145,9 +158,9 @@ const SliderEmbla = () => {
         >
           <GrFormPrevious className="text-lg" />
         </button>
-      )}
+      )} */}
 
-      {nextBtnEnabled && (
+      {/* {nextBtnEnabled && (
         <button
           className={`${styles.embla__button} ${styles["embla__button--next"]}`}
           onClick={scrollNext}
@@ -155,7 +168,7 @@ const SliderEmbla = () => {
         >
           <MdNavigateNext className="text-lg" />
         </button>
-      )}
+      )} */}
 
       {/* Optional dots indicator */}
       {showDots && (

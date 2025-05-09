@@ -59,12 +59,23 @@ export default function SearchModal({ isOpen, onClose }) {
             transition={{ type: "spring", stiffness: 300, damping: 40 }}
             onClick={onClose}
           >
-            {/* Modal content box now full width */}
+           
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative bg-white w-full max-w-full  md:h-[700px] rounded-none shadow-lg overflow-y-auto"
+              className="
+                   relative
+                   bg-white
+                   w-full
+                   max-w-full
+                   h-full
+                   md:max-h-[770px] 
+                 rounded-none
+                   shadow-lg
+                   overflow-y-auto 
+                   -webkit-overflow-scrolling-touch 
+                 "
             >
-              {/* Close button in top-right corner */}
+
               <button
                 onClick={onClose}
                 className="absolute top-4 cursor-pointer right-4 text-2xl z-10"

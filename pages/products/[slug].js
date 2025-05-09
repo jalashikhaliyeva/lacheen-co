@@ -25,9 +25,9 @@ export default function Products() {
         <Header />
         <NavList onMenuToggle={setIsMenuOpen} />
 
-        <Container>
+       
           <ProductDetailed />
-        </Container>
+       
 
         <Footer />
       </main>

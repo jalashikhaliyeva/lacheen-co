@@ -49,29 +49,28 @@ function LanguageSwitcher() {
     >
       <button
         id="dropdownLanguageButton"
-        className="px-2 flex items-center justify-center gap-2 py-1 text-base font-gilroy focus:outline-none "
+        className="px-2 flex items-center justify-center gap-2 py-1 text-base font-gilroy focus:outline-none"
         type="button"
       >
         {selectedLanguage}
         <BsChevronDown
-         className={`
-          text-xs
-          transform-gpu origin-center
-          transition-all duration-500 ease-out
-          ${isDropdownOpen 
-            ? "rotate-180 scale-110" 
-            : "rotate-0 scale-100"}
-        `}
+          className={`
+            text-xs transform-gpu origin-center
+            transition-all duration-500 ease-out
+            ${isDropdownOpen ? "rotate-180 scale-110" : "rotate-0 scale-100"}
+          `}
         />
       </button>
 
       <div
         className={`
           absolute z-[999] w-28 mt-2 font-gilroy bg-white 
-          border border-gray-300 rounded-sm shadow-lg p-2
+          md:border md:border-gray-300 md:rounded-sm md:shadow-lg md:p-2
           transition-all duration-300 ease-in-out
-          ${isDropdownOpen ? "opacity-100 translate-y-0 visible" : "opacity-0 -translate-y-4 invisible"}
-          left-1/2 -translate-x-1/2
+          ${isDropdownOpen
+            ? "opacity-100 translate-y-0 visible"
+            : "opacity-0 -translate-y-4 invisible"}
+          md:left-1/2 md:-translate-x-1/2
         `}
       >
         <ul className="py-1">
@@ -80,11 +79,10 @@ function LanguageSwitcher() {
               key={lang}
               className={`
                 px-4 py-2 cursor-pointer rounded
-                hover:bg-gray-100  text-base transition-colors
+                hover:bg-gray-100 text-base transition-colors
                 ${selectedLanguage === lang
-                  ? "text-gray-700 font-semibold "
-                  : "text-gray-700 "
-                }
+                  ? "text-gray-700 font-semibold"
+                  : "text-gray-700"}
               `}
               onClick={() => handleLanguageChange(lang)}
             >

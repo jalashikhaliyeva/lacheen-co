@@ -1,7 +1,10 @@
 import Image from "next/image";
+import { useRouter } from "next/router";
 import React from "react";
 
 function Hero() {
+  const router = useRouter();
+
   return (
     <div className="w-full relative">
       <div className="relative w-full h-[340px]  md:h-[670px]">
@@ -24,7 +27,14 @@ function Hero() {
               Elevate your style
             </h1>
             {/* <p className="text-base mb-8">Elevate your style with our premium products</p> */}
-            <button className="relative text-white cursor-pointer px-8 py-3 rounded-full group overflow-hidden">
+            <button
+              onClick={() =>
+                router.push({
+                  pathname: "/products",
+                })
+              }
+              className="relative text-white cursor-pointer px-8 py-3 rounded-full group overflow-hidden"
+            >
               <span className="relative inline-block text-lg">
                 Discover
                 <span

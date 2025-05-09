@@ -77,7 +77,7 @@ const Footer = () => {
             </div>
 
             {/* Email Sign‑up */}
-            <div className="flex flex-col gap-4 font-gilroy w-full md:w-1/3">
+            <div        onClick={handleEmailClick} className="flex flex-col gap-4 font-gilroy w-full md:w-1/3">
               <h6 className="text-base pb-5 uppercase font-normal text-neutral-500">
                 Email Sign‑up
               </h6>
@@ -86,7 +86,7 @@ const Footer = () => {
               </p>
               <button
                 onClick={handleEmailClick}
-                className="text-sm hover-effect w-fit"
+                className="text-sm hover-effect w-fit cursor-pointer"
               >
                 lacheenco@gmail.com
               </button>

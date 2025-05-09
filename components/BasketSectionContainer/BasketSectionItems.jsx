@@ -53,7 +53,7 @@ function BasketSectionItems() {
                 alt="Product Image"
                 width={300}
                 height={300}
-                className="w-full sm:w-40 md:w-52 h-32 md:h-48 object-cover object-bottom"
+                className="w-full sm:w-40 md:w-52 h-[350px] md:h-48 object-cover object-bottom"
                 onClick={() => openModal("/images/12.jpg")}
               />
             </div>
