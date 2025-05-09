@@ -160,13 +160,13 @@ function Information() {
   };
 
   return (
-    <div className="bg-white font-gilroy mt-5 dark:bg-gray-800 rounded-xl py-10 px-6 sm:px-10 flex flex-col items-center w-full max-w-[90%] mx-auto">
+    <div className="bg-white font-gilroy mt-5  rounded-xl py-10 px-6 sm:px-10 flex flex-col items-center w-full max-w-[90%] mx-auto">
       <div className="flex flex-col gap-1 lg:w-3/5 w-full">
         {/* Product Name */}
         <div className="flex flex-col gap-4 w-full">
           <div className="w-full">
             <p className="text-xl text-gray-500 mb-1">Product Name</p>
-            <div className="group flex dark:bg-gray-800 py-3 px-4 items-center border border-gray-400 rounded-lg w-full bg-gray-100 hover:bg-gray-200">
+            <div className="group flex  py-3 px-4 items-center border border-gray-400 rounded-lg w-full bg-gray-100 hover:bg-gray-200">
               <AiOutlineProduct className="text-gray-500 mr-3 group-hover:text-gray-800" />
               <textarea
                 placeholder="Enter product name"
@@ -182,7 +182,7 @@ function Information() {
           <div className="w-full relative" ref={categoryRef}>
             <p className="text-xl text-gray-500 mb-1">Category</p>
             <div
-              className="w-full border dark:bg-gray-800 font-medium border-gray-400 rounded-md py-3 px-4 flex items-center bg-gray-100 cursor-pointer"
+              className="w-full border  font-medium border-gray-400 rounded-md py-3 px-4 flex items-center bg-gray-100 cursor-pointer"
               onClick={() => setCategoryOpen(!categoryOpen)}
             >
               {category ? (

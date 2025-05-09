@@ -8,7 +8,6 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../locales/i18n";
 
 import Spinner from "@/components/Spinner";
-
 export default function App({ Component, pageProps }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);

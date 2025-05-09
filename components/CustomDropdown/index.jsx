@@ -86,7 +86,7 @@ const CustomDropdown = ({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="group flex dark:bg-gray-800 py-3 px-4 items-center border border-gray-400 rounded-lg w-full bg-gray-100 hover:bg-gray-200"
+        className="group flex py-3 px-4 items-center border border-gray-400 rounded-lg w-full bg-gray-100 hover:bg-gray-200"
       >
         {displayValue}
       </button>
@@ -112,7 +112,7 @@ const CustomDropdown = ({
             <ul>
               <li
                 onClick={() => setIsAdding(true)}
-                className="px-3 py-2 hover:bg-gray-200 rounded-lg dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                className="px-3 py-2 hover:bg-gray-200 rounded-lg  cursor-pointer transition-colors"
               >
                 {addNewLabel}
               </li>
@@ -120,7 +120,7 @@ const CustomDropdown = ({
               {multiSelect && (
                 <li
                   onClick={() => handleSelect("select-all")}
-                  className="px-3 py-2 hover:bg-gray-200 rounded-lg dark:hover:bg-gray-600 cursor-pointer flex justify-between items-center"
+                  className="px-3 py-2 hover:bg-gray-200 rounded-lg  cursor-pointer flex justify-between items-center"
                 >
                   <span>Select All</span>
                   {selected.length === options.length && options.length > 0 && (
@@ -132,7 +132,7 @@ const CustomDropdown = ({
                 <li
                   key={index}
                   onClick={() => handleSelect(option)}
-                  className="px-3 py-2 hover:bg-gray-200 rounded-lg dark:hover:bg-gray-600 cursor-pointer flex justify-between items-center"
+                  className="px-3 py-2 hover:bg-gray-200 rounded-lg  cursor-pointer flex justify-between items-center"
                 >
                   <span>{option}</span>
                   {(!multiSelect && selected === option) ||

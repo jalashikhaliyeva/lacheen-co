@@ -1,9 +1,36 @@
-import React from 'react'
+import Header from "@/components/Header";
+import NavList from "@/components/NavList";
+import { useState } from "react";
+import Footer from "@/components/Footer";
+import ProductsListHeader from "@/components/ProductsList/ProductsListHeader";
+import ProductList from "@/components/ProductsList";
+import ProductDetailed from "@/components/ProductDetailed";
+import Container from "@/components/Container";
 
-function ProductDetailed() {
+export default function Products() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [layout, setLayout] = useState("grid2");
   return (
-    <div>ProductDetailed</div>
-  )
-}
+    <div className="relative">
+      <div
+        className={`fixed inset-0 bg-black z-40 transition-opacity duration-300 ease-in-out ${
+          isMenuOpen
+            ? "opacity-45 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+        style={{ top: "100px" }}
+      />
 
-export default ProductDetailed
+      <main>
+        <Header />
+        <NavList onMenuToggle={setIsMenuOpen} />
+
+        <Container>
+          <ProductDetailed />
+        </Container>
+
+        <Footer />
+      </main>
+    </div>
+  );
+}

@@ -3,7 +3,7 @@ import ProductCardSingle from "../ProductCardSingle";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
 
-function ProductList({ layout }) {
+function FavoriteProducts({ layout }) {
   const [wishlist, setWishlist] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [toastProduct, setToastProduct] = useState(null);
@@ -209,7 +209,7 @@ function ProductList({ layout }) {
       case "grid3":
         return "h-[140px] md:h-[300px] lg:h-[300px]";
       default:
-        return "h-[400px] md:h-[400px] lg:h-[450px]";
+        return "h-[230px] md:h-[400px] lg:h-[450px]";
     }
   };
   const closeToast = () => {
@@ -288,4 +288,4 @@ function ProductList({ layout }) {
   );
 }
 
-export default ProductList;
+export default FavoriteProducts;

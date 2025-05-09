@@ -19,7 +19,8 @@ const locations = [
 const mapStyles = {
   positron: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
   voyager: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
-  darkMatter: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+  darkMatter:
+    "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
 };
 
 const CustomMap = () => {
@@ -74,9 +75,13 @@ const CustomMap = () => {
           }
 
           // Create popup
-          const popup = new maplibregl.Popup({ closeButton: true, offset: [0, -20] })
+          const popup = new maplibregl.Popup({
+            closeButton: true,
+            offset: [0, -20],
+          })
             .setLngLat(location.position)
-            .setHTML(`
+            .setHTML(
+              `
               <div style="font-family: sans-serif; padding: 4px;">
                 <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 4px; color: #333;">
                   ${location.name}
@@ -85,9 +90,10 @@ const CustomMap = () => {
                   ${location.address}
                 </p>
               </div>
-            `)
+            `
+            )
             .addTo(map.current);
-          
+
           popupRef.current = popup;
           setSelectedLocation(location);
         });

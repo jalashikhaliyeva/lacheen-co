@@ -158,7 +158,7 @@ function NavList({ onMenuToggle }) {
               onMouseEnter={() => handleMenuEnter(item.id)}
             >
               <p
-                className={`font-gilroy font-[400] text-xs  md:text-base uppercase cursor-pointer transition-all duration-200 ${
+                className={`font-gilroy font-[400] text-xs text-neutral-800  md:text-base uppercase cursor-pointer transition-all duration-200 ${
                   item.isHighlighted ? "text-pink-800" : ""
                 } ${
                   activeMenu === item.id
@@ -214,7 +214,7 @@ function NavList({ onMenuToggle }) {
                   contentVisible ? "opacity-100 ease-out" : "opacity-0 ease-in"
                 }`}
               >
-                <h3 className="font-gilroy font-bold text-2xl mb-4">
+                <h3 className="font-gilroy text-neutral-800 font-bold text-2xl mb-4">
                   {menuItems.find((item) => item.id === displayedMenu)?.label}
                 </h3>
                 <p className="font-gilroy text-gray-700 mb-6">
@@ -237,7 +237,7 @@ function NavList({ onMenuToggle }) {
                   contentVisible ? "opacity-100" : "opacity-0"
                 }`}
               >
-                <h4 className="font-gilroy font-bold text-lg mb-4">
+                <h4 className="font-gilroy text-neutral-800 font-bold text-lg mb-4">
                   Featured Items
                 </h4>
                 <div className="grid grid-cols-2 gap-4">

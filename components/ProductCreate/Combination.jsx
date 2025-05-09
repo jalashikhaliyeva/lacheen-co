@@ -82,13 +82,13 @@ const CustomDropdown = ({
 
   return (
     <div className="relative w-full font-gilroy" ref={dropdownRef}>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="group flex dark:bg-gray-800 py-3 px-4 items-center border border-gray-400 rounded-lg w-full bg-gray-100 hover:bg-gray-200"
+        className="group flex  py-3 px-4 items-center border border-gray-400 rounded-lg w-full bg-gray-100 hover:bg-gray-200"
       >
         {displayValue}
       </button>
@@ -114,13 +114,13 @@ const CustomDropdown = ({
             <ul>
               <li
                 onClick={() => setIsAdding(true)}
-                className="px-3 py-2 hover:bg-gray-200 rounded-lg dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                className="px-3 py-2 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors"
               >
                 {addNewLabel}
               </li>
               <li
                 onClick={() => handleSelect("select-all")}
-                className="px-3 py-2 hover:bg-gray-200 rounded-lg dark:hover:bg-gray-600 cursor-pointer flex justify-between items-center"
+                className="px-3 py-2 hover:bg-gray-200 rounded-lg  cursor-pointer flex justify-between items-center"
               >
                 <span>Select All</span>
                 {selected.length === options.length && options.length > 0 && (
@@ -131,7 +131,7 @@ const CustomDropdown = ({
                 <li
                   key={index}
                   onClick={() => handleSelect(option)}
-                  className="px-3 py-2 hover:bg-gray-200 rounded-lg dark:hover:bg-gray-600 cursor-pointer flex justify-between items-center"
+                  className="px-3 py-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between items-center"
                 >
                   <span>{option}</span>
                   {selected.includes(option) && <span>✓</span>}
@@ -211,7 +211,7 @@ const InlineMultipleImagePicker = ({ images, onChange }) => {
         ))}
         <div
           onClick={handleImageClick}
-          className="w-20 h-20 border rounded flex items-center justify-center cursor-pointer bg-gray-50 dark:bg-gray-600"
+          className="w-20 h-20 border rounded flex items-center justify-center cursor-pointer bg-gray-50 "
         >
           <span className="text-xs text-gray-500">Add Image</span>
         </div>
@@ -249,7 +249,7 @@ const VariantTable = ({ variants, setVariants }) => {
   return (
     <div className="overflow-x-auto mt-5 w-full font-gilroy rounded-2xl border">
       <table className="min-w-full bg-white rounded-2xl">
-        <thead className="bg-gray-100 dark:bg-gray-700">
+        <thead className="bg-gray-100 ">
           <tr>
             <th className="px-4 py-2 border">Images</th>
             <th className="px-4 py-2 border">Color</th>
@@ -432,7 +432,7 @@ function Combination() {
 
   return (
     <>
-      <div className="bg-white font-gilroy mt-5 dark:bg-gray-800 rounded-xl py-10 px-6 sm:px-10 flex flex-col items-center w-full max-w-[90%] mx-auto">
+      <div className="bg-white font-gilroy mt-5  rounded-xl py-10 px-6 sm:px-10 flex flex-col items-center w-full max-w-[90%] mx-auto">
         <div className="w-full lg:w-3/5 mb-4">
           <CustomDropdown
             label="Select Color:"
