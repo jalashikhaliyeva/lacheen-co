@@ -9,10 +9,10 @@ import VideoSection from "@/components/VideoSection";
 import VideoandImage from "@/components/VideoandImage";
 import TrendingNow from "@/components/TrendingNow";
 import Footer from "@/components/Footer";
-import { useAuth } from "@/shared/context/AuthContext";
+import { useAuthClient } from "@/shared/context/AuthContext";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user } = useAuthClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (

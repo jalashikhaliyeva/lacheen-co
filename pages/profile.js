@@ -3,10 +3,10 @@ import Header from "@/components/Header";
 import NavList from "@/components/NavList";
 import ProfileInformation from "@/components/ProfileInformation";
 import Footer from "@/components/Footer";
-import { useAuth } from "@/shared/context/AuthContext";
+import { useAuthClient } from "@/shared/context/AuthContext";
 
 export default function Profile() {
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading } = useAuthClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // mock data for the demo; replace with real fetch later

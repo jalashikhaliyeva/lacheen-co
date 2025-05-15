@@ -13,10 +13,10 @@ import { IoMenuOutline } from "react-icons/io5";
 import LanguageSwitcher from "../LanguageSwitcher";
 import MobileMenu from "./MobileMenu";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@/shared/context/AuthContext";
+import { useAuthClient } from "@/shared/context/AuthContext";
 
 function Header() {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuthClient();
   const { t } = useTranslation();
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
