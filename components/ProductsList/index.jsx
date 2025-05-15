@@ -3,7 +3,7 @@ import ProductCardSingle from "../ProductCardSingle";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
-import Toast from "../Toast";
+import Toast from "@/components/Toast";
 
 function ProductList({ layout }) {
   const { t } = useTranslation();

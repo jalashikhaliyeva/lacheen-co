@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ProductCardSingle from "../ProductCardSingle";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
-import Toast from "../Toast";
+import Toast from "@/components/Toast";
 import { useTranslation } from "react-i18next";
 
 function FavoriteProducts({ layout }) {
