@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 
@@ -6,11 +7,12 @@ const FilterComponent = ({ onClose }) => {
   const [openSection, setOpenSection] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isMounted, setIsMounted] = useState(true);
+  const { t } = useTranslation();
   const [selectedFilters, setSelectedFilters] = useState({
     color: [],
     size: [],
     price: [],
-    brand: [],
+    category: [],
   });
 
   // Handle animation sequence on mount
@@ -33,7 +35,7 @@ const FilterComponent = ({ onClose }) => {
     color: ["Red", "Yellow", "Blue", "Green", "Black", "White"],
     size: ["S", "M", "L", "XL", "XXL"],
     price: ["Under $50", "$50-$100", "$100-$200", "Over $200"],
-    brand: ["Nike", "Adidas", "Puma", "Reebok", "New Balance"],
+    category: ["Nike", "Adidas", "Puma", "Reebok", "New Balance"],
   };
 
   const toggleSection = (section) =>
@@ -50,16 +52,16 @@ const FilterComponent = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Overlay with fade transition */}
-      <div 
+      <div
         className={`absolute inset-0 bg-black transition-opacity duration-300 ease-in-out ${
           isVisible ? "opacity-50" : "opacity-0"
-        }`} 
+        }`}
         onClick={handleClose}
       />
 
       {/* Panel with slide-in transition */}
       <div className="absolute inset-y-0 right-0 flex max-w-full pl-10 font-gilroy">
-        <div 
+        <div
           className={`relative w-screen max-w-md transform transition-all duration-300 ease-in-out ${
             isVisible ? "translate-x-0" : "translate-x-full"
           }`}
@@ -88,7 +90,7 @@ const FilterComponent = ({ onClose }) => {
                   >
                     <div>
                       <h3 className="capitalize text-md text-gray-900">
-                        {section}
+                        {t(section)}
                       </h3>
                       {selectedFilters[section].length > 0 && (
                         <p className="mt-1 text-xs text-gray-500">
@@ -143,7 +145,7 @@ const FilterComponent = ({ onClose }) => {
                 onClick={handleClose}
                 className="bg-neutral-800 px-4 py-2 text-sm text-white hover:bg-neutral-600 transition-colors duration-200"
               >
-                Apply filters
+                {t("apply_filters")}
               </button>
               <button
                 onClick={() =>
@@ -151,12 +153,12 @@ const FilterComponent = ({ onClose }) => {
                     color: [],
                     size: [],
                     price: [],
-                    brand: [],
+                    category: [],
                   })
                 }
                 className="border border-neutral-800 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors duration-200"
               >
-                Clear all
+                {t("clear_all")}
               </button>
             </div>
           </div>

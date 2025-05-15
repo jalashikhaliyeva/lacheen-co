@@ -8,6 +8,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../locales/i18n";
 
 import Spinner from "@/components/Spinner";
+import { AuthProvider } from "@/shared/context/AuthContext";
 export default function App({ Component, pageProps }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -38,10 +39,12 @@ export default function App({ Component, pageProps }) {
     <>
       {loading && <Spinner />}
       <I18nextProvider i18n={i18n}>
-        <ProductProvider>
-          <Component {...pageProps} />
-          <ToastContainer />
-        </ProductProvider>
+        <AuthProvider>
+          <ProductProvider>
+            <Component {...pageProps} />
+            <ToastContainer />
+          </ProductProvider>
+        </AuthProvider>
       </I18nextProvider>
     </>
   );

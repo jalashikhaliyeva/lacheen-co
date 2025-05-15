@@ -5,8 +5,10 @@ import Image from "next/image";
 import { IoClose } from "react-icons/io5";
 import { AnimatePresence, motion } from "framer-motion";
 import TrendingInitSearch from "../TrendingInitSearch";
+import { useTranslation } from "react-i18next";
 
 export default function SearchModal({ isOpen, onClose }) {
+  const { t } = useTranslation();
   // State to ensure code runs only on client (prevent SSR mismatch)
   const [mounted, setMounted] = useState(false);
   // Controlled input value for search query
@@ -59,7 +61,6 @@ export default function SearchModal({ isOpen, onClose }) {
             transition={{ type: "spring", stiffness: 300, damping: 40 }}
             onClick={onClose}
           >
-           
             <div
               onClick={(e) => e.stopPropagation()}
               className="
@@ -75,7 +76,6 @@ export default function SearchModal({ isOpen, onClose }) {
                    -webkit-overflow-scrolling-touch 
                  "
             >
-
               <button
                 onClick={onClose}
                 className="absolute top-4 cursor-pointer right-4 text-2xl z-10"
@@ -102,7 +102,7 @@ export default function SearchModal({ isOpen, onClose }) {
               <div className="flex flex-col items-center h-full px-6">
                 {/* Heading text */}
                 <h2 className="text-2xl md:text-4xl font-gilroy my-8">
-                  What are you looking for?
+                  {t("what_are_you_looking_for")}
                 </h2>
                 {/* Search input container */}
                 <div className="w-full relative max-w-4xl">
@@ -131,7 +131,7 @@ export default function SearchModal({ isOpen, onClose }) {
 
                 {/* Trending searches list */}
                 <div className="flex flex-row gap-4 mt-4 font-gilroy text-sm">
-                  <h2 className="uppercase">trending searches :</h2>
+                  <h2 className="uppercase"> {t("trending_searches")}:</h2>
                   {["Sneakers", "Flats", "Sandals"].map((term) => (
                     <button
                       key={term}

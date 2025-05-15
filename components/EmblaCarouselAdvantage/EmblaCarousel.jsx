@@ -8,6 +8,7 @@ import Container from "../Container";
 import { GoArrowLeft, GoArrowRight } from "react-icons/go";
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
+import { useTranslation } from "react-i18next";
 const slides = [
   {
     id: 1,
@@ -52,6 +53,7 @@ const slides = [
 ];
 
 const SliderEmbla = () => {
+  const { t } = useTranslation();
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     containScroll: "trimSnaps",
@@ -102,7 +104,9 @@ const SliderEmbla = () => {
     <div className={`mt-4 md:mt-10 ${styles.embla}`}>
       <Container>
         <div className="flex justify-between w-full">
-          <h1 className="pb-3 font-gilroy text-xl md:text-2xl">Must-Haves</h1>
+          <h1 className="pb-3 font-gilroy text-xl md:text-2xl">
+            {t("must_haves")}
+          </h1>
           <div className="flex items-center  gap-3">
             {prevBtnEnabled && (
               <BsArrowLeft

@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import NavList from "@/components/NavList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Hero from "@/components/Hero";
 import CategorySection from "@/components/CategorySection";
 import Citate from "@/components/Citate";
@@ -9,8 +9,10 @@ import VideoSection from "@/components/VideoSection";
 import VideoandImage from "@/components/VideoandImage";
 import TrendingNow from "@/components/TrendingNow";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/shared/context/AuthContext";
 
 export default function Home() {
+  const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -31,7 +33,6 @@ export default function Home() {
         <CategorySection />
         <Citate />
         <SliderEmbla />
-        {/* <VideoSection /> */}
         <VideoandImage />
         <TrendingNow />
         <Footer />

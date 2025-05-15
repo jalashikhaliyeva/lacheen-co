@@ -1,8 +1,10 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 function Hero() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -24,7 +26,7 @@ function Hero() {
         <div className="absolute inset-0 flex items-end justify-center p-4 text-center">
           <div className="max-w-2xl text-white font-gilroy text-center">
             <h1 className="text-2xl md:text-3xl text-center font-normal mb-2">
-              Elevate your style
+              {t("elevate_your_style")}
             </h1>
             {/* <p className="text-base mb-8">Elevate your style with our premium products</p> */}
             <button
@@ -36,7 +38,7 @@ function Hero() {
               className="relative text-white cursor-pointer px-8 py-3 rounded-full group overflow-hidden"
             >
               <span className="relative inline-block text-lg">
-                Discover
+                {t("discover")}
                 <span
                   className="
         absolute left-1/2 bottom-0

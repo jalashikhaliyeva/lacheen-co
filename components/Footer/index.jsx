@@ -1,8 +1,11 @@
 import React from "react";
 import Container from "../Container";
 import Image from "next/image";
+import { useTranslation } from "react-i18next";
+import { CiInstagram, CiMail } from "react-icons/ci";
 
 const Footer = () => {
+  const { t } = useTranslation();
   const handlePhoneClick = (phoneNumber) => {
     window.open(`tel:${phoneNumber}`);
   };
@@ -30,11 +33,9 @@ const Footer = () => {
             {/* Help */}
             <div className="flex flex-col gap-4 font-gilroy w-full md:w-1/3">
               <h6 className="text-base pb-5 uppercase font-normal text-neutral-500">
-                Help
+                {t("help")}
               </h6>
-              <p className="text-sm">
-                You can write to us via WhatsApp or call us at the number below.
-              </p>
+              <p className="text-sm">{t("contact_text")}</p>
               <button
                 onClick={() => handlePhoneClick("+994517777285")}
                 className="text-sm hover-effect w-fit"
@@ -47,13 +48,24 @@ const Footer = () => {
               >
                 +994 51 777 72 85
               </button>
-              <p className="text-sm">Follow us on Instagram</p>
+              <div
+                className="text-sm flex  flex-row text-neutral-800 gap-2 items-center cursor-pointer"
+                onClick={() =>
+                  window.open(
+                    "https://www.instagram.com/lacheen.co?igsh=MWgzbnp4am56NHhnYg==",
+                    "_blank"
+                  )
+                }
+              >
+                <CiInstagram className="text-2xl" />
+                {t("follow_us")}
+              </div>
             </div>
 
             {/* Stores */}
             <div className="flex flex-col gap-4 font-gilroy w-full md:w-1/3">
               <h6 className="text-base pb-5 uppercase font-normal text-neutral-500">
-                Stores
+                {t("stores")}
               </h6>
               <button
                 onClick={() =>
@@ -77,16 +89,17 @@ const Footer = () => {
             </div>
 
             {/* Email Sign‑up */}
-            <div        onClick={handleEmailClick} className="flex flex-col gap-4 font-gilroy w-full md:w-1/3">
+            <div
+              onClick={handleEmailClick}
+              className="flex flex-col gap-4 font-gilroy w-full md:w-1/3"
+            >
               <h6 className="text-base pb-5 uppercase font-normal text-neutral-500">
-                Email Sign‑up
+                {t("email_signup")}
               </h6>
-              <p className="text-sm">
-                Sign up for Lacheen emails and receive the latest news from us.
-              </p>
+              <p className="text-sm">{t("newsletter_text")}</p>
               <button
                 onClick={handleEmailClick}
-                className="text-sm hover-effect w-fit cursor-pointer"
+                className="text-sm items-center gap-1 hover-effect w-fit cursor-pointer"
               >
                 lacheenco@gmail.com
               </button>
@@ -99,13 +112,12 @@ const Footer = () => {
       <div className="pt-8 w-full font-gilroy">
         {/* links: wrap on small, horizontal on sm+ */}
         <div className="flex flex-col sm:flex-row justify-center items-center gap-5 mb-5">
-          <p className="text-sm">Sitemap</p>
-          <p className="text-sm">All rights reserved</p>
-          <p className="text-sm">Terms of Use</p>
-          <p className="text-sm">Privacy Policy</p>
+          <p className="text-sm"> {t("sitemap")}</p>
+          <p className="text-sm"> {t("all_rights_reserved")}</p>
+          <p className="text-sm">{t("terms_of_use")}</p>
+          <p className="text-sm">{t("privacy_policy")}</p>
         </div>
-
-        {/* logo centered */}
+         {/* logo centered */}
         <div className="flex justify-center py-10">
           <Image
             src={"/images/logo/lacheen-logo.png"}

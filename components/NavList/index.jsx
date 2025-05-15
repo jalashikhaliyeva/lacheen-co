@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import Container from "../Container";
+import { useTranslation } from "react-i18next";
 
 function NavList({ onMenuToggle }) {
+  const { t } = useTranslation();
   const [activeMenu, setActiveMenu] = useState(null);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isMenuMounted, setIsMenuMounted] = useState(false);
@@ -11,12 +13,12 @@ function NavList({ onMenuToggle }) {
   const timeoutRef = useRef(null);
   const contentTimeoutRef = useRef(null);
   const menuItems = [
-    { id: "new", label: "New" },
-    { id: "special", label: "Special Prices", isHighlighted: true },
-    { id: "viewAll", label: "View all" },
-    { id: "sandals", label: "Sandals" },
-    { id: "sneakers", label: "Sneakers" },
-    { id: "flats", label: "Flats" },
+    { id: "new", label: t("nav.new") },
+    { id: "special", label: t("nav.special_prices"), isHighlighted: true },
+    { id: "viewAll", label: t("nav.view_all") },
+    { id: "sandals", label: t("categories.sandals") },
+    { id: "sneakers", label: t("categories.sneakers") },
+    { id: "flats", label: t("categories.flats") },
   ];
 
   const subMenuData = {
@@ -148,7 +150,10 @@ function NavList({ onMenuToggle }) {
   }, []);
 
   return (
-    <div className="hidden md:block bg-white relative z-50" onMouseLeave={handleMenuLeave}>
+    <div
+      className="hidden md:block bg-white relative z-50"
+      onMouseLeave={handleMenuLeave}
+    >
       <Container>
         <div className="flex overflow-hidden gap-7 justify-center items-center pb-4">
           {menuItems.map((item) => (
@@ -238,7 +243,7 @@ function NavList({ onMenuToggle }) {
                 }`}
               >
                 <h4 className="font-gilroy text-neutral-800 font-bold text-lg mb-4">
-                  Featured Items
+               {t("featured-section.title")}
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   {subMenuData[displayedMenu]?.images.map((image, idx) => (

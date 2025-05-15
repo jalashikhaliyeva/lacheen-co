@@ -30,9 +30,7 @@ export default function Login() {
       <main>
         <Header />
         <NavList onMenuToggle={setIsMenuOpen} />
-
         <LoginForm />
-
         <Footer />
       </main>
     </div>

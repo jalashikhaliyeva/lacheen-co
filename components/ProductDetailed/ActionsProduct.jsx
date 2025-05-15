@@ -1,4 +1,6 @@
+import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   LiaCheckSolid,
   LiaChevronDownSolid,
@@ -7,7 +9,15 @@ import {
 import { PiChatsThin, PiHeart } from "react-icons/pi";
 
 function ActionsProduct() {
+  const { t } = useTranslation();
   const [showDetails, setShowDetails] = useState(false);
+  const router = useRouter();
+  const itemPath = router.asPath; // e.g. "/products/42"
+  const phoneNumber = "994517777285";
+  const message = `Salam, mən ${itemPath} məhsul ilə maraqlanıram`;
+  const waLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+    message
+  )}`;
 
   const toggleDetails = () => {
     setShowDetails(!showDetails);
@@ -41,7 +51,7 @@ function ActionsProduct() {
 
       <div className="hidden md:flex w-full bg-amber-50 font-gilroy text-center items-center justify-center">
         <p className="text-sm text-neutral-600 py-1 px-3 text-center">
-          Large size - Choose one size smaller
+          {t("size_advice")}
         </p>
       </div>
 
@@ -52,9 +62,9 @@ function ActionsProduct() {
         <p className="p-2 hover:bg-neutral-100 transition-colors duration-100">
           37
         </p>
-        <div className="flex justify-between items-center hover:bg-neutral-100 transition-colors duration-10">
+        <div className="flex cursor-not-allowed justify-between items-center hover:bg-neutral-100 transition-colors duration-10">
           <p className="p-2 text-neutral-300 0">38</p>
-          <p className="text-xs">Out of Stock</p>
+          <p className="text-xs">{t("out_of_stock")}</p>
         </div>
 
         <p className="p-2 hover:bg-neutral-100 transition-colors duration-100">
@@ -94,9 +104,9 @@ function ActionsProduct() {
             <p className="p-2 hover:bg-neutral-100 transition-colors duration-100">
               37
             </p>
-            <div className="flex justify-between items-center hover:bg-neutral-100 transition-colors duration-10">
+            <div className="flex cursor-not-allowed justify-between items-center hover:bg-neutral-100 transition-colors duration-10">
               <p className="p-2 text-neutral-300 0">38</p>
-              <p className="text-xs">Out of Stock</p>
+              <p className="text-xs"> {t("out_of_stock")}</p>
             </div>
 
             <p className="p-2 hover:bg-neutral-100 transition-colors duration-100">
@@ -122,22 +132,29 @@ function ActionsProduct() {
             hover:border-neutral-900
             active:scale-95"
           >
-            Add to cart
+            {t("add_to_cart")}
           </button>
         </div>
-        <div className=" py-2 px-2 border border-black bg-black text-center">
+        <div className="cursor-pointer py-2 px-2 border border-black bg-black text-center">
           <PiHeart className="text-2xl text-white" />
         </div>
       </div>
 
       <div className="hidden md:flex mt-4 md:mt-5 flex-col gap-2 text-sm md:text-base">
-        <div className="flex flex-row gap-2 items-center">
-          <PiChatsThin size={26} />
-          <p>WhatsApp link to check stock availability from the store</p>
-        </div>
+        <a
+          href={waLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cursor-pointer"
+        >
+          <div className="flex flex-row gap-2 items-center">
+            <PiChatsThin size={26} />
+            <p>{t("whatsapp_stock_check")}</p>
+          </div>
+        </a>
         <div className="flex flex-row gap-2 items-center">
           <LiaCheckSolid size={18} />
-          <p>Free shipping for orders over 900 TL</p>
+          <p> 100 AZN {t("free_shipping_threshold")} </p>
         </div>
       </div>
     </div>

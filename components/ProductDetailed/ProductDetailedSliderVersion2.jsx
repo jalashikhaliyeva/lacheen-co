@@ -108,10 +108,10 @@ const ProductDetailedSliderVersion2 = () => {
             <div
               key={i}
               className="relative min-w-full flex items-center justify-center h-full"
-              onClick={() => {
-                setModalStartIndex(i);
-                setIsModalOpen(true);
-              }}
+              // onClick={() => {
+              //   setModalStartIndex(i);
+              //   setIsModalOpen(true);
+              // }}
             >
               <Image
                 src={src}
@@ -119,10 +119,10 @@ const ProductDetailedSliderVersion2 = () => {
                 width={500}
                 height={600}
                 className="object-contain pointer-events-none"
-                onClick={() => {
-                  setModalStartIndex(i);
-                  setIsModalOpen(true);
-                }}
+                // onClick={() => {
+                //   setModalStartIndex(i);
+                //   setIsModalOpen(true);
+                // }}
               />
             </div>
           ))}

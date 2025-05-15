@@ -1,8 +1,6 @@
 import React from "react";
 import ActionsProduct from "./ActionsProduct";
-
 import ProductDetailedSliderVersion2 from "./ProductDetailedSliderVersion2";
-import ProductDetailedSlider from "./ProductDetailedSlider";
 import ProductDetailedSliderVersion3 from "./ProductDetailedSliderVersion3";
 import SliderEmbla from "../EmblaCarouselAdvantage/EmblaCarousel";
 import Container from "../Container";
@@ -30,39 +28,33 @@ function ProductDetailed() {
       "Foldable design",
     ],
   };
+
   return (
     <>
       <Container>
-        <div className="w-full flex flex-col md:flex-row gap-3">
+        <div className="w-full flex flex-col md:flex-row gap-3 relative">
+          {/* Left column - scrollable content */}
           <div className="w-full md:w-[70%]">
-            {/* version 1  */}
-            {/* <ProductDetailedSlider images={product.images} /> */}
-            {/* _______________ */}
-            {/* version 2  */}
-            {/* <ProductDetailedSliderVersion2 images={product.images} /> */}
-
-            {/* _______________ */}
-            {/* version 3 */}
             <div className="block md:hidden">
               <ProductDetailedSliderVersion2 images={product.images} />
             </div>
-
             <div className="hidden md:block">
               <ProductDetailedSliderVersion3 images={product.images} />
             </div>
-
-            {/* _______________ */}
           </div>
 
+          {/* Right column - fixed sidebar */}
           <div className="w-full md:w-[30%]">
-            <ActionsProduct />
+            <div className="md:sticky md:top-4">
+              {" "}
+              {/* Added sticky positioning */}
+              <ActionsProduct />
+            </div>
           </div>
         </div>
       </Container>
 
-      <>
-        <SliderEmbla />
-      </>
+      <SliderEmbla />
     </>
   );
 }

@@ -32,6 +32,7 @@
     "popover": "^2.4.1",
     "react": "^19.0.0",
     "react-calendar": "^5.1.0",
+    "react-datepicker": "^8.3.0",
     "react-day-picker": "^9.6.7",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",

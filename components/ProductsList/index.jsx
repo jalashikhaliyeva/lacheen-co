@@ -2,17 +2,27 @@ import React, { useState, useEffect, useRef } from "react";
 import ProductCardSingle from "../ProductCardSingle";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
+import { useTranslation } from "react-i18next";
+import Toast from "../Toast";
 
 function ProductList({ layout }) {
+  const { t } = useTranslation();
   const [wishlist, setWishlist] = useState([]);
-  const [showToast, setShowToast] = useState(false);
-  const [toastProduct, setToastProduct] = useState(null);
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const loaderRef = useRef(null);
   const ITEMS_PER_PAGE = 8;
+  const [showToast, setShowToast] = useState(false);
+  const [toastProduct, setToastProduct] = useState(null);
 
+  const closeToast = () => setShowToast(false);
+
+  const toggleWishlist = (product) => {
+
+    setToastProduct(product);
+    setShowToast(true);
+  };
   const products = [
     {
       id: 1,
@@ -166,16 +176,7 @@ function ProductList({ layout }) {
       setLoading(false);
     }, 800);
   };
-  const toggleWishlist = (product) => {
-    if (wishlist.some((item) => item.id === product.id)) {
-      setWishlist(wishlist.filter((item) => item.id !== product.id));
-    } else {
-      setWishlist([...wishlist, product]);
-      setToastProduct(product);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 5000);
-    }
-  };
+
   const getGridClasses = () => {
     switch (layout) {
       case "full":
@@ -212,54 +213,18 @@ function ProductList({ layout }) {
         return "h-[400px] md:h-[400px] lg:h-[450px]";
     }
   };
-  const closeToast = () => {
-    setShowToast(false);
-  };
+
   return (
     <>
-      {showToast && toastProduct && (
-        <div className="fixed top-4 left-0 right-0 flex justify-center z-50">
-          <div
-            className={`bg-white shadow-lg rounded-md h-[120px] flex items-center mx-4 border border-gray-200 w-full max-w-2xl ${
-              showToast ? "animate-slide-down" : "animate-slide-up"
-            }`}
-            onAnimationEnd={() => {
-              if (!showToast) {
-                setToastProduct(null);
-              }
-            }}
-          >
-            {/* Product Image */}
-            <div className="h-full w-[120px] relative">
-              <Image
-                src={toastProduct.images[0]}
-                alt={toastProduct.name}
-                fill
-                className="object-cover object-bottom rounded-l-md"
-                sizes="120px"
-              />
-            </div>
+      <Toast
+        show={showToast}
+        onClose={closeToast}
+        product={toastProduct}
+        message={t("wishlist.added")}
+      linkText={t("wishlist.access")}
+        linkHref="/wishlist"
+      />
 
-            <div className="flex-1 p-6 flex flex-col justify-center">
-              <p className="font-gilroy text-sm md:text-lg mb-2">
-                The item has been added to your wishlist!
-              </p>
-              <p className="font-gilroy cursor-pointer text-xs md:text-sm text-neutral-700">
-                Access your{" "}
-                <span className="underline underline-offset-4">wishlist</span>
-              </p>
-            </div>
-
-            <button
-              onClick={closeToast}
-              className="absolute right-4 top-4 p-1 rounded-full cursor-pointer"
-              aria-label="Close notification"
-            >
-              <IoClose className="text-gray-600 text-xl" />
-            </button>
-          </div>
-        </div>
-      )}
       <div
         className={`mb-10 grid ${getGridClasses()} gap-1 w-full pt-8 px-4 md:px-20`}
       >

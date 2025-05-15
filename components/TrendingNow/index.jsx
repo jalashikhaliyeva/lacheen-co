@@ -9,11 +9,13 @@ import { PiHeartLight } from "react-icons/pi";
 import { PiHeart } from "react-icons/pi";
 import { PiHeartFill } from "react-icons/pi";
 import ProductCard from "../ProductCard";
+import { useTranslation } from "react-i18next";
+import Toast from "../Toast";
 function TrendingNow() {
   const [wishlist, setWishlist] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [toastProduct, setToastProduct] = useState(null);
-
+  const { t } = useTranslation();
   const products = [
     {
       id: 1,
@@ -59,54 +61,20 @@ function TrendingNow() {
   return (
     <Container>
       {/* Toast Notification */}
-      {showToast && toastProduct && (
-        <div className="fixed top-4 left-0 right-0 flex justify-center z-50">
-          <div
-            className={`bg-white shadow-lg rounded-md h-[120px] flex items-center mx-4 border border-gray-200 w-full max-w-2xl ${
-              showToast ? "animate-slide-down" : "animate-slide-up"
-            }`}
-            onAnimationEnd={() => {
-              if (!showToast) {
-                setToastProduct(null);
-              }
-            }}
-          >
-            {/* Product Image */}
-            <div className="h-full w-[120px] relative">
-              <Image
-                src={toastProduct.images[0]}
-                alt={toastProduct.name}
-                fill
-                className="object-cover object-bottom rounded-l-md"
-              />
-            </div>
-
-            {/* Text Content */}
-            <div className="flex-1 p-6 flex flex-col justify-center">
-              <p className="font-gilroy text-lg mb-2">
-                The item has been added to your wishlist!
-              </p>
-              <p className="font-gilroy cursor-pointer text-sm text-neutral-700">
-                Access your{" "}
-                <span className="underline underline-offset-4">wishlist</span>
-              </p>
-            </div>
-
-            {/* Close Button */}
-            <button
-              onClick={closeToast}
-              className="absolute right-4 top-4 p-1 rounded-full cursor-pointer"
-              aria-label="Close notification"
-            >
-              <IoClose className="text-gray-600 text-xl" />
-            </button>
-          </div>
-        </div>
-      )}
+      <Toast
+        show={showToast}
+        onClose={closeToast}
+        product={toastProduct}
+        message={t("wishlist.added")}
+        linkText={t("wishlist.access")}
+        linkHref="/wishlist"
+      />
 
       <div className="flex flex-col items-center h-full pt-10 mb-14">
         <p className="uppercase font-gilroy text-sm py-5">Women</p>
-        <h2 className="font-gilroy text-2xl font-normal">Trending Now</h2>
+        <h2 className="font-gilroy text-2xl font-normal">
+          {t("trending_now")}
+        </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full pt-8 px-4 md:px-20">
           {products.map((product) => (
@@ -131,7 +99,7 @@ function TrendingNow() {
                     before:-z-10 before:transition-all before:duration-300
                     hover:before:w-full"
         >
-          Discover more
+          {t("discover_more")}
         </button>
       </div>
     </Container>

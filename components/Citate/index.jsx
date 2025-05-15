@@ -1,11 +1,13 @@
 import React from "react";
 import { Playfair_Display, Cormorant } from "next/font/google";
 import Container from "../Container";
+import { useTranslation } from "react-i18next";
 
 const playfair = Playfair_Display({ subsets: ["latin"] });
 const cormorant = Cormorant({ subsets: ["latin"], weight: "400" });
 
 function Citate() {
+  const { t } = useTranslation();
   return (
     <Container>
       <div className="bg-neutral-100 p-9 h-[300px] flex flex-col gap-4 items-center justify-center relative">
@@ -27,7 +29,11 @@ function Citate() {
           "
         </span>
 
-        <p class={`${cormorant.className} uppercase text-base md:text-2xl mt-2`}>Lacheen</p>
+        <p
+          class={`${cormorant.className} uppercase text-base md:text-2xl mt-2`}
+        >
+          Lacheen
+        </p>
       </div>
     </Container>
   );

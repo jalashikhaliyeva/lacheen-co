@@ -1,8 +1,10 @@
 import React from "react";
 import Container from "../Container";
 import Image from "next/image";
+import { useTranslation } from "react-i18next";
 
 function CategorySection() {
+  const { t } = useTranslation();
   return (
     <Container>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 w-full my-4 md:my-10">
@@ -20,10 +22,10 @@ function CategorySection() {
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
             <div className="text-center font-gilroy  transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2">
               <h3 className="text-xl font-normal transition-all duration-300 group-hover:tracking-wide">
-              Sandals
+                Sandals
               </h3>
               <p className="text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] delay-75 mt-1">
-                Shop Now
+                {t("shop_now")}
               </p>
             </div>
           </div>
@@ -67,10 +69,10 @@ function CategorySection() {
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
             <div className="text-center font-gilroy transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2">
               <h3 className="text-xl font-normal transition-all duration-300 group-hover:tracking-wide">
-              Flats
+                Flats
               </h3>
               <p className="text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] delay-75 mt-1">
-                Shop Now
+                {t("shop_now")}
               </p>
             </div>
           </div>
