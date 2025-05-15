@@ -3,7 +3,7 @@ import ProductCardSingle from "../ProductCardSingle";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
-import Toast from "@/components/Toast";
+import CustomToast from "../CustomToast";
 
 function ProductList({ layout }) {
   const { t } = useTranslation();
@@ -216,7 +216,7 @@ function ProductList({ layout }) {
 
   return (
     <>
-      <Toast
+      <CustomToast
         show={showToast}
         onClose={closeToast}
         product={toastProduct}

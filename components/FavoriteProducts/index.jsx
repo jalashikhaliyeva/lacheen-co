@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import ProductCardSingle from "../ProductCardSingle";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
-import Toast from "@/components/Toast";
 import { useTranslation } from "react-i18next";
+import CustomToast from "../CustomToast";
 
 function FavoriteProducts({ layout }) {
   const [wishlist, setWishlist] = useState([]);
@@ -216,7 +216,7 @@ function FavoriteProducts({ layout }) {
 
   return (
     <>
-      <Toast
+      <CustomToast
         show={showToast}
         onClose={closeToast}
         product={toastProduct}
