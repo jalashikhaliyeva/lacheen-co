@@ -1,6 +1,8 @@
+
+"use client";
 import { useRouter } from "next/router";
 import { signOut } from "firebase/auth";
-import { auth } from "@/firebase/firebaseConfig";
+import { auth } from "@/firebase/backendConfig";
 import useAuth from "@/shared/hooks/useAuth";
 import Spinner from "../Spinner";
 

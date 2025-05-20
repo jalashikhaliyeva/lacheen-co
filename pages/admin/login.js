@@ -3,18 +3,16 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase/firebaseConfig";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Container from "@/components/Container";
-
+import { auth } from "@/firebase/backendConfig";
 function AdminLogin() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -24,12 +22,16 @@ function AdminLogin() {
     }
 
     setLoading(true);
-
+    console.log(auth, "auth");
+    console.log(email, "email");
+    console.log(password, "password");
     try {
       await signInWithEmailAndPassword(auth, email, password);
+
       // On successful login, redirect to the admin dashboard.
       router.push("/admin");
     } catch (error) {
+      console.log(error, "error");
       const errorMessage = "Login failed. Please try again.";
       toast.error(errorMessage);
     } finally {

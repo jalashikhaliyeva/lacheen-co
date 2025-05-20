@@ -151,7 +151,7 @@ import {
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
-import { app } from "@/firebase/firebaseConfig";
+import { app } from "@/firebase/backendConfig";
 
 const InlineMultipleImagePicker = ({ images, onChange }) => {
   const fileInputRef = React.useRef(null);

@@ -45,7 +45,6 @@ export default function LoginForm() {
       if (window.history.length > 1) {
         router.back();
       } else {
-       
         router.push("/");
       }
     } catch (err) {
@@ -58,11 +57,11 @@ export default function LoginForm() {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       showError(t("auth.login_success"));
-     if (window.history.length > 1) {
-       router.back();
-     } else {
-       router.push("/");
-     }
+      if (window.history.length > 1) {
+        router.back();
+      } else {
+        router.push("/");
+      }
     } catch (err) {
       showError(err.message || t("auth.login_failed"));
     }

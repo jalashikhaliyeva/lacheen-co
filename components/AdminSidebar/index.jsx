@@ -12,7 +12,7 @@ import {
 } from "react-icons/fi";
 import { PiUsersThree } from "react-icons/pi";
 import { signOut } from "firebase/auth";
-import { auth } from "@/firebase/firebaseConfig";
+import { auth } from "@/firebase/backendConfig";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { fetchCategories } from "@/firebase/services/categoriesService";

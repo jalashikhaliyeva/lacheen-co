@@ -1,5 +1,5 @@
 import { getDatabase, ref, get, update, push, set , remove } from "firebase/database";
-import { app } from "@/firebase/firebaseConfig";
+import { app } from "@/firebase/backendConfig";
 
 /**
  * Fetches all products from the Firebase Realtime Database.

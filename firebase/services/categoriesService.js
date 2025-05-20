@@ -7,7 +7,7 @@ import {
   set,
   remove,
 } from "firebase/database";
-import { app } from "@/firebase/firebaseConfig";
+import { app } from "@/firebase/backendConfig";
 
 /**
  * Fetches all categories from Firebase

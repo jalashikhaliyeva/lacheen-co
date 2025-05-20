@@ -1,7 +1,7 @@
 // pages/admin/index.js
 import useAuth from "@/shared/hooks/useAuth";
 import { signOut } from "firebase/auth";
-import { auth } from "@/firebase/firebaseConfig";
+import { auth } from "@/firebase/backendConfig";
 import { useRouter } from "next/router";
 import AdminSidebar from "@/components/AdminSidebar";
 import AdminLayout from "@/components/AdminLayout";

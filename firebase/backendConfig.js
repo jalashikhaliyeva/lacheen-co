@@ -4,24 +4,25 @@ import { getDatabase, ref, get } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { getStorage } from "firebase/storage";
-const firebaseConfig = {
+const backendConfig = {
   apiKey: "AIzaSyASUST9_U8t7zqVAgqFpf09fsjnhaJQxc8",
   authDomain: "lacheen-co.firebaseapp.com",
-  projectId: "lacheen-co",
   databaseURL: "https://lacheen-co-default-rtdb.firebaseio.com",
+  projectId: "lacheen-co",
   storageBucket: "lacheen-co.firebasestorage.app",
   messagingSenderId: "158928113782",
   appId: "1:158928113782:web:e702cfcf4a3f71cbd58f57",
   measurementId: "G-JGCQF9M69V",
 };
 
-// Initialize the Firebase app
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+const backendApp = !getApps().length
+  ? initializeApp(backendConfig)
+  : getApps()[0];
 
-// Initialize the Realtime Database
-const db = getDatabase(app);
+
+const db = getDatabase(backendApp);
 const productsRef = ref(db, "products");
-// Retrieve and log the "products" data
+
 get(productsRef)
   .then((snapshot) => {
     if (snapshot.exists()) {
@@ -34,11 +35,11 @@ get(productsRef)
     console.error("Error retrieving data:", error);
   });
 
-// Initialize other Firebase services as needed
-const auth = getAuth(app);
+
+const auth = getAuth(backendApp);
 let analytics;
 if (typeof window !== "undefined") {
-  analytics = getAnalytics(app);
+  analytics = getAnalytics(backendApp);
 }
 
-export { app, db, auth, analytics };
+export { backendApp, db, auth, analytics };

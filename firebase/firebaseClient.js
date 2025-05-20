@@ -1,11 +1,11 @@
-// Client firebase config 
+// Client firebase config
 import { initializeApp, getApps } from "firebase/app";
 import { getDatabase, ref, get } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { getStorage } from "firebase/storage";
 
-const firebaseConfig = {
+const clientConfig = {
   apiKey: "AIzaSyAEMCBbgPtfJ2bWc3mfrayWUS8LWqIjln8",
   authDomain: "lacheen-co-client.firebaseapp.com",
   projectId: "lacheen-co-client",
@@ -15,14 +15,17 @@ const firebaseConfig = {
   measurementId: "G-YLL6BTXQ0B",
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 
-const db = getDatabase(app);
+const clientApp = !getApps().length
+  ? initializeApp(clientConfig)
+  : getApps()[0];
 
-const auth = getAuth(app);
+const db = getDatabase(clientApp);
+
+const auth = getAuth(clientApp);
 let analytics;
 if (typeof window !== "undefined") {
-  analytics = getAnalytics(app);
+  analytics = getAnalytics(clientApp);
 }
 
-export { app, db, auth, analytics };
+export { clientApp, db, auth, analytics };

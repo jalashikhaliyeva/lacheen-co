@@ -147,7 +147,7 @@ const CustomDropdown = ({
 
 
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { app } from "@/firebase/firebaseConfig";
+import { app } from "@/firebase/backendConfig";
 import { useSizes } from "@/shared/hooks/useSizes";
 
 const InlineMultipleImagePicker = ({ images, onChange }) => {

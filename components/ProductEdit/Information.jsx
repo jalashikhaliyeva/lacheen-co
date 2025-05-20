@@ -14,7 +14,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 // Reusable CustomDropdown for color selection
-import { app } from "@/firebase/firebaseConfig";
+import { app } from "@/firebase/backendConfig";
 // In Information.js
 import { useSizes } from "@/shared/hooks/useSizes";
 function Information() {
