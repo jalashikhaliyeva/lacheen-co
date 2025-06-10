@@ -101,41 +101,52 @@ function Header() {
 
         {/* Mobile Header */}
         <div className="flex md:hidden justify-between items-center py-4 h-[80px] w-full">
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => {
-                console.log('Menu clicked, current state:', isMobileMenuOpen);
-                setIsMobileMenuOpen(prev => !prev);
+          <div className="flex items-center gap-1 min-w-[120px]">
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('Menu clicked, current state:', isMobileMenuOpen);
+                  setIsMobileMenuOpen(!isMobileMenuOpen);
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className="text-neutral-900 focus:outline-none relative w-8 h-8 z-10 touch-manipulation flex items-center justify-center p-1"
+                aria-label={isMobileMenuOpen ? t("menu.close") : t("menu.open")}
+                type="button"
+              >
+                <div className="relative w-6 h-6">
+                  <span
+                    className={`absolute block w-6 h-px bg-current transition-all duration-300 ${
+                      isMobileMenuOpen
+                        ? "rotate-45 top-1/2 -translate-y-1/2"
+                        : "top-1"
+                    }`}
+                  />
+                  <span
+                    className={`absolute block w-6 h-px bg-current transition-opacity duration-300 top-1/2 -translate-y-1/2 ${
+                      isMobileMenuOpen ? "opacity-0" : "opacity-100"
+                    }`}
+                  />
+                  <span
+                    className={`absolute block w-6 h-px bg-current transition-all duration-300 ${
+                      isMobileMenuOpen
+                        ? "-rotate-45 top-1/2 -translate-y-1/2"
+                        : "bottom-1"
+                    }`}
+                  />
+                </div>
+              </button>
+            </div>
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push("/");
               }}
-              className="text-neutral-900 focus:outline-none relative w-10 h-10 z-50 flex items-center justify-center"
-              aria-label={isMobileMenuOpen ? t("menu.close") : t("menu.open")}
-              type="button"
-            >
-              <div className="relative w-6 h-6">
-                <span
-                  className={`absolute block w-6 h-px bg-current transition-all duration-300 ${
-                    isMobileMenuOpen
-                      ? "rotate-45 top-1/2 -translate-y-1/2"
-                      : "top-1"
-                  }`}
-                />
-                <span
-                  className={`absolute block w-6 h-px bg-current transition-opacity duration-300 top-1/2 -translate-y-1/2 ${
-                    isMobileMenuOpen ? "opacity-0" : "opacity-100"
-                  }`}
-                />
-                <span
-                  className={`absolute block w-6 h-px bg-current transition-all duration-300 ${
-                    isMobileMenuOpen
-                      ? "-rotate-45 top-1/2 -translate-y-1/2"
-                      : "bottom-1"
-                  }`}
-                />
-              </div>
-            </button>
-            <button
-              onClick={() => router.push("/")}
-              className="cursor-pointer ml-2 focus:outline-none"
+              className="cursor-pointer ml-2"
               aria-label="Home"
             >
               <Image
@@ -147,39 +158,67 @@ function Header() {
                 quality={100}
                 priority
               />
-            </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-1 text-neutral-900">
+          <div className="flex items-center gap-3 text-neutral-900">
             <button
-              onClick={() => setIsSearchOpen(true)}
-              className="focus:outline-none w-10 h-10 flex items-center justify-center"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsSearchOpen(true);
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="focus:outline-none touch-manipulation w-8 h-8 flex items-center justify-center"
               aria-label={t("nav.search")}
-              type="button"
             >
               <CiSearch className="text-xl" />
             </button>
             <button
-              onClick={() => router.push("/wishlist")}
-              className="focus:outline-none w-10 h-10 flex items-center justify-center"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                router.push("/wishlist");
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="focus:outline-none touch-manipulation w-8 h-8 flex items-center justify-center"
               aria-label="Wishlist"
-              type="button"
             >
               <PiHeartLight className="text-xl" />
             </button>
             <button
-              onClick={() => router.push(accountPath)}
-              className="focus:outline-none w-10 h-10 flex items-center justify-center"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                router.push(accountPath);
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="focus:outline-none touch-manipulation w-8 h-8 flex items-center justify-center"
               aria-label={user ? "Profile" : "Login"}
-              type="button"
             >
               <PiUserLight className="text-xl" />
             </button>
             <button
-              onClick={() => router.push("/basket")}
-              className="focus:outline-none w-10 h-10 flex items-center justify-center"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                router.push("/basket");
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="focus:outline-none touch-manipulation w-8 h-8 flex items-center justify-center"
               aria-label="Basket"
-              type="button"
             >
               <PiBasketLight className="text-xl" />
             </button>

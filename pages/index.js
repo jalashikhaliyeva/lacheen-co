@@ -1,13 +1,13 @@
 // pages/index.js (Updated Home Page)
+import { useState } from "react";
 import Header from "@/components/Header";
 import NavList from "@/components/NavList";
-import { useState } from "react";
 import Hero from "@/components/Hero";
-import HeroV1 from "@/components/Hero-v1";
+// import HeroV1 from "@/components/Hero-v1";
 import CategorySection from "@/components/CategorySection";
 import Citate from "@/components/Citate";
 import SliderEmbla from "@/components/EmblaCarouselAdvantage/EmblaCarousel";
-import VideoSection from "@/components/VideoSection";
+// import VideoSection from "@/components/VideoSection";
 import VideoandImage from "@/components/VideoandImage";
 import TrendingNow from "@/components/TrendingNow";
 import Footer from "@/components/Footer";
@@ -16,13 +16,14 @@ import { fetchCategories } from "@/firebase/services/categoriesService";
 
 export default function Home({ categories }) {
   const { user } = useAuthClient();
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="relative">
       <main>
         <Header />
-        <NavList />
+        <NavList onMenuToggle={setIsMenuOpen}  />
         <Hero />
         {/* <HeroV1 /> */}
         <CategorySection  categories={categories}/>

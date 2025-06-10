@@ -8,6 +8,7 @@ import { PiHeartLight } from "react-icons/pi";
 import { PiHeart } from "react-icons/pi";
 import { PiHeartFill } from "react-icons/pi";
 import style from "./ProductCard.module.css";
+
 function ProductCard({
   product,
   isInWishlist,
@@ -26,6 +27,7 @@ function ProductCard({
   };
 
   const handleDragStart = (e) => {
+    e.stopPropagation();
     setIsDragging(true);
     setStartX(e.type === "touchstart" ? e.touches[0].clientX : e.clientX);
     setTranslateX(0);
@@ -33,14 +35,16 @@ function ProductCard({
 
   const handleDragMove = (e) => {
     if (!isDragging) return;
+    e.stopPropagation();
 
     const currentX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
     const diff = currentX - startX;
     setTranslateX(diff);
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (e) => {
     if (!isDragging) return;
+    e.stopPropagation();
     setIsDragging(false);
 
     // Determine swipe direction
@@ -58,13 +62,15 @@ function ProductCard({
     setTranslateX(0);
   };
 
-  const goToNext = () => {
+  const goToNext = (e) => {
+    e.stopPropagation();
     if (currentImageIndex < product.images.length - 1) {
       setCurrentImageIndex((prev) => prev + 1);
     }
   };
 
-  const goToPrev = () => {
+  const goToPrev = (e) => {
+    e.stopPropagation();
     if (currentImageIndex > 0) {
       setCurrentImageIndex((prev) => prev - 1);
     }
@@ -77,7 +83,7 @@ function ProductCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`${style.card} relative cursor-pointer  aspect-square w-full overflow-hidden`}
+        className={`${style.card} relative cursor-pointer aspect-square w-full overflow-hidden`}
         style={{
           height: `${imageHeight}px`,
         }}
@@ -121,11 +127,8 @@ function ProductCard({
           <>
             {currentImageIndex > 0 && (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goToPrev();
-                }}
-                className="absolute cursor-pointer left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full  transition-all duration-300 opacity-0 group-hover:opacity-100"
+                onClick={goToPrev}
+                className="absolute cursor-pointer left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
                 aria-label="Previous image"
               >
                 <SlArrowLeft className="text-neutral-600 text-2xl" />
@@ -134,11 +137,8 @@ function ProductCard({
 
             {currentImageIndex < product.images.length - 1 && (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goToNext();
-                }}
-                className="absolute right-2 cursor-pointer  top-1/2 -translate-y-1/2 z-20 p-2 rounded-full  transition-all duration-300 opacity-0 group-hover:opacity-100"
+                onClick={goToNext}
+                className="absolute right-2 cursor-pointer top-1/2 -translate-y-1/2 z-20 p-2 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
                 aria-label="Next image"
               >
                 <SlArrowRight className="text-neutral-600 text-2xl" />
@@ -173,7 +173,10 @@ function ProductCard({
                     : "bg-neutral-300 hover:bg-gray-600"
                 }`}
                 onMouseEnter={() => handleDotHover(index)}
-                onClick={() => handleDotHover(index)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDotHover(index);
+                }}
                 aria-label={`View image ${index + 1} of ${
                   product.images.length
                 }`}
@@ -190,4 +193,5 @@ function ProductCard({
     </div>
   );
 }
+
 export default ProductCard;

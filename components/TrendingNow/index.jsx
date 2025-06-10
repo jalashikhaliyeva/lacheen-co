@@ -44,7 +44,10 @@ function TrendingNow() {
     },
   ];
 
-  const toggleWishlist = (product) => {
+  const toggleWishlist = (product, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (wishlist.some((item) => item.id === product.id)) {
       setWishlist(wishlist.filter((item) => item.id !== product.id));
     } else {
@@ -61,7 +64,7 @@ function TrendingNow() {
 
   return (
     <Container>
-      {/* Toast Notification */}
+
       <CustomToast
         show={showToast}
         onClose={closeToast}
@@ -71,7 +74,7 @@ function TrendingNow() {
         linkHref="/wishlist"
       />
 
-      <div className="flex flex-col items-center h-full pt-10 mb-14">
+      <div className="flex flex-col items-center h-full pt-10 mb-14 relative z-0">
         <p className="uppercase font-gilroy text-sm py-5">Women</p>
         <h2 className="font-gilroy text-2xl font-normal">
           {t("trending_now")}
@@ -79,13 +82,14 @@ function TrendingNow() {
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full pt-8 px-4 md:px-20">
           {products.map((product) => (
-            <ProductCard
-              imageHeight={350}
-              key={product.id}
-              product={product}
-              isInWishlist={wishlist.some((item) => item.id === product.id)}
-              onToggleWishlist={() => toggleWishlist(product)}
-            />
+            <div key={product.id} className="relative z-0">
+              <ProductCard
+                imageHeight={350}
+                product={product}
+                isInWishlist={wishlist.some((item) => item.id === product.id)}
+                onToggleWishlist={(e) => toggleWishlist(product, e)}
+              />
+            </div>
           ))}
         </div>
 
