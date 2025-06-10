@@ -28,7 +28,6 @@ function AdminLogin() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
 
-      // On successful login, redirect to the admin dashboard.
       router.push("/admin");
     } catch (error) {
       console.log(error, "error");

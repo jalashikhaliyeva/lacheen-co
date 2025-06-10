@@ -1,0 +1,668 @@
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { useRouter } from "next/router";
+import { useAuthClient } from "@/shared/context/AuthContext";
+import { useBasket } from "@/shared/context/BasketContext";
+import { LiaCheckSolid, LiaPlusSolid } from "react-icons/lia";
+import { getUserAddresses } from "@/firebase/services/firebaseAddressService";
+import { createOrder } from "@/firebase/services/firebaseOrderService";
+import { createOrUpdateUserProfile, getUserProfile } from "@/firebase/services/firebaseUserService";
+import AddressForm from "@/components/AddressForm/AddressForm";
+import CustomToast from "@/components/CustomToast/CustomToast";
+import Header from "@/components/Header";
+import NavList from "@/components/NavList";
+import Container from "@/components/Container";
+import { fetchSizes } from "@/firebase/services/sizeService";
+
+function CheckoutPage() {
+  const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t } = useTranslation();
+  const { user } = useAuthClient();
+  const { basketItems } = useBasket();
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [description, setDescription] = useState("");
+  const [deliveryTimeRange, setDeliveryTimeRange] = useState("");
+  const [sizes, setSizes] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [cashAmount, setCashAmount] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const orderDetailsRef = useRef(null);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [showPhoneInput, setShowPhoneInput] = useState(true);
+  const [useExistingPhone, setUseExistingPhone] = useState(false);
+  const [phoneNumberConfirmed, setPhoneNumberConfirmed] = useState(false);
+
+  const deliveryTimeOptions = [
+    { name: `${t("morning")}: 10:00 - 12:00` },
+    { name: `${t("afternoon")}: 12:00 - 15:00` },
+    { name: `${t("evening")}: 15:00 - 18:00` },
+  ];
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      if (!user) return;
+
+      try {
+        const addressesList = await getUserAddresses(user.uid);
+        setAddresses(addressesList);
+        const defaultAddress =
+          addressesList.find((addr) => addr.isDefault) || addressesList[0];
+        if (defaultAddress) {
+          setSelectedAddress(defaultAddress);
+        }
+      } catch (error) {
+        console.error("Error fetching addresses:", error);
+        setToastMessage(t("error_loading_addresses"));
+        setShowToast(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const loadSizes = async () => {
+      try {
+        const sizesList = await fetchSizes();
+        setSizes(sizesList.filter((size) => size.is_active));
+      } catch (error) {
+        console.error("Error loading sizes:", error);
+        setToastMessage(t("error_loading_sizes"));
+        setShowToast(true);
+      }
+    };
+
+    const loadUserProfile = async () => {
+      if (user) {
+        try {
+          const userData = await getUserProfile(user.uid);
+          if (userData?.phoneNumber) {
+            setPhoneNumber(userData.phoneNumber);
+            setShowPhoneInput(false);
+          }
+        } catch (error) {
+          console.error("Error loading user profile:", error);
+          setToastMessage(t("error_loading_profile"));
+          setShowToast(true);
+        }
+      }
+    };
+
+    fetchAddresses();
+    loadSizes();
+    loadUserProfile();
+  }, [user, t]);
+
+  const handleAddressSuccess = (newAddress) => {
+    setAddresses((prev) => [...prev, newAddress]);
+    setSelectedAddress(newAddress);
+    setToastMessage(t("address_added_successfully"));
+    setShowToast(true);
+  };
+
+  const handleSizeSelection = (sizeId) => {
+    setSelectedSizes((prev) => {
+      const newSizes = prev.includes(sizeId)
+        ? prev.filter((id) => id !== sizeId)
+        : prev.length < 2
+        ? [...prev, sizeId]
+        : prev;
+
+      // Clear the sizes error if we have a valid selection
+      if (newSizes.length > 0 && errors.sizes) {
+        setErrors((prev) => ({ ...prev, sizes: undefined }));
+      }
+
+      return newSizes;
+    });
+  };
+
+  const calculateSubtotal = () => {
+    return basketItems
+      .reduce((total, item) => {
+        return total + parseFloat(item.price) * item.quantity;
+      }, 0)
+      .toFixed(2);
+  };
+
+  const calculateDelivery = () => {
+    const subtotal = parseFloat(calculateSubtotal());
+    return subtotal >= 100 ? 0 : 5;
+  };
+
+  const calculateTotal = () => {
+    const subtotal = parseFloat(calculateSubtotal());
+    const delivery = calculateDelivery();
+    return (subtotal + delivery).toFixed(2);
+  };
+
+  const formatPhoneNumber = (number) => {
+    // Remove any non-digit characters
+    const cleaned = number.replace(/\D/g, "");
+    // If number starts with 994, remove it
+    const withoutPrefix = cleaned.startsWith("994")
+      ? cleaned.slice(3)
+      : cleaned;
+    // Return with +994 prefix
+    return `+994${withoutPrefix}`;
+  };
+
+  const handlePhoneNumberChange = (e) => {
+    const value = e.target.value;
+    // Remove any non-digit characters
+    const cleaned = value.replace(/\D/g, "");
+    // Limit to 9 digits (excluding +994)
+    const limited = cleaned.slice(0, 9);
+    setPhoneNumber(limited);
+  };
+
+  const handleUseExistingPhone = () => {
+    setUseExistingPhone(true);
+    setPhoneNumberConfirmed(true);
+    // Keep the existing phone number
+    setPhoneNumber(phoneNumber);
+    // Clear any phone-related errors
+    setErrors(prev => ({
+      ...prev,
+      phoneSelection: undefined,
+      phoneNumber: undefined
+    }));
+  };
+
+  const handleEnterNewPhone = () => {
+    setUseExistingPhone(false);
+    setPhoneNumberConfirmed(false);
+    // Keep the existing phone number in the input
+    setPhoneNumber(phoneNumber);
+    // Clear any phone-related errors
+    setErrors(prev => ({
+      ...prev,
+      phoneSelection: undefined,
+      phoneNumber: undefined
+    }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!selectedAddress) {
+      newErrors.address = t("address_required");
+    }
+    if (!deliveryTimeRange) {
+      newErrors.deliveryTime = t("delivery_time_required");
+    }
+    if (selectedSizes.length === 0) {
+      newErrors.sizes = t("sizes_required");
+    }
+    if (paymentMethod === "cash" && !cashAmount) {
+      newErrors.cashAmount = t("cash_amount_required");
+    }
+    if (phoneNumber && !useExistingPhone && !phoneNumberConfirmed) {
+      newErrors.phoneSelection = t("select_phone_option_required");
+    }
+    if (!phoneNumberConfirmed && (showPhoneInput && !phoneNumber)) {
+      newErrors.phoneNumber = t("phone_number_required");
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      orderDetailsRef.current?.scrollIntoView({ behavior: "smooth" });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handlePlaceOrder = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Update user's phone number if it was missing or changed
+      if (phoneNumber) {
+        await createOrUpdateUserProfile(user.uid, { phoneNumber });
+      }
+
+      const orderData = {
+        userId: user.uid,
+        userInfo: {
+          name: user.displayName || selectedAddress.fullName,
+          email: user.email,
+          phone: formatPhoneNumber(phoneNumber), // Ensure we send the formatted phone number
+          address: selectedAddress.address,
+          city: selectedAddress.city,
+          postalCode: selectedAddress.postalCode,
+        },
+        items: basketItems.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+          image: item.image,
+        })),
+        deliveryDetails: {
+          timeRange: deliveryTimeRange,
+          description: description,
+          selectedSizes: selectedSizes,
+        },
+        payment: {
+          method: paymentMethod,
+          amount: paymentMethod === "cash" ? cashAmount : calculateTotal(),
+        },
+        total: calculateTotal(),
+        subtotal: calculateSubtotal(),
+        deliveryFee: calculateDelivery(),
+      };
+
+      await createOrder(orderData);
+      setToastMessage(t("order_placed_successfully"));
+      setShowToast(true);
+
+      // Reset all form inputs
+      setDescription("");
+      setDeliveryTimeRange("");
+      setSelectedSizes([]);
+      setPaymentMethod("card");
+      setCashAmount("");
+      setErrors({});
+
+      // Navigate to profile page after a short delay to show the success message
+      setTimeout(() => {
+        router.push("/profile?tab=orders");
+      }, 1500);
+
+      // Clear basket after successful order
+      // You'll need to implement this in your basket context
+    } catch (error) {
+      console.error("Error placing order:", error);
+      setToastMessage(t("error_placing_order"));
+      setShowToast(true);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen py-8">
+      <CustomToast
+        show={showToast}
+        onClose={() => setShowToast(false)}
+        message={toastMessage}
+      />
+      <Header />
+      <NavList onMenuToggle={setIsMenuOpen} />
+
+      <Container>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 font-gilroy">
+          {/* Left Column - Delivery Address */}
+          <div className="lg:col-span-2">
+            <div className="bg-white p-6">
+              <h2 className="text-xl mb-4">{t("delivery_address")}</h2>
+
+              {loading ? (
+                <div className="animate-pulse">
+                  <div className="h-20 bg-neutral-200 mb-4"></div>
+                </div>
+              ) : addresses.length > 0 ? (
+                <div className="space-y-4">
+                  {addresses.map((address) => (
+                    <div
+                      key={address.id}
+                      className={`p-4 border cursor-pointer transition-all ${
+                        selectedAddress?.id === address.id
+                          ? "border-neutral-900 bg-neutral-50"
+                          : "border-neutral-200 hover:border-neutral-400"
+                      } ${errors.address ? "border-red-500" : ""}`}
+                      onClick={() => setSelectedAddress(address)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1">
+                          <div
+                            className={`w-4 h-4  border ${
+                              selectedAddress?.id === address.id
+                                ? "border-neutral-900 bg-neutral-900"
+                                : "border-neutral-400"
+                            }`}
+                          ></div>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="">{address.title}</p>
+                            {address.isDefault && (
+                              <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 ">
+                                {t("default_address")}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-neutral-600">{address.fullName}</p>
+                          <p className="text-neutral-600">{address.phone}</p>
+                          <p className="text-neutral-600">{address.address}</p>
+                          <p className="text-neutral-600">
+                            {address.city}, {address.postalCode}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {errors.address && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.address}
+                    </p>
+                  )}
+
+                  <button
+                    onClick={() => setShowAddressForm(true)}
+                    className="w-full py-3 border cursor-pointer border-neutral-200 flex items-center justify-center gap-2 text-neutral-600 hover:border-neutral-400 transition-colors"
+                  >
+                    <LiaPlusSolid size={20} />
+                    {t("add_new_address")}
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-neutral-600 mb-4">
+                    {t("no_addresses_found")}
+                  </p>
+                  <button
+                    onClick={() => setShowAddressForm(true)}
+                    className="py-2 px-4 border border-neutral-900 text-neutral-800 hover:text-white hover:bg-neutral-900 transition-all duration-500"
+                  >
+                    {t("add_new_address")}
+                  </button>
+                </div>
+              )}
+
+              {/* Add phone number input if needed */}
+              <div className="my-6">
+                <h2 className="text-xl mb-4">{t("contact_information")}</h2>
+                {phoneNumber && !useExistingPhone && !phoneNumberConfirmed ? (
+                  <div className="space-y-4">
+                    <div className={`p-4 border ${errors.phoneSelection ? 'border-red-500' : 'border-neutral-200'}  bg-neutral-50`}>
+                      <p className="text-neutral-700 mb-2">
+                        {t("existing_phone_number")}
+                      </p>
+                      <p className="text-neutral-900 font-medium mb-4">
+                        {formatPhoneNumber(phoneNumber)}
+                      </p>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleUseExistingPhone}
+                          className="px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
+                        >
+                          {t("use_this_number")}
+                        </button>
+                        <button
+                          onClick={handleEnterNewPhone}
+                          className="px-4 py-2 border border-neutral-200 hover:border-neutral-400 transition-colors"
+                        >
+                          {t("enter_new_number")}
+                        </button>
+                      </div>
+                      {errors.phoneSelection && (
+                        <p className="text-red-500 text-sm mt-2">{errors.phoneSelection}</p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-4">
+                    <label className="block text-sm text-neutral-700 mb-1">
+                      {t("phone_number")}
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600">
+                        +994
+                      </div>
+                      <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={handlePhoneNumberChange}
+                        className={`w-full pl-12 pr-3 py-2 border ${
+                          errors.phoneNumber ? 'border-red-500' : 'border-neutral-300'
+                        }  focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent`}
+                        placeholder="xx xxx xx xx"
+                      />
+                    </div>
+                    {errors.phoneNumber && (
+                      <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Description Input */}
+              <div className="mt-8" ref={orderDetailsRef}>
+                <h2 className="text-xl mb-5">{t("order_details")}</h2>
+                <div className="mb-4">
+                  <label className="block text-sm text-neutral-700 mb-1">
+                    {t("order_description")}
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full p-2 border border-neutral-200"
+                    rows="3"
+                    placeholder={t("enter_order_description")}
+                  />
+                </div>
+
+                {/* Delivery Time Range */}
+                <div className="mb-4">
+                  <label className="block text-sm text-neutral-700 mb-1">
+                    {t("delivery_time_range")}
+                  </label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className={`w-full p-2 border text-left flex justify-between items-center ${
+                        errors.deliveryTime
+                          ? "border-red-500"
+                          : "border-neutral-200"
+                      }`}
+                    >
+                      <span className="text-neutral-600">
+                        {deliveryTimeRange || t("select_time_range")}
+                      </span>
+                      <svg
+                        className={`w-4 h-4 transition-transform ${
+                          isDropdownOpen ? "rotate-180" : ""
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    {errors.deliveryTime && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.deliveryTime}
+                      </p>
+                    )}
+                    {isDropdownOpen && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-neutral-200 shadow-lg">
+                        {deliveryTimeOptions.map((option, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            className="w-full px-4 py-2 text-left hover:bg-neutral-50 transition-colors"
+                            onClick={() => {
+                              setDeliveryTimeRange(option.name);
+                              setIsDropdownOpen(false);
+                            }}
+                          >
+                            {option.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Size Selection */}
+                <div className="mb-4">
+                  <label className="block text-sm text-neutral-700 mb-1">
+                    {t("select_sizes")}
+                  </label>
+                  <div className="grid grid-cols-6 gap-2">
+                    {sizes.map((size) => (
+                      <button
+                        key={size.id}
+                        onClick={() => handleSizeSelection(size.id)}
+                        className={`p-2 border text-center ${
+                          selectedSizes.includes(size.id)
+                            ? "border-neutral-900 bg-neutral-50"
+                            : "border-neutral-200 hover:border-neutral-400"
+                        } ${errors.sizes ? "border-red-500" : ""}`}
+                      >
+                        {size.value}
+                      </button>
+                    ))}
+                  </div>
+                  {errors.sizes && (
+                    <p className="text-red-500 text-sm mt-1">{errors.sizes}</p>
+                  )}
+                </div>
+
+                {/* Payment Method */}
+                <div className="mb-4">
+                  <label className="block text-sm text-neutral-700 mb-1">
+                    {t("payment_method")}
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        value="card"
+                        checked={paymentMethod === "card"}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                      />
+                      {t("card_payment")}
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        value="cash"
+                        checked={paymentMethod === "cash"}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                      />
+                      {t("cash_payment")}
+                    </label>
+                  </div>
+                </div>
+
+                {/* Cash Amount Input */}
+                {paymentMethod === "cash" && (
+                  <div className="mb-4">
+                    <label className="block text-sm text-neutral-700 mb-1">
+                      {t("cash_amount")}
+                    </label>
+                    <input
+                      type="number"
+                      value={cashAmount}
+                      onChange={(e) => setCashAmount(e.target.value)}
+                      className={`w-full p-2 border ${
+                        errors.cashAmount
+                          ? "border-red-500"
+                          : "border-neutral-200"
+                      }`}
+                      placeholder={t("enter_cash_amount")}
+                    />
+                    {errors.cashAmount && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.cashAmount}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="bg-white p-6 sticky top-8">
+              <h2 className="text-xl font-semibold mb-4">
+                {t("order_summary")}
+              </h2>
+
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <p className="text-neutral-600">{t("subtotal")}</p>
+                  <span>{calculateSubtotal()} ₼</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <p className="text-neutral-600">{t("delivery")}</p>
+                  <span>
+                    {calculateDelivery() === 0
+                      ? t("free")
+                      : `${calculateDelivery()} ₼`}
+                  </span>
+                </div>
+
+                <div className="border-t pt-4">
+                  <div className="flex justify-between font-semibold">
+                    <p>{t("total")}</p>
+                    <span>{calculateTotal()} ₼</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handlePlaceOrder}
+                  disabled={isSubmitting}
+                  className="w-full py-3 bg-neutral-900 text-white hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? t("placing_order") : t("place_order")}
+                </button>
+
+                <div className="space-y-2 text-sm text-neutral-600">
+                  <div className="flex items-center gap-2">
+                    <LiaCheckSolid size={18} />
+                    <p>{t("delivery_time")}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <LiaCheckSolid size={18} />
+                    <p>100 AZN {t("free_shipping_threshold")}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Container>
+
+      {showAddressForm && (
+        <AddressForm
+          onClose={() => setShowAddressForm(false)}
+          onSuccess={handleAddressSuccess}
+        />
+      )}
+    </div>
+  );
+}
+
+export default CheckoutPage;

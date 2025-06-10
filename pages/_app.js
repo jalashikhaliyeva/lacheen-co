@@ -6,10 +6,14 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { I18nextProvider } from "react-i18next";
 import i18n from "../locales/i18n";
-
 import Spinner from "@/components/Spinner";
 import { AuthProvider } from "@/shared/context/AuthContext";
+import { CategoriesProvider } from "@/shared/context/CategoriesContext";
+import { BasketProvider } from "@/shared/context/BasketContext";
+
 export default function App({ Component, pageProps }) {
+  const { categories: initialCategories = [], ...otherProps } = pageProps;
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -40,10 +44,14 @@ export default function App({ Component, pageProps }) {
       {loading && <Spinner />}
       <I18nextProvider i18n={i18n}>
         <AuthProvider>
-          <ProductProvider>
-            <Component {...pageProps} />
-            <ToastContainer />
-          </ProductProvider>
+          <CategoriesProvider initialCategories={initialCategories}>
+            <ProductProvider>
+              <BasketProvider>
+                <Component {...pageProps} />
+                <ToastContainer />
+              </BasketProvider>
+            </ProductProvider>
+          </CategoriesProvider>
         </AuthProvider>
       </I18nextProvider>
     </>

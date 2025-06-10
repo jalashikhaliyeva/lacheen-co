@@ -18,18 +18,11 @@ export default function Login() {
 
   return (
     <div className="relative">
-      <div
-        className={`fixed inset-0 bg-black z-40 transition-opacity duration-300 ease-in-out ${
-          isMenuOpen
-            ? "opacity-45 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
-        style={{ top: "100px" }}
-      />
+   
 
       <main>
         <Header />
-        <NavList onMenuToggle={setIsMenuOpen} />
+        <NavList  />
         <LoginForm />
         <Footer />
       </main>

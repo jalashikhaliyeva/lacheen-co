@@ -1,154 +1,122 @@
-import React, { useState, useEffect, useContext } from "react";
+// src/components/Combination.jsx
+import React, { useState, useEffect, useContext, useRef } from "react";
 import Container from "../Container";
 import { toast } from "react-toastify";
 import { TbTrash } from "react-icons/tb";
+import { fetchColors } from "@/firebase/services/colorService";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { app } from "@/firebase/backendConfig";
+import { useSizes } from "@/shared/hooks/useSizes";
 import { ProductContext } from "@/shared/context/ProductContext";
 
-// Reusable CustomDropdown for color selection
 const CustomDropdown = ({
   label,
   options,
   selected,
   onSelect,
-  onAddNew,
-  addNewLabel,
   placeholder,
-  multiSelect = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
-  const [newOption, setNewOption] = useState("");
-  const dropdownRef = React.useRef(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
-        setIsAdding(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSelect = (option) => {
-    if (option === "select-all") {
-      if (selected.length === options.length && options.length > 0) {
-        onSelect([]);
-      } else {
-        onSelect([...options]);
-      }
+  const isSelected = (opt) =>
+    selected.some((s) => s.name === opt.name && s.code === opt.code);
+
+  const handleOptionClick = (opt) => {
+    if (isSelected(opt)) {
+      onSelect(selected.filter((s) => s.name !== opt.name));
     } else {
-      if (selected.includes(option)) {
-        onSelect(selected.filter((item) => item !== option));
-      } else {
-        onSelect([...selected, option]);
-      }
-    }
-    if (!multiSelect) {
-      setIsOpen(false);
+      onSelect([...selected, opt]);
     }
   };
 
-  const handleAddNew = (e) => {
-    e.preventDefault();
-    const trimmed = newOption.trim();
-    const exists = options.some(
-      (option) => option.toLowerCase() === trimmed.toLowerCase()
-    );
-    if (trimmed !== "" && !exists) {
-      onAddNew(trimmed);
-      if (multiSelect) {
-        onSelect([...selected, trimmed]);
-      } else {
-        onSelect(trimmed);
-      }
-      setNewOption("");
-      setIsAdding(false);
-      if (!multiSelect) {
-        setIsOpen(false);
-      }
-    } else if (exists) {
-      toast.warning("This color already exists!");
+  const handleSelectAll = () => {
+    if (selected.length === options.length) {
+      onSelect([]);
+    } else {
+      onSelect([...options]);
     }
   };
 
   const displayValue =
-    multiSelect && selected.length > 0
-      ? selected.join(", ")
-      : !multiSelect && selected
-      ? selected
-      : placeholder;
+    selected.length > 0 ? selected.map((s) => s.name).join(", ") : placeholder;
 
   return (
     <div className="relative w-full font-gilroy" ref={dropdownRef}>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label}
-      </label>
+      {label && (
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+        </label>
+      )}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="group flex  py-3 px-4 items-center border border-gray-400 rounded-lg w-full bg-gray-100 hover:bg-gray-200"
+        className="group flex py-3 px-4 items-center border border-gray-400 rounded-lg w-full bg-gray-100 hover:bg-gray-200"
       >
-        {displayValue}
+        <span className="truncate">{displayValue}</span>
+        <svg
+          className="ml-auto w-4 h-4 text-gray-500"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
+
       {isOpen && (
-        <div className="absolute mt-1 w-full bg-gray-100 border border-gray-400 rounded-lg shadow-md z-10">
-          {isAdding ? (
-            <form onSubmit={handleAddNew}>
-              <input
-                type="text"
-                value={newOption}
-                onChange={(e) => setNewOption(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") {
-                    setIsAdding(false);
-                  }
-                }}
-                placeholder="Enter new value"
-                className="w-full px-3 py-2 border-b focus:outline-none"
-                autoFocus
+        <ul className="absolute mt-1 w-full bg-gray-100 border border-gray-400 rounded-lg shadow-md z-10 max-h-60 overflow-y-auto">
+          <li
+            onClick={handleSelectAll}
+            className="px-3 py-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between items-center"
+          >
+            <span>
+              {selected.length === options.length
+                ? "Deselect All"
+                : "Select All"}
+            </span>
+            {selected.length === options.length && options.length > 0 && (
+              <span>✓</span>
+            )}
+          </li>
+
+          {options.map((opt, idx) => (
+            <li
+              key={idx}
+              onClick={() => {
+                handleOptionClick(opt);
+              }}
+              className="px-3 py-2 hover:bg-gray-200 rounded-lg cursor-pointer flex items-center"
+            >
+              <span
+                className="inline-block w-4 h-4 rounded-full mr-2 border"
+                style={{ backgroundColor: opt.code }}
               />
-            </form>
-          ) : (
-            <ul>
-              <li
-                onClick={() => setIsAdding(true)}
-                className="px-3 py-2 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors"
-              >
-                {addNewLabel}
-              </li>
-              <li
-                onClick={() => handleSelect("select-all")}
-                className="px-3 py-2 hover:bg-gray-200 rounded-lg  cursor-pointer flex justify-between items-center"
-              >
-                <span>Select All</span>
-                {selected.length === options.length && options.length > 0 && (
-                  <span>✓</span>
-                )}
-              </li>
-              {options.map((option, index) => (
-                <li
-                  key={index}
-                  onClick={() => handleSelect(option)}
-                  className="px-3 py-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between items-center"
-                >
-                  <span>{option}</span>
-                  {selected.includes(option) && <span>✓</span>}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+              <span className="flex-1">{opt.name}</span>
+              {isSelected(opt) && <span>✓</span>}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
 };
-
-
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { app } from "@/firebase/backendConfig";
-import { useSizes } from "@/shared/hooks/useSizes";
 
 const InlineMultipleImagePicker = ({ images, onChange }) => {
   const fileInputRef = React.useRef(null);
@@ -164,25 +132,23 @@ const InlineMultipleImagePicker = ({ images, onChange }) => {
   const handleFileChange = async (e) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
-      // Upload each file and return the permanent URL
       const uploadedImages = await Promise.all(
         filesArray.map(async (file) => {
           try {
-            // Create a reference with a unique path
-            const fileRef = storageRef(storage, `variant-images/${file.name}-${Date.now()}`);
-            // Upload the file to Firebase Storage
+            const fileRef = storageRef(
+              storage,
+              `variant-images/${file.name}-${Date.now()}`
+            );
             await uploadBytes(fileRef, file);
-            // Retrieve the download URL
             const downloadURL = await getDownloadURL(fileRef);
             return downloadURL;
           } catch (error) {
             console.error("Error uploading variant image:", error);
-            return null; // Optionally skip this file on error
+            return null;
           }
         })
       );
-      // Filter out any files that failed to upload
-      const validImages = uploadedImages.filter(url => url !== null);
+      const validImages = uploadedImages.filter((url) => url !== null);
       onChange([...images, ...validImages]);
     }
   };
@@ -211,7 +177,7 @@ const InlineMultipleImagePicker = ({ images, onChange }) => {
         ))}
         <div
           onClick={handleImageClick}
-          className="w-20 h-20 border rounded flex items-center justify-center cursor-pointer bg-gray-50 "
+          className="w-20 h-20 border rounded flex items-center justify-center cursor-pointer bg-gray-50"
         >
           <span className="text-xs text-gray-500">Add Image</span>
         </div>
@@ -228,9 +194,8 @@ const InlineMultipleImagePicker = ({ images, onChange }) => {
   );
 };
 
-
-
-const VariantTable = ({ variants, setVariants }) => {
+// Updated VariantTable to show color with swatch and handle color objects
+const VariantTable = ({ variants, setVariants, availableColors }) => {
   const safeVariants = Array.isArray(variants) ? variants : [];
   const { sizes: availableSizes, loading: sizesLoading } = useSizes();
 
@@ -246,10 +211,26 @@ const VariantTable = ({ variants, setVariants }) => {
     setVariants((prev) => prev.filter((variant) => variant.id !== id));
   };
 
+  // Handle color selection for variants
+  const handleColorChange = (variantId, selectedColorObj) => {
+    setVariants((prev) =>
+      prev.map((variant) => {
+        if (variant.id === variantId) {
+          return {
+            ...variant,
+            color: selectedColorObj.name,
+            colorObject: selectedColorObj, // Store the full color object
+          };
+        }
+        return variant;
+      })
+    );
+  };
+
   return (
     <div className="overflow-x-auto mt-5 w-full font-gilroy rounded-2xl border">
       <table className="min-w-full bg-white rounded-2xl">
-        <thead className="bg-gray-100 ">
+        <thead className="bg-gray-100">
           <tr>
             <th className="px-4 py-2 border">Images</th>
             <th className="px-4 py-2 border">Color</th>
@@ -262,116 +243,151 @@ const VariantTable = ({ variants, setVariants }) => {
           </tr>
         </thead>
         <tbody>
-          {safeVariants.map((variant) => (
-            <tr key={variant.id} className="text-center">
-              <td className="px-4 py-2 border">
-                <InlineMultipleImagePicker
-                  images={variant.images}
-                  onChange={(newImages) =>
-                    updateVariant(variant.id, "images", newImages)
-                  }
-                />
-              </td>
-              <td className="px-4 py-2 border">
-                <input
-                  type="text"
-                  value={variant.color}
-                  onChange={(e) =>
-                    updateVariant(variant.id, "color", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
-              <td className="px-4 py-2 border">
-                <input
-                  type="text"
-                  value={variant.name}
-                  onChange={(e) =>
-                    updateVariant(variant.id, "name", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
-              <td className="px-4 py-2 border">
-                <input
-                  type="number"
-                  value={variant.price}
-                  onChange={(e) =>
-                    updateVariant(variant.id, "price", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
-              <td className="px-4 py-2 border">
-                <input
-                  type="number"
-                  value={variant.sellingPrice}
-                  onChange={(e) =>
-                    updateVariant(variant.id, "sellingPrice", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
-              <td className="px-4 py-2 border">
-                <input
-                  type="number"
-                  value={variant.quantity}
-                  onChange={(e) =>
-                    updateVariant(variant.id, "quantity", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
-              <td className="px-4 py-2 border">
-                {sizesLoading ? (
-                  <p>Loading sizes...</p>
-                ) : (
-                  <>
-                    <div className="flex gap-1 flex-wrap justify-center">
-                      {availableSizes.map((size) => {
-                        const currentSizes = variant.sizes || [];
-                        const isSelected = currentSizes?.includes(size);
-                        return (
-                          <button
-                            key={size}
-                            onClick={() => {
-                              const newSizes = isSelected
-                                ? currentSizes.filter((s) => s !== size)
-                                : [...currentSizes, size];
-                              updateVariant(variant.id, "sizes", newSizes);
-                            }}
-                            className={`border px-2 py-1 rounded-md cursor-pointer ${
-                              isSelected
-                                ? "bg-neutral-300 text-black"
-                                : "bg-gray-100 text-black"
-                            }`}
-                          >
-                            {size}
-                          </button>
+          {safeVariants.map((variant) => {
+            // Find the current color object for this variant
+            const currentColorObj = variant.colorObject ||
+              availableColors.find((c) => c.name === variant.color) || {
+                name: variant.color || "",
+                code: "",
+              };
+
+            return (
+              <tr key={variant.id} className="text-center">
+                <td className="px-4 py-2 border">
+                  <InlineMultipleImagePicker
+                    images={variant.images}
+                    onChange={(newImages) =>
+                      updateVariant(variant.id, "images", newImages)
+                    }
+                  />
+                </td>
+                <td className="px-4 py-2 border">
+                  {/* Color dropdown with swatch */}
+                  <div className="relative">
+                    <select
+                      value={currentColorObj.name}
+                      onChange={(e) => {
+                        const selectedColor = availableColors.find(
+                          (c) => c.name === e.target.value
                         );
-                      })}
-                    </div>
-                    <button
-                      onClick={() =>
-                        updateVariant(variant.id, "sizes", availableSizes)
-                      }
-                      className="mt-1 text-sm text-blue-800 underline"
+                        if (selectedColor) {
+                          handleColorChange(variant.id, selectedColor);
+                        }
+                      }}
+                      className="w-full border rounded px-2 py-1 bg-white"
                     >
-                      Select All
-                    </button>
-                  </>
-                )}
-              </td>
-              <td className="px-4 py-2 border">
-                <button
-                  onClick={() => deleteVariant(variant.id)}
-                  className="text-red-400 hover:underline cursor-pointer"
-                >
-                  <TbTrash className="text-xl" />
-                </button>
-              </td>
-            </tr>
-          ))}
+                      <option value="">Select Color</option>
+                      {availableColors.map((color) => (
+                        <option key={color.name} value={color.name}>
+                          {color.name}
+                        </option>
+                      ))}
+                    </select>
+                    {/* Color swatch display */}
+                    {currentColorObj.code && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <span
+                          className="inline-block w-4 h-4 rounded-full border"
+                          style={{ backgroundColor: currentColorObj.code }}
+                        />
+                        <span className="text-xs text-gray-600">
+                          {currentColorObj.code}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </td>
+                <td className="px-4 py-2 border">
+                  <input
+                    type="text"
+                    value={variant.name}
+                    onChange={(e) =>
+                      updateVariant(variant.id, "name", e.target.value)
+                    }
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </td>
+                <td className="px-4 py-2 border">
+                  <input
+                    type="number"
+                    value={variant.price}
+                    onChange={(e) =>
+                      updateVariant(variant.id, "price", e.target.value)
+                    }
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </td>
+                <td className="px-4 py-2 border">
+                  <input
+                    type="number"
+                    value={variant.sellingPrice}
+                    onChange={(e) =>
+                      updateVariant(variant.id, "sellingPrice", e.target.value)
+                    }
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </td>
+                <td className="px-4 py-2 border">
+                  <input
+                    type="number"
+                    value={variant.quantity}
+                    onChange={(e) =>
+                      updateVariant(variant.id, "quantity", e.target.value)
+                    }
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </td>
+                <td className="px-4 py-2 border">
+                  {sizesLoading ? (
+                    <p>Loading sizes...</p>
+                  ) : (
+                    <>
+                      <div className="flex gap-1 flex-wrap justify-center">
+                        {availableSizes.map((size) => {
+                          const currentSizes = variant.sizes || [];
+                          const isSelected = currentSizes.includes(size);
+                          return (
+                            <button
+                              key={size}
+                              onClick={() => {
+                                const newSizes = isSelected
+                                  ? currentSizes.filter((s) => s !== size)
+                                  : [...currentSizes, size];
+                                updateVariant(variant.id, "sizes", newSizes);
+                              }}
+                              className={`border px-2 py-1 rounded-md cursor-pointer ${
+                                isSelected
+                                  ? "bg-neutral-300 text-black"
+                                  : "bg-gray-100 text-black"
+                              }`}
+                            >
+                              {size}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <button
+                        onClick={() =>
+                          updateVariant(variant.id, "sizes", availableSizes)
+                        }
+                        className="mt-1 text-sm text-blue-800 underline"
+                      >
+                        Select All
+                      </button>
+                    </>
+                  )}
+                </td>
+                <td className="px-4 py-2 border">
+                  <button
+                    onClick={() => deleteVariant(variant.id)}
+                    className="text-red-400 hover:underline cursor-pointer"
+                  >
+                    <TbTrash className="text-xl" />
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -379,100 +395,124 @@ const VariantTable = ({ variants, setVariants }) => {
 };
 
 function Combination() {
-  // Include combinationData from context as before
   const { combinationData, setCombinationData, informationData } =
     useContext(ProductContext);
+
   const { colors, selectedColor, variants } = combinationData;
-  const [showVariantTable, setShowVariantTable] = useState(variants.length > 0);
+  const [showVariantTable, setShowVariantTable] = useState(
+    Array.isArray(variants) && variants.length > 0
+  );
+
+  const [availableColors, setAvailableColors] = useState([]);
+  const [loadingColors, setLoadingColors] = useState(true);
 
   useEffect(() => {
-    if (variants && variants.length > 0) {
-      setShowVariantTable(true);
-    }
-  }, [variants]);
+    const loadColors = async () => {
+      try {
+        const fetched = await fetchColors();
+        const active = fetched.filter((c) => c.is_active);
+        setAvailableColors(active.map((c) => ({ name: c.name, code: c.code })));
+        setCombinationData((prev) => ({
+          ...prev,
+          colors: active.map((c) => c.name),
+        }));
+      } catch (error) {
+        console.error("Error loading colors:", error);
+        toast.error("Failed to load colors.");
+      } finally {
+        setLoadingColors(false);
+      }
+    };
+    loadColors();
+  }, []);
 
-  // Whenever the selected colors change and the table is already shown,
-  // update the variants.
   useEffect(() => {
     if (showVariantTable) {
       generateOrUpdateVariants();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedColor]);
 
   const generateOrUpdateVariants = () => {
     setCombinationData((prev) => {
-      const currentVariants = Array.isArray(prev.variants) ? prev.variants : [];
-      // Use a mapping keyed by a non-editable "baseColor" property.
-      const variantMap = currentVariants.reduce((map, variant) => {
-        map[variant.baseColor] = variant;
+      const existingVariants = Array.isArray(prev.variants)
+        ? prev.variants
+        : [];
+
+      const variantMap = existingVariants.reduce((map, v) => {
+        map[v.baseColor] = v;
         return map;
       }, {});
-      const newVariants = prev.selectedColor.map((color) => {
-        if (variantMap[color]) {
-          return variantMap[color];
+
+      const newVariants = prev.selectedColor.map((colorObj) => {
+        const colorName = colorObj.name;
+        if (variantMap[colorName]) {
+          // Update existing variant with the full color object
+          return {
+            ...variantMap[colorName],
+            colorObject: colorObj, // Ensure we store the full color object
+          };
         }
         return {
-          // Generate a unique id that does not depend on the color value.
           id: Math.random().toString(36).substr(2, 9),
-          baseColor: color,
-          color: color,
+          baseColor: colorName,
+          color: colorName,
+          colorObject: colorObj, // Store the full color object with code
           name: informationData.name || "",
           price: informationData.price || "",
           sellingPrice: informationData.sellingPrice || "",
           quantity: informationData.quantity || "",
           images: [],
           sizes: [],
-          is_child: true, // Mark as child since it was added via combination
+          is_child: true,
         };
       });
+
       return { ...prev, variants: newVariants };
     });
   };
 
   return (
     <>
-      <div className="bg-white font-gilroy mt-5  rounded-xl py-10 px-6 sm:px-10 flex flex-col items-center w-full max-w-[90%] mx-auto">
-        <div className="w-full lg:w-3/5 mb-4">
-          <CustomDropdown
-            label="Select Color:"
-            options={colors}
-            selected={selectedColor}
-            onSelect={(newSelected) =>
-              setCombinationData((prev) => ({
-                ...prev,
-                selectedColor: newSelected,
-              }))
-            }
-            onAddNew={(newColor) =>
-              setCombinationData((prev) => ({
-                ...prev,
-                colors: [...prev.colors, newColor],
-              }))
-            }
-            addNewLabel="Add New Color"
-            placeholder="Choose a color"
-            multiSelect={true}
-          />
-        </div>
+      <div className="bg-white font-gilroy mt-5 rounded-xl py-10 px-6 sm:px-10 flex flex-col items-center w-full max-w-[90%] mx-auto">
+        <div className="flex  w-full flex-row justify-center gap-5">
+          <div className="w-1/2 mb-4">
+            {loadingColors ? (
+              <p>Loading colors...</p>
+            ) : (
+              <CustomDropdown
+                label="Select Color:"
+                options={availableColors}
+                selected={selectedColor}
+                onSelect={(newSelected) =>
+                  setCombinationData((prev) => ({
+                    ...prev,
+                    selectedColor: newSelected,
+                  }))
+                }
+                placeholder="Choose one or more colors"
+              />
+            )}
+          </div>
 
-        {selectedColor.length > 0 && !showVariantTable && (
-          <button
-            onClick={() => {
-              generateOrUpdateVariants();
-              setShowVariantTable(true);
-            }}
-            className="flex items-center cursor-pointer gap-2 px-3 py-2 hover:bg-neutral-100 text-neutral-600 border border-neutral-300 rounded transition-colors"
-          >
-            Generate Variants
-          </button>
-        )}
+          {selectedColor.length > 0 && !showVariantTable && (
+            <button
+              onClick={() => {
+                generateOrUpdateVariants();
+                setShowVariantTable(true);
+              }}
+              className="flex w-fit items-center cursor-pointer gap-2 my-auto px-3 py-1 h-10 hover:bg-neutral-100 text-neutral-600 border border-neutral-300 rounded transition-colors"
+            >
+              Generate Variants
+            </button>
+          )}
+        </div>
       </div>
 
       {showVariantTable && (
         <Container>
           <VariantTable
             variants={variants}
+            availableColors={availableColors}
             setVariants={(update) =>
               setCombinationData((prev) => ({
                 ...prev,

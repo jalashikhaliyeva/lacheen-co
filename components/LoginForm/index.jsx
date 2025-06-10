@@ -3,7 +3,7 @@ import Container from "../Container";
 import { IoEye, IoEyeOff, IoClose, IoLogoGoogle } from "react-icons/io5";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
-import { auth } from "../../firebase/firebaseClient";
+import { auth } from "../../firebase/backendConfig";
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,

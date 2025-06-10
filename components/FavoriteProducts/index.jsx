@@ -3,11 +3,12 @@ import ProductCardSingle from "../ProductCardSingle";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
-import CustomToast from "../CustomToast";
+import { removeFromWishlist } from "@/firebase/services/firebaseWishlistService";
+import { useAuthClient } from "@/shared/context/AuthContext";
+import { ArrowRight, Heart, Plus } from "lucide-react";
+import CustomToast from "../CustomToast/CustomToast";
 
-function FavoriteProducts({ layout }) {
-  const [wishlist, setWishlist] = useState([]);
-
+function FavoriteProducts({ layout, wishlistItems = [], onWishlistUpdate }) {
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -15,127 +16,44 @@ function FavoriteProducts({ layout }) {
   const ITEMS_PER_PAGE = 8;
   const [showToast, setShowToast] = useState(false);
   const [toastProduct, setToastProduct] = useState(null);
+  const [toastMessage, setToastMessage] = useState("");
   const { t } = useTranslation();
+  const { user } = useAuthClient();
   const closeToast = () => setShowToast(false);
-
-  const toggleWishlist = (product) => {
-    // … add/remove logic …
-    setToastProduct(product);
-    setShowToast(true);
+  const handleNavigate = () => {
+    window.location.href = "/products";
   };
-  const products = [
-    {
-      id: 1,
-      name: "Speedy 25",
-      price: "150",
-      images: ["/images/IMG_2928.jpg", "/images/IMG_2927.jpg"],
-    },
-    {
-      id: 2,
-      name: "Speedy 30",
-      price: "150",
-      images: ["/images/IMG_2931.jpg", "/images/IMG_2932.jpg"],
-    },
-    {
-      id: 3,
-      name: "Speedy Bandoulière 25",
-      price: "150",
-      images: ["/images/IMG_2929.jpg", "/images/IMG_2925.jpg"],
-    },
-    {
-      id: 4,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-    {
-      id: 5,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-    {
-      id: 6,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-    {
-      id: 1,
-      name: "Speedy 25",
-      price: "150",
-      images: ["/images/IMG_2928.jpg", "/images/IMG_2927.jpg"],
-    },
-    {
-      id: 2,
-      name: "Speedy 30",
-      price: "150",
-      images: ["/images/IMG_2931.jpg", "/images/IMG_2932.jpg"],
-    },
-    {
-      id: 3,
-      name: "Speedy Bandoulière 25",
-      price: "150",
-      images: ["/images/IMG_2929.jpg", "/images/IMG_2925.jpg"],
-    },
-    {
-      id: 4,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-    {
-      id: 5,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-    {
-      id: 6,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-    {
-      id: 1,
-      name: "Speedy 25",
-      price: "150",
-      images: ["/images/IMG_2928.jpg", "/images/IMG_2927.jpg"],
-    },
-    {
-      id: 2,
-      name: "Speedy 30",
-      price: "150",
-      images: ["/images/IMG_2931.jpg", "/images/IMG_2932.jpg"],
-    },
-    {
-      id: 3,
-      name: "Speedy Bandoulière 25",
-      price: "150",
-      images: ["/images/IMG_2929.jpg", "/images/IMG_2925.jpg"],
-    },
-    {
-      id: 4,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-    {
-      id: 5,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-    {
-      id: 6,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-  ];
+  const toggleWishlist = async (product) => {
+    if (!user) {
+      setToastMessage(t("wishlist.login_required"));
+      setToastProduct(product);
+      setShowToast(true);
+      return;
+    }
+
+    try {
+      await removeFromWishlist(user.uid, product.id);
+      setToastMessage(t("wishlist.removed"));
+      setToastProduct(product);
+      setShowToast(true);
+      // Update the parent component's wishlist
+      if (onWishlistUpdate) {
+        onWishlistUpdate(
+          wishlistItems.filter((item) => item.id !== product.id)
+        );
+      }
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      setToastMessage(t("wishlist.error"));
+      setToastProduct(product);
+      setShowToast(true);
+    }
+  };
+
   useEffect(() => {
-    setVisibleProducts(products.slice(0, ITEMS_PER_PAGE));
-  }, []);
+    setVisibleProducts(wishlistItems.slice(0, ITEMS_PER_PAGE));
+  }, [wishlistItems]);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -143,7 +61,7 @@ function FavoriteProducts({ layout }) {
         if (
           target.isIntersecting &&
           !loading &&
-          visibleProducts.length < products.length
+          visibleProducts.length < wishlistItems.length
         ) {
           loadMoreProducts();
         }
@@ -160,16 +78,16 @@ function FavoriteProducts({ layout }) {
         observer.unobserve(loaderRef.current);
       }
     };
-  }, [visibleProducts, loading]);
+  }, [visibleProducts, loading, wishlistItems]);
+
   const loadMoreProducts = () => {
     setLoading(true);
 
-    // Simulate loading delay
     setTimeout(() => {
       const nextPage = page + 1;
       const startIndex = (nextPage - 1) * ITEMS_PER_PAGE;
       const endIndex = startIndex + ITEMS_PER_PAGE;
-      const newProducts = products.slice(0, endIndex);
+      const newProducts = wishlistItems.slice(0, endIndex);
 
       setVisibleProducts(newProducts);
       setPage(nextPage);
@@ -189,18 +107,20 @@ function FavoriteProducts({ layout }) {
         return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
     }
   };
+
   const getImageHeight = () => {
     switch (layout) {
       case "full":
-        return 700; // full-width
+        return 700;
       case "grid2":
-        return 450; //  2-column grid
+        return 450;
       case "grid3":
-        return 300; // S for 3-column grid
+        return 300;
       default:
-        return 450; // Default medium height
+        return 450;
     }
   };
+
   const getImageHeightClasses = () => {
     switch (layout) {
       case "full":
@@ -214,13 +134,56 @@ function FavoriteProducts({ layout }) {
     }
   };
 
+  if (wishlistItems.length === 0) {
+    return (
+      <div className="flex flex-col justify-center items-center py-20 px-8 relative overflow-hidden">
+        {/* Floating hearts animation */}
+        <div className="absolute inset-0 pointer-events-none">
+          {[...Array(6)].map((_, i) => (
+            <Heart
+              key={i}
+              className={`absolute text-rose-200 animate-pulse opacity-20
+                  ${i === 0 ? "top-10 left-10 w-4 h-4" : ""}
+                  ${i === 1 ? "top-20 right-16 w-6 h-6" : ""}
+                  ${i === 2 ? "bottom-32 left-20 w-5 h-5" : ""}
+                  ${i === 3 ? "bottom-16 right-12 w-4 h-4" : ""}
+                  ${i === 4 ? "top-1/3 left-1/2 w-3 h-3" : ""}
+                  ${i === 5 ? "bottom-1/2 right-1/3 w-5 h-5" : ""}
+                `}
+              style={{ animationDelay: `${i * 0.5}s` }}
+            />
+          ))}
+        </div>
+
+        <div className="text-center z-10">
+          <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-rose-50 to-pink-50 rounded-full flex items-center justify-center">
+            <Heart className="w-12 h-12 text-rose-700" />
+          </div>
+          <h3 className="text-2xl  font-medium text-gray-800 mb-3 font-gilroy">
+            {t("wishlist.empty")}
+          </h3>
+          <p className="text-gray-500 mb-8 max-w-md font-gilroy">
+            {t("wishlist.empty_description")}
+          </p>
+          <button
+            onClick={handleNavigate}
+            className="group  text-rose-700 px-8 py-3 rounded-full font-gilroy font-medium transform transition-all duration-300 hover:scale-105 "
+          >
+            {t("wishlist.discover_more")}
+            <ArrowRight className="inline-block ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <CustomToast
         show={showToast}
         onClose={closeToast}
         product={toastProduct}
-        message={t("wishlist.added")}
+        message={toastMessage}
         linkText={t("wishlist.access")}
         linkHref="/wishlist"
       />
@@ -233,7 +196,7 @@ function FavoriteProducts({ layout }) {
             imageHeight={getImageHeight()}
             key={product.id}
             product={product}
-            isInWishlist={wishlist.some((item) => item.id === product.id)}
+            isInWishlist={true}
             onToggleWishlist={() => toggleWishlist(product)}
           />
         ))}
@@ -244,7 +207,7 @@ function FavoriteProducts({ layout }) {
         ref={loaderRef}
         className="flex justify-center items-center p-4 mb-8"
       >
-        {loading && visibleProducts.length < products.length && (
+        {loading && visibleProducts.length < wishlistItems.length && (
           <div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-700 rounded-full animate-spin"></div>
         )}
       </div>

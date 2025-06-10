@@ -8,6 +8,7 @@ import {
   PiCalendarLight,
   PiGiftLight,
 } from "react-icons/pi";
+import { PiPackage } from "react-icons/pi";
 import { TfiSearch } from "react-icons/tfi";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -15,14 +16,16 @@ import { SlLocationPin } from "react-icons/sl";
 import PersonalInfo from "./PersonalInfo";
 import AddressDetails from "./AddressDetails";
 import { useTranslation } from "react-i18next";
+import { LucidePackageCheck } from "lucide-react";
+import OrdersUserSingle from "../Orders";
 
-function ProfileInformation({ user, orders, onLogout }) {
+function ProfileInformation({ user, orders, onLogout, initialTab = "personal" }) {
   const router = useRouter();
   const { t } = useTranslation();
   const [birthday, setBirthday] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [activeTab, setActiveTab] = useState("personal");
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   if (!user) {
     router.push("/login");
@@ -52,9 +55,9 @@ function ProfileInformation({ user, orders, onLogout }) {
 
   return (
     <Container>
-      <div className="w-full flex flex-col md:flex-row gap-5 my-10 mx-auto">
+      <div className="w-full flex flex-col md:flex-row gap-5 my-10 mx-auto relative">
         {/* Sidebar Navigation */}
-        <div className="w-full md:w-[20%] flex gap-3 flex-col">
+        <div className="w-full md:w-[20%] flex gap-3 flex-col md:sticky md:top-10 md:self-start">
           <div
             className={`font-gilroy text-lg py-3 px-5 ${
               activeTab === "personal"
@@ -68,27 +71,16 @@ function ProfileInformation({ user, orders, onLogout }) {
           </div>
           <div
             className={`font-gilroy text-lg py-3 px-5 ${
-              activeTab === "address"
+              activeTab === "orders"
                 ? "bg-neutral-100 text-neutral-900"
                 : "text-neutral-600"
             } gap-3 flex items-center cursor-pointer hover:bg-neutral-50 transition-colors`}
-            onClick={() => setActiveTab("address")}
+            onClick={() => handleNavigation("orders")}
           >
-            <SlLocationPin className="text-xl" />
-            <p>{t("address_details")}</p>
+            <PiPackage className="text-xl" />
+            <p>{t("orders")}</p>
           </div>
-          <div
-            className={`font-gilroy text-lg py-3 px-5 ${
-              activeTab === "wishlist"
-                ? "bg-neutral-100 text-neutral-900"
-                : "text-neutral-600"
-            } gap-3 flex items-center cursor-pointer hover:bg-neutral-50 transition-colors`}
-            onClick={() => handleNavigation("wishlist")}
-          >
-            <PiHeartLight className="text-xl" />
-            <p>{t("wishlist_title")}</p>
-          </div>
-          
+
           <div
             className={`font-gilroy text-lg py-3 px-5 ${
               activeTab === "basket"
@@ -100,20 +92,45 @@ function ProfileInformation({ user, orders, onLogout }) {
             <PiBasketLight className="text-xl" />
             <p>{t("basket")}</p>
           </div>
-          <div className="mt-auto">
+        
+          <div
+            className={`font-gilroy text-lg py-3 px-5 ${
+              activeTab === "wishlist"
+                ? "bg-neutral-100 text-neutral-900"
+                : "text-neutral-600"
+            } gap-3 flex items-center cursor-pointer hover:bg-neutral-50 transition-colors`}
+            onClick={() => handleNavigation("wishlist")}
+          >
+            <PiHeartLight className="text-xl" />
+            <p>{t("wishlist_title")}</p>
+          </div>
+          <div
+            className={`font-gilroy text-lg py-3 px-5 ${
+              activeTab === "address"
+                ? "bg-neutral-100 text-neutral-900"
+                : "text-neutral-600"
+            } gap-3 flex items-center cursor-pointer hover:bg-neutral-50 transition-colors`}
+            onClick={() => setActiveTab("address")}
+          >
+            <SlLocationPin className="text-xl" />
+            <p>{t("address_details")}</p>
+          </div>
+         
+          <div className="">
             <button
               onClick={onLogout}
-              className="w-full border mt-5 border-neutral-200 text-neutral-700 font-gilroy cursor-pointer py-2 transition-colors hover:bg-neutral-50 -b-lg"
+              className="w-full border  border-neutral-200 text-neutral-700 font-gilroy cursor-pointer py-2 transition-colors hover:bg-neutral-50 "
             >
-  {t("logout")}
+              {t("logout")}
             </button>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="w-full md:w-[80%] font-gilroy mx-auto bg-white p-6">
+        <div className="w-full md:w-[80%] font-gilroy mx-auto bg-white p-6 ">
           {activeTab === "personal" && <PersonalInfo user={user} />}
           {activeTab === "address" && <AddressDetails user={user} />}
+          {activeTab === "orders" && <OrdersUserSingle />}
         </div>
       </div>
     </Container>

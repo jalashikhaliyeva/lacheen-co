@@ -45,7 +45,7 @@ export default function SearchModal({ isOpen, onClose }) {
         <>
           {/* Backdrop: dark overlay with fade effect */}
           <motion.div
-            className="fixed inset-0 bg-black/40 z-50"
+            className="fixed inset-0 bg-black/40 z-[100]"
             onClick={onClose} // Clicking backdrop closes modal
             initial={{ opacity: 0 }} // Starting state for animation
             animate={{ opacity: 0.8 }} // Animated to 50% opacity
@@ -54,7 +54,7 @@ export default function SearchModal({ isOpen, onClose }) {
           />
 
           <motion.div
-            className="fixed inset-0 z-50 flex items-start justify-center"
+            className="fixed inset-0 z-[101] flex items-start justify-center"
             initial={{ y: "-100%", opacity: 0 }} // Start above viewport, invisible
             animate={{ y: "0%", opacity: 1 }} // Slide into place and fade in
             exit={{ y: "-100%", opacity: 0 }} // Slide up and fade out on close

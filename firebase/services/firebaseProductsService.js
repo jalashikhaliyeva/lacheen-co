@@ -1,11 +1,14 @@
-import { getDatabase, ref, get, update, push, set , remove } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  get,
+  update,
+  push,
+  set,
+  remove,
+} from "firebase/database";
 import { app } from "@/firebase/backendConfig";
 
-/**
- * Fetches all products from the Firebase Realtime Database.
- *
- * @returns {Promise<Array>} An array of products.
- */
 export const fetchProducts = async () => {
   const db = getDatabase(app);
   const productsRef = ref(db, "products");
@@ -103,7 +106,7 @@ export const fetchProductById = async (id) => {
 /**
  * Fetches related products based on a common parent ID.
  *
- * This function returns the parent product (if it exists) and all child products 
+ * This function returns the parent product (if it exists) and all child products
  * that have a "parents_id" matching the commonParentId.
  *
  * @param {string} commonParentId - The id that all related products share.
@@ -131,8 +134,6 @@ export const fetchRelatedProducts = async (commonParentId) => {
     throw error;
   }
 };
-
-
 
 /**
  * Deletes a product from the Firebase Realtime Database by its ID.
@@ -174,6 +175,97 @@ export const deleteMultipleProducts = async (ids) => {
     return true;
   } catch (error) {
     console.error("Error deleting multiple products:", error);
+    throw error;
+  }
+};
+
+export const fetchProductsByCategory = async (categorySlug) => {
+  const db = getDatabase(app);
+  const productsRef = ref(db, "products");
+
+  try {
+    const snapshot = await get(productsRef);
+    if (!snapshot.exists()) {
+      console.log("🚫 Heç bir məhsul yoxdur.");
+      return [];
+    }
+
+    const allProductsObj = snapshot.val();
+    const allProducts = Object.values(allProductsObj);
+
+    const slugToNameNormalized = categorySlug
+      .replace(/-/g, " ")
+      .trim()
+      .toLowerCase();
+
+    const filteredProducts = allProducts.filter((product) => {
+      if (!product.category || typeof product.category !== "string") {
+        return false;
+      }
+
+      const productCategoryNormalized = product.category.trim().toLowerCase();
+
+      const matchesCategory =
+        productCategoryNormalized === slugToNameNormalized;
+
+      const isActive =
+        product.is_active === false || product.is_active === "false"
+          ? false
+          : true;
+
+      return matchesCategory && isActive;
+    });
+
+    console.log(
+      `🛒 Category slug="${categorySlug}" üçün tapılan filtrlənmiş məhsullar:`,
+      filteredProducts
+    );
+    return filteredProducts;
+  } catch (error) {
+    console.error(
+      `❌ Error fetching products for category slug="${categorySlug}":`,
+      error
+    );
+    throw error;
+  }
+};
+
+export const fetchProductsByFilter = async (filter) => {
+  const db = getDatabase(app);
+  const productsRef = ref(db, "products");
+
+  try {
+    const snapshot = await get(productsRef);
+    if (snapshot.exists()) {
+      const allProducts = Object.values(snapshot.val());
+
+      let filteredProducts = [];
+
+      switch (filter) {
+        case "new":
+          filteredProducts = allProducts.filter(
+            (product) => product.is_new === true && product.is_active === true
+          );
+          break;
+        case "special":
+          filteredProducts = allProducts.filter(
+            (product) => product.sale > 0 && product.is_active === true
+          );
+          break;
+        default:
+          filteredProducts = allProducts.filter(
+            (product) => product.is_active === true
+          );
+      }
+
+      console.log(`Products with filter "${filter}":`, filteredProducts);
+      return filteredProducts;
+    } else {
+      console.log("No products available");
+      return [];
+    }
+  } catch (error) {
+    console.error(`Error fetching products with filter "${filter}":`, error);
     throw error;
   }
 };

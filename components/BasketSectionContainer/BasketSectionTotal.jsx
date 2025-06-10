@@ -4,42 +4,71 @@ import {
   LiaChevronDownSolid,
   LiaChevronUpSolid,
 } from "react-icons/lia";
+import { useAuthClient } from "@/shared/context/AuthContext";
+import { useTranslation } from "react-i18next";
+import { useBasket } from "@/shared/context/BasketContext";
+import { useRouter } from "next/navigation";
 
 function BasketSectionTotal() {
   const [showDetails, setShowDetails] = useState(false);
+  const { user } = useAuthClient();
+  const { t } = useTranslation();
+  const { basketItems } = useBasket();
+  const router = useRouter();
+
+  const calculateSubtotal = () => {
+    return basketItems.reduce((total, item) => {
+      return total + (parseFloat(item.price) * item.quantity);
+    }, 0).toFixed(2);
+  };
+
+  const calculateDelivery = () => {
+    const subtotal = parseFloat(calculateSubtotal());
+    return subtotal >= 100 ? 0 : 5; // Free delivery over 100 AZN
+  };
+
+  const calculateTotal = () => {
+    const subtotal = parseFloat(calculateSubtotal());
+    const delivery = calculateDelivery();
+    return (subtotal + delivery).toFixed(2);
+  };
 
   const toggleDetails = () => {
     setShowDetails(!showDetails);
   };
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-1 md:gap-4 w-full font-gilroy bg-white p-4 md:p-5 border-neutral-200">
       <h2 className="hidden md:block text-lg md:text-xl font-semibold">
-        Order Summary
+        {t("order_summary")}
       </h2>
 
-      {/* Always visible on desktop, hidden on mobile behind toggle */}
       <div className="hidden md:block">
         <div className="flex flex-row justify-between">
-          <p className="text-base md:text-lg">Subtotal</p>
-          <span className="text-base">1555 ₼</span>
+          <p className="text-base md:text-lg">{t("subtotal")}</p>
+          <span className="text-base">{calculateSubtotal()} ₼</span>
         </div>
         <div className="flex flex-row justify-between">
-          <p className="text-base md:text-lg">Teslimat</p>
-          <span className="text-base">odenishsiz</span>
+          <p className="text-base md:text-lg">{t("delivery")}</p>
+          <span className="text-base">
+            {calculateDelivery() === 0 ? t("free") : `${calculateDelivery()} ₼`}
+          </span>
         </div>
       </div>
 
-      <div className="flex flex-row justify-between  md:border-t border-neutral-200 pt-3">
-        <p className="text-base md:text-lg uppercase font-medium">Total</p>
-        <span className="text-base font-semibold">1555 ₼</span>
+      <div className="flex flex-row justify-between md:border-t border-neutral-200 pt-3">
+        <p className="text-base md:text-lg uppercase font-medium">{t("total")}</p>
+        <span className="text-base font-semibold">{calculateTotal()} ₼</span>
       </div>
 
-      {/* Mobile toggle for additional information */}
       <div className="md:hidden">
         <div className="flex justify-between items-center mt-2">
           <button onClick={toggleDetails} className="text-sm text-neutral-600">
-            {showDetails ? "Hide details" : "Show details"}
+            {showDetails ? t("hide_details") : t("show_details")}
           </button>
           <button onClick={toggleDetails}>
             {showDetails ? (
@@ -50,7 +79,6 @@ function BasketSectionTotal() {
           </button>
         </div>
 
-        {/* Dropdown content with smooth transition */}
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
             showDetails ? "max-h-96" : "max-h-0"
@@ -58,27 +86,30 @@ function BasketSectionTotal() {
         >
           <div className="mt-1">
             <div className="flex flex-row justify-between mb-2">
-              <p className="text-base">Subtotal</p>
-              <span className="text-base">1555 ₼</span>
+              <p className="text-base">{t("subtotal")}</p>
+              <span className="text-base">{calculateSubtotal()} ₼</span>
             </div>
             <div className="flex flex-row justify-between mb-3">
-              <p className="text-base">Teslimat</p>
-              <span className="text-base">odenishsiz</span>
+              <p className="text-base">{t("delivery")}</p>
+              <span className="text-base">
+                {calculateDelivery() === 0 ? t("free") : `${calculateDelivery()} ₼`}
+              </span>
             </div>
 
             <div className="flex flex-col gap-2 text-sm pb-2">
               <div className="flex flex-row gap-2 items-center">
                 <LiaCheckSolid size={18} />
-                <p>Delivering in 10 days</p>
+                <p>{t("delivery_time")}</p>
               </div>
               <div className="flex flex-row gap-2 items-center">
                 <LiaCheckSolid size={18} />
-                <p>900 TL üzeri alışverişlerde ücretsiz kargo</p>
+                <p>100 AZN{t("free_shipping_threshold")}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
+
       <div className="mt-4 md:mt-6">
         <button
           className="py-2 px-4 w-full border cursor-pointer font-gilroy border-neutral-900 text-neutral-800 
@@ -88,20 +119,21 @@ function BasketSectionTotal() {
             hover:bg-neutral-900
             hover:border-neutral-900
             active:scale-95"
+          disabled={basketItems.length === 0}
+          onClick={() => router.push('/checkout')}
         >
-          Buy now, don't miss it!
+          {t("buy_now")}
         </button>
       </div>
 
-      {/* Always visible on desktop */}
       <div className="hidden md:flex mt-4 md:mt-5 flex-col gap-2 text-sm md:text-base">
         <div className="flex flex-row gap-2 items-center">
           <LiaCheckSolid size={18} />
-          <p>Delivering in 10 days</p>
+          <p>{t("delivery_time")}</p>
         </div>
         <div className="flex flex-row gap-2 items-center">
           <LiaCheckSolid size={18} />
-          <p>900 TL üzeri alışverişlerde ücretsiz kargo</p>
+          <p>100 AZN {t("free_shipping_threshold")}</p>
         </div>
       </div>
     </div>

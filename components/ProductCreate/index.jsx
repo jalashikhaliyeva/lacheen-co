@@ -1,4 +1,3 @@
-// components/ProductCreateTabs.js
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { createProduct } from "@/firebase/services/firebaseProductsService";
@@ -17,56 +16,67 @@ function ProductCreateTabs() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("information");
 
-  // Button style classes for tab navigation:
   const baseButtonClass = "text-lg font-gilroy p-2 cursor-pointer font-base";
-  // const activeButtonClass = "bg-[#EBF0FF] text-lightBlueeText rounded-md";
   const activeButtonClass = "text-teal-700 border-b-2 border-teal-700 pb-1";
 
-
   const handleCreateProduct = async () => {
-    // 1. Validate required fields (except description and quantity)
-    const requiredFields = ["name", "price", "sellingPrice", "barcode", "category"];
+    const requiredFields = [
+      "name",
+      "price",
+      "sellingPrice",
+      "barcode",
+      "category",
+    ];
     const hasRequiredFields = requiredFields.every(
       (key) =>
         informationData[key] !== undefined &&
         informationData[key] !== null &&
         informationData[key].toString().trim() !== ""
     );
-  
-    // 2. Check that there is at least one image
+
     const hasImages =
       Array.isArray(informationData.images) &&
       informationData.images.length > 0;
-  
-    // 3. Determine active status based on completeness
+
     const isActive = hasRequiredFields && hasImages;
-  
-    // Prepare the main product data (include the is_new field explicitly)
+
     const mainProductData = {
       ...informationData,
-      is_child: false, // Main product flag
+      is_child: false,
       is_active: isActive,
       is_new: informationData.is_new, // Preserve the "new" flag
+      // Ensure color is stored consistently with name and code
+      color: informationData.selectedColor || { name: "", code: "" },
     };
-  
+
     try {
       // 1. Create the main product in Firebase.
       const createdProduct = await createProduct(mainProductData);
-  
+
       // 2. Create variant entries if any are defined.
       if (combinationData.variants && combinationData.variants.length > 0) {
         for (const variant of combinationData.variants) {
-          // Use the variant data as-is and add/update the parent's id and child flag
+          // Use the variant data and inherit category and barcode from parent
           const newVariantData = {
             ...variant, // Preserves updated name, images, and other fields
             parents_id: createdProduct.id,
             is_child: true,
+            // Inherit category and barcode from parent product
+            category: informationData.category,
+            barcode: informationData.barcode,
+            // Also inherit description if variant doesn't have one
+            description: variant.description || informationData.description,
+            // Ensure color is stored with both name and code
+            color: variant.colorObject || {
+              name: variant.color || "",
+              code: "",
+            },
           };
-  
+
           await createProduct(newVariantData);
         }
       }
-  
+
       // 3. Reset the context data for a clean form.
       setInformationData({
         id: "",
@@ -77,13 +87,13 @@ function ProductCreateTabs() {
         sellingPrice: 0,
         quantity: "",
         category: "",
-        color: "",
+        color: { name: "", code: "" },
         images: [],
         sizes: [],
         is_active: true,
         is_child: false,
         colors: [],
-        selectedColor: [],
+        selectedColor: null,
         is_new: false,
       });
       setCombinationData({
@@ -91,7 +101,7 @@ function ProductCreateTabs() {
         selectedColor: [],
         variants: [],
       });
-  
+
       // 4. Show success notification and redirect.
       toast.success("Product created successfully!");
       router.push("/admin/products");
@@ -100,8 +110,6 @@ function ProductCreateTabs() {
       toast.error("There was an error creating the product.");
     }
   };
-  
-
   const renderTab = () => {
     return activeTab === "information" ? (
       <div>
@@ -142,11 +150,14 @@ function ProductCreateTabs() {
           >
             Create Product
           </button>
-          <button  onClick={() =>
-            router.push({
-              pathname: "/admin/products",
-            })
-          } className="bg-white cursor-pointer text-red-400 border rounded-md px-4 py-2 mt-4">
+          <button
+            onClick={() =>
+              router.push({
+                pathname: "/admin/products",
+              })
+            }
+            className="bg-white cursor-pointer text-red-400 border rounded-md px-4 py-2 mt-4"
+          >
             Cancel
           </button>
         </div>

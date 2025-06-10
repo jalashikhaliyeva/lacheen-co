@@ -8,7 +8,6 @@ import { ProductContext } from "@/shared/context/ProductContext";
 import { fetchProductById } from "@/firebase/services/firebaseProductsService";
 import ProductCreateTabs from "@/components/ProductCreate";
 import Breadcrumbs from "@/components/Breadcrumbs";
-// import ProductCreateTabs from "@/components/ProductEdit";
 
 function ProductEdit() {
   const router = useRouter();
@@ -16,8 +15,8 @@ function ProductEdit() {
   const { id } = router.query;
   const { setInformationData } = useContext(ProductContext);
   useEffect(() => {
-    if (!router.isReady) return; // Wait until router is ready
-    console.log("Router query:", router.query); // Debug the query parameters
+    if (!router.isReady) return;
+    console.log("Router query:", router.query);
     console.log(id, "id from router");
 
     if (id) {
@@ -28,27 +27,21 @@ function ProductEdit() {
         })
         .catch((error) => console.error("Error in fetchProductById:", error));
     }
-  }, [router.isReady, id, setInformationData]);
+  }, [router.isReady, id, setInformationData, router.query]);
 
   return (
     <ProtectedRoute>
       <AdminLayout>
         <div className="bg-bodyGray h-full pb-20 ">
           <Container>
-          <div className="pt-7">
+            <div className="pt-7">
               <Breadcrumbs />
-              {/* Your page content goes here */}
             </div>
 
             <h1 className="text-2xl font-helvetica font-medium mb-4">
               Edit Product
             </h1>
-            {/* Optionally, show product name here */}
-            {/* {name ? (
-              <p className="text-lg">Editing product: {name}</p>
-            ) : (
-              <p className="text-lg">No product selected.</p>
-            )} */}
+
             <ProductCreateTabs />
           </Container>
         </div>

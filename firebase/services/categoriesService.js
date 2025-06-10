@@ -9,10 +9,7 @@ import {
 } from "firebase/database";
 import { app } from "@/firebase/backendConfig";
 
-/**
- * Fetches all categories from Firebase
- * @returns {Promise<Array>} Array of categories
- */
+
 export const fetchCategories = async () => {
   const db = getDatabase(app);
   const categoriesRef = ref(db, "categories");

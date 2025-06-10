@@ -1,36 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { GoTrash } from "react-icons/go";
 import { PiMinusSquareLight } from "react-icons/pi";
 import { RiDeleteBack2Line } from "react-icons/ri";
 import { SlLocationPin } from "react-icons/sl";
+import {
+  getUserProfile,
+  addUserAddress,
+  deleteUserAddress,
+  setDefaultAddress,
+} from "@/firebase/services/firebaseUserService";
+import CustomToast from "../CustomToast/CustomToast";
 
 function AddressDetails({ user }) {
   const { t } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      title: "Home",
-      fullName: "John Doe",
-      phone: "+994 55 123 45 67",
-      address: "123 Main Street",
-      city: "Baku",
-      postalCode: "AZ1000",
-      isDefault: true,
-    },
-    {
-      id: 2,
-      title: "Work",
-      fullName: "John Doe",
-      phone: "+994 55 987 65 43",
-      address: "456 Business Center",
-      city: "Baku",
-      postalCode: "AZ1001",
-      isDefault: false,
-    },
-  ]);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [addresses, setAddresses] = useState([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [newAddress, setNewAddress] = useState({
     title: "",
@@ -42,53 +31,111 @@ function AddressDetails({ user }) {
     isDefault: false,
   });
 
-  const [showAddForm, setShowAddForm] = useState(false);
+  useEffect(() => {
+    const loadAddresses = async () => {
+      if (user) {
+        try {
+          const userData = await getUserProfile(user.uid);
+          if (userData && userData.addresses) {
+            setAddresses(userData.addresses);
+          }
+        } catch (error) {
+          console.error("Error loading addresses:", error);
+          setToastMessage(t("error_loading_addresses"));
+          setShowToast(true);
+        }
+      }
+    };
 
-  const handleSave = () => {
-    setIsSaving(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSaving(false);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    }, 1000);
-  };
+    loadAddresses();
+  }, [user, t]);
 
-  const handleAddAddress = () => {
-    if (newAddress.isDefault) {
-      // If setting as default, unset all other defaults
-      setAddresses((prev) =>
-        prev.map((addr) => ({ ...addr, isDefault: false }))
-      );
+  const closeToast = () => setShowToast(false);
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!newAddress.title.trim()) {
+      newErrors.title = t("address_title_required");
     }
-
-    setAddresses((prev) => [...prev, { ...newAddress, id: Date.now() }]);
-    setNewAddress({
-      title: "",
-      fullName: user?.displayName || "",
-      phone: "",
-      address: "",
-      city: "",
-      postalCode: "",
-      isDefault: false,
-    });
-    setShowAddForm(false);
-    handleSave();
+    if (!newAddress.fullName.trim()) {
+      newErrors.fullName = t("full_name_required");
+    }
+    if (!newAddress.phone.trim()) {
+      newErrors.phone = t("phone_required");
+    }
+    if (!newAddress.address.trim()) {
+      newErrors.address = t("address_required");
+    }
+    if (!newAddress.city.trim()) {
+      newErrors.city = t("city_required");
+    }
+    if (!newAddress.postalCode.trim()) {
+      newErrors.postalCode = t("postal_code_required");
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSetDefault = (id) => {
-    setAddresses((prev) =>
-      prev.map((addr) => ({
-        ...addr,
-        isDefault: addr.id === id,
-      }))
-    );
-    handleSave();
+  const handleAddAddress = async () => {
+    if (!validateForm()) {
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const updatedAddresses = await addUserAddress(user.uid, newAddress);
+      if (updatedAddresses) {
+        setAddresses(updatedAddresses);
+        setNewAddress({
+          title: "",
+          fullName: user?.displayName || "",
+          phone: "",
+          address: "",
+          city: "",
+          postalCode: "",
+          isDefault: false,
+        });
+        setErrors({});
+        setShowAddForm(false);
+        setToastMessage(t("address_added_successfully"));
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error("Error adding address:", error);
+      setToastMessage(t("error_adding_address"));
+      setShowToast(true);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleDelete = (id) => {
-    setAddresses((prev) => prev.filter((addr) => addr.id !== id));
-    handleSave();
+  const handleSetDefault = async (id) => {
+    try {
+      const updatedAddresses = await setDefaultAddress(user.uid, id);
+      if (updatedAddresses) {
+        setAddresses(updatedAddresses);
+        setToastMessage(t("default_address_updated"));
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error("Error setting default address:", error);
+      setToastMessage(t("error_updating_default_address"));
+      setShowToast(true);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const updatedAddresses = await deleteUserAddress(user.uid, id);
+      if (updatedAddresses) {
+        setAddresses(updatedAddresses);
+        setToastMessage(t("address_deleted_successfully"));
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error("Error deleting address:", error);
+      setToastMessage(t("error_deleting_address"));
+      setShowToast(true);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -101,6 +148,11 @@ function AddressDetails({ user }) {
 
   return (
     <div>
+      <CustomToast
+        show={showToast}
+        onClose={closeToast}
+        message={toastMessage}
+      />
       <h2 className="text-2xl font-gilroy text-gray-800 mb-6">
         {t("address_details")}
       </h2>
@@ -173,39 +225,47 @@ function AddressDetails({ user }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col space-y-1">
                 <label className="text-sm text-gray-700">
-                  {" "}
-                  {t("address_title")}
+                  {t("address_title")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="title"
                   value={newAddress.title}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  className={`w-full p-3 border ${
+                    errors.title ? "border-red-500" : "border-gray-300"
+                  } focus:outline-none focus:ring-1 focus:ring-gray-400`}
                   placeholder="e.g. Home, Work"
                 />
+                {errors.title && (
+                  <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+                )}
               </div>
 
               <div className="flex flex-col space-y-1">
                 <label className="text-sm text-gray-700">
-                  {" "}
-                  {t("full_name")}
+                  {t("full_name")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="fullName"
                   value={newAddress.fullName}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  className={`w-full p-3 border ${
+                    errors.fullName ? "border-red-500" : "border-gray-300"
+                  } focus:outline-none focus:ring-1 focus:ring-gray-400`}
                   placeholder="John Doe"
                 />
+                {errors.fullName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col space-y-1">
                 <label className="text-sm text-gray-700">
-                  {t("auth.phone_number")}
+                  {t("auth.phone_number")} <span className="text-red-500">*</span>
                 </label>
                 <div className="flex">
                   <div className="p-3 bg-gray-100 border border-r-0">+994</div>
@@ -216,51 +276,73 @@ function AddressDetails({ user }) {
                     onChange={handleInputChange}
                     maxLength={15}
                     placeholder="xx xxx xx xx"
-                    className="border w-full p-3 focus:outline-none focus:shadow-outline"
+                    className={`border w-full p-3 focus:outline-none focus:shadow-outline ${
+                      errors.phone ? "border-red-500" : "border-gray-300"
+                    }`}
                   />
                 </div>
+                {errors.phone && (
+                  <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                )}
               </div>
 
               <div className="flex flex-col space-y-1">
-                <label className="text-sm text-gray-700">{t("city")}</label>
+                <label className="text-sm text-gray-700">
+                  {t("city")} <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   name="city"
                   value={newAddress.city}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  className={`w-full p-3 border ${
+                    errors.city ? "border-red-500" : "border-gray-300"
+                  } focus:outline-none focus:ring-1 focus:ring-gray-400`}
                   placeholder="Baku"
                 />
+                {errors.city && (
+                  <p className="text-red-500 text-sm mt-1">{errors.city}</p>
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col space-y-1">
                 <label className="text-sm text-gray-700">
-                  {t("street_address")}
+                  {t("street_address")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="address"
                   value={newAddress.address}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  className={`w-full p-3 border ${
+                    errors.address ? "border-red-500" : "border-gray-300"
+                  } focus:outline-none focus:ring-1 focus:ring-gray-400`}
                   placeholder="123 Main Street"
                 />
+                {errors.address && (
+                  <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+                )}
               </div>
 
               <div className="flex flex-col space-y-1">
                 <label className="text-sm text-gray-700">
-                  {t("postal_code")}
+                  {t("postal_code")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="postalCode"
                   value={newAddress.postalCode}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  className={`w-full p-3 border ${
+                    errors.postalCode ? "border-red-500" : "border-gray-300"
+                  } focus:outline-none focus:ring-1 focus:ring-gray-400`}
                   placeholder="AZ1000"
                 />
+                {errors.postalCode && (
+                  <p className="text-red-500 text-sm mt-1">{errors.postalCode}</p>
+                )}
               </div>
             </div>
 
@@ -292,13 +374,8 @@ function AddressDetails({ user }) {
                   isSaving ? "bg-gray-400" : "bg-black hover:bg-gray-800"
                 } transition-colors`}
               >
-                {isSaving ? "Saving..." : "Save Address"}
+                {isSaving ? t("saving") : t("save_address")}
               </button>
-              {saveSuccess && (
-                <p className="text-green-600 text-sm flex items-center">
-                  {t("changes_saved_successfully")}
-                </p>
-              )}
             </div>
           </div>
         )}

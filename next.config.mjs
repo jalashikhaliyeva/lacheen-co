@@ -7,6 +7,10 @@ const nextConfig = {
     localeDetection: false,
    
   },
+  images: {
+  domains: ["firebasestorage.googleapis.com"],
+}
+
 };
 
 export default nextConfig;

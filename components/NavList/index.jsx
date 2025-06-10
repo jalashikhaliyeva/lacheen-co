@@ -1,269 +1,83 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
+import Link from "next/link";
 import Container from "../Container";
 import { useTranslation } from "react-i18next";
+import { useCategories } from "@/shared/context/CategoriesContext";
+import { useRouter } from "next/router";
 
-function NavList({ onMenuToggle }) {
+function NavList() {
+  const { categories, loading, error } = useCategories();
   const { t } = useTranslation();
-  const [activeMenu, setActiveMenu] = useState(null);
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [isMenuMounted, setIsMenuMounted] = useState(false);
-  const [displayedMenu, setDisplayedMenu] = useState(null);
-  const [contentVisible, setContentVisible] = useState(true);
+  const router = useRouter();
+  const currentCategory = router.query.category || null;
 
-  const timeoutRef = useRef(null);
-  const contentTimeoutRef = useRef(null);
+  // Determine if the current path is the products page
+  const isProductsPage = router.pathname === "/products";
+
+  const staticMenuItems = [
+    { id: "new", label: t("nav.new"), is_active: true },
+    {
+      id: "special",
+      label: t("nav.special_prices"),
+      isHighlighted: true,
+      is_active: true,
+    },
+    { id: "viewAll", label: t("nav.view_all"), is_active: true },
+  ];
   const menuItems = [
-    { id: "new", label: t("nav.new") },
-    { id: "special", label: t("nav.special_prices"), isHighlighted: true },
-    { id: "viewAll", label: t("nav.view_all") },
-    { id: "sandals", label: t("categories.sandals") },
-    { id: "sneakers", label: t("categories.sneakers") },
-    { id: "flats", label: t("categories.flats") },
+    ...staticMenuItems,
+    ...categories
+      .filter((category) => category.is_active)
+      .map((category) => ({
+        id: category.slug || category.id,
+        label: category.name,
+        is_active: category.is_active,
+      })),
   ];
 
-  const subMenuData = {
-    new: {
-      mainImage: "/images/16.jpg",
-      description:
-        "Discover our latest collection of trendy footwear for the season.",
-      items: [
-        "Spring Collection",
-        "Summer Styles",
-        "Limited Edition",
-        "Collaborations",
-      ],
-      images: [
-        "/images/12.jpg",
-        "/images/14.jpg",
-        "/images/15.jpg",
-        "/images/13.jpg",
-      ],
-    },
-    special: {
-      mainImage: "/images/products/IMG_0998 2.jpg",
-      description: "Don't miss out on these amazing deals and discounts!",
-      items: ["Clearance", "Last Season", "Buy 1 Get 1", "Seasonal Offers"],
-      images: [
-        "/images/products/IMG_1137.jpg",
-        "/images/products/IMG_1154.jpg",
-        "/images/products/IMG_1151.jpg",
-        "/images/products/IMG_1146.jpg",
-      ],
-    },
-    viewAll: {
-      mainImage: "/images/products/IMG_1598 2.jpg",
-      description: "Browse our complete collection of footwear.",
-      items: ["All Shoes", "All Sandals", "All Boots", "All Accessories"],
-      images: [
-        "/images/products/IMG_1137.jpg",
-        "/images/products/IMG_1154.jpg",
-        "/images/products/IMG_1151.jpg",
-        "/images/products/IMG_1146.jpg",
-      ],
-    },
-    sandals: {
-      mainImage: "/images/products/IMG_1052.jpg",
-      description: "Comfortable and stylish sandals for every occasion.",
-      items: ["Casual Sandals", "Dress Sandals", "Sport Sandals", "Beachwear"],
-      images: [
-        "/images/products/IMG_1137.jpg",
-        "/images/products/IMG_1154.jpg",
-        "/images/products/IMG_1151.jpg",
-        "/images/products/IMG_1146.jpg",
-      ],
-    },
-    sneakers: {
-      mainImage: "/images/17.jpg",
-      description: "Trendy sneakers for your active lifestyle.",
-      items: ["Running", "Casual", "Basketball", "Limited Edition"],
-      images: [
-        "/images/products/IMG_1137.jpg",
-        "/images/products/IMG_1154.jpg",
-        "/images/products/IMG_1151.jpg",
-        "/images/products/IMG_1146.jpg",
-      ],
-    },
-    flats: {
-      mainImage: "/images/products/IMG_1052.jpg",
-      description: "Elegant and comfortable flats for everyday wear.",
-      items: ["Ballet Flats", "Loafers", "Pointed Toe", "Comfort Plus"],
-      images: [
-        "/images/products/IMG_1137.jpg",
-        "/images/products/IMG_1154.jpg",
-        "/images/products/IMG_1151.jpg",
-        "/images/products/IMG_1146.jpg",
-      ],
-    },
+  const getItemUrl = (item) => {
+    if (item.id === "viewAll") {
+      return "/products";
+    }
+    return `/products?category=${item.id}`;
   };
 
-  const handleMenuEnter = (menuId) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+  const isActive = (itemId) => {
+    // Only apply active state logic if we are on the /products page
+    if (!isProductsPage) {
+      return false;
     }
 
-    setActiveMenu(menuId);
-    onMenuToggle(true);
-
-    if (!isMenuMounted) {
-      setIsMenuMounted(true);
-      // Start the opening animation
-      setTimeout(() => {
-        setIsMenuVisible(true);
-        setDisplayedMenu(menuId);
-        setContentVisible(true);
-      }, 10); // Small delay to allow mounting before animation
-    } else if (menuId !== displayedMenu) {
-      setContentVisible(false);
-      if (contentTimeoutRef.current) {
-        clearTimeout(contentTimeoutRef.current);
-      }
-      contentTimeoutRef.current = setTimeout(() => {
-        setDisplayedMenu(menuId);
-        setContentVisible(true);
-      }, 200); // Reduced from 260ms for faster content transition
-    } else {
-      // If same menu is re-entered, just ensure it's visible
-      setIsMenuVisible(true);
+    if (itemId === "viewAll" && !currentCategory) {
+      return true;
     }
+    return itemId === currentCategory;
   };
-
-  const handleMenuLeave = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    // Start the closing animation
-    setIsMenuVisible(false);
-    // Delay the unmounting to allow the animation to complete
-    timeoutRef.current = setTimeout(() => {
-      setActiveMenu(null);
-      setIsMenuMounted(false);
-      onMenuToggle(false);
-    }, 300); // Matches the exit animation duration
-  };
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      if (contentTimeoutRef.current) clearTimeout(contentTimeoutRef.current);
-    };
-  }, []);
 
   return (
-    <div
-      className="hidden md:block bg-white relative z-50"
-      onMouseLeave={handleMenuLeave}
-    >
+    <div className="hidden md:block bg-white relative z-50">
       <Container>
         <div className="flex overflow-hidden gap-7 justify-center items-center pb-4">
           {menuItems.map((item) => (
-            <div
-              key={item.id}
-              className="relative group"
-              onMouseEnter={() => handleMenuEnter(item.id)}
-            >
-              <p
-                className={`font-gilroy font-[400] text-xs text-neutral-800  md:text-base uppercase cursor-pointer transition-all duration-200 ${
-                  item.isHighlighted ? "text-pink-800" : ""
-                } ${
-                  activeMenu === item.id
-                    ? "border-b-2 border-black pb-1"
-                    : "hover:border-b hover:border-gray-300 pb-1"
-                }`}
-              >
-                {item.label}
-              </p>
-              {activeMenu === item.id && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black transform origin-left scale-x-100 transition-transform duration-300"></div>
-              )}
+            <div key={item.id} className="relative group">
+              <Link href={getItemUrl(item)} passHref>
+                <p
+                  className={`font-gilroy font-normal text-xs text-neutral-800 md:text-base uppercase cursor-pointer transition-all duration-200 ${
+                    item.isHighlighted ? "text-pink-800" : ""
+                  } py-1 relative inline-block`}
+                >
+                  {item.label}
+                  <span
+                    className={`absolute bottom-0 left-0 h-[1px] bg-neutral-400 transition-all duration-300 ${
+                      isActive(item.id) ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  />
+                </p>
+              </Link>
             </div>
           ))}
         </div>
       </Container>
-
-      {/* Mega Menu Dropdown */}
-      {isMenuMounted && (
-        <div
-          className={`absolute left-0 right-0 bg-white shadow-lg z-50
-                    overflow-hidden will-change-[opacity,transform,max-height]
-                    ${
-                      isMenuVisible
-                        ? "animate-slide-down-soft"
-                        : "animate-slide-up-soft"
-                    }`}
-          // style={{
-          //   boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-          //   willChange: "opacity, transform",
-          // }}
-        >
-          <Container>
-            <div className="flex justify-center h-full p-6">
-              {/* Main Image */}
-              <div
-                className={`w-[360px] h-[400px] pr-6 transition-opacity duration-300 ${
-                  contentVisible ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                <div className="w-full h-full bg-gray-100 overflow-hidden rounded-lg">
-                  <img
-                    src={subMenuData[displayedMenu]?.mainImage}
-                    alt="Main banner"
-                    className="w-full h-full object-cover transition-transform duration-700 ease-in-out hover:scale-105"
-                  />
-                </div>
-              </div>
-
-              {/* Content Column */}
-              <div
-                className={`w-1/3 pr-6 transition-opacity duration-300 ${
-                  contentVisible ? "opacity-100 ease-out" : "opacity-0 ease-in"
-                }`}
-              >
-                <h3 className="font-gilroy text-neutral-800 font-bold text-2xl mb-4">
-                  {menuItems.find((item) => item.id === displayedMenu)?.label}
-                </h3>
-                <p className="font-gilroy text-gray-700 mb-6">
-                  {subMenuData[displayedMenu]?.description}
-                </p>
-                <ul className="space-y-3">
-                  {subMenuData[displayedMenu]?.items.map((itm, idx) => (
-                    <li
-                      key={idx}
-                      className="font-gilroy text-lg hover:text-pink-800 cursor-pointer transition-colors duration-200"
-                    >
-                      {itm}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div
-                className={`transition-opacity duration-300 ${
-                  contentVisible ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                <h4 className="font-gilroy text-neutral-800 font-bold text-lg mb-4">
-               {t("featured-section.title")}
-                </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  {subMenuData[displayedMenu]?.images.map((image, idx) => (
-                    <div
-                      key={idx}
-                      className="aspect-square w-[160px] h-[180px] overflow-hidden rounded-lg transition-all duration-300 ease-in-out hover:shadow-md"
-                    >
-                      <img
-                        src={image}
-                        alt={`Product ${idx + 1}`}
-                        className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-110"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </Container>
-        </div>
-      )}
     </div>
   );
 }

@@ -4,10 +4,13 @@ import NavList from "@/components/NavList";
 import ProfileInformation from "@/components/ProfileInformation";
 import Footer from "@/components/Footer";
 import { useAuthClient } from "@/shared/context/AuthContext";
+import { useRouter } from "next/router";
 
 export default function Profile() {
   const { user, logout, loading } = useAuthClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
+  const { tab } = router.query;
 
   // mock data for the demo; replace with real fetch later
   const orders = { total: 14, pending: 3, cancelled: 1 };
@@ -56,6 +59,7 @@ export default function Profile() {
           user={user}
           orders={orders}
           onLogout={logout}
+          initialTab={tab || "personal"}
         />
 
         <Footer />

@@ -6,13 +6,8 @@ import { FiZoomIn } from 'react-icons/fi';
 import { GoPlus } from "react-icons/go";
 
 
-const ProductDetailedSliderVersion3 = () => {
-  const images = [
-    "/images/13.jpg",
-    "/images/14.jpg",
-    "/images/15.jpg",
-    "/images/16.jpg",
-  ];
+const ProductDetailedSliderVersion3 = ({images}) => {
+ 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState(0);

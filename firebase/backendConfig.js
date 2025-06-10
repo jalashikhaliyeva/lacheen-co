@@ -4,6 +4,7 @@ import { getDatabase, ref, get } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { getStorage } from "firebase/storage";
+
 const backendConfig = {
   apiKey: "AIzaSyASUST9_U8t7zqVAgqFpf09fsjnhaJQxc8",
   authDomain: "lacheen-co.firebaseapp.com",
@@ -18,7 +19,6 @@ const backendConfig = {
 const backendApp = !getApps().length
   ? initializeApp(backendConfig)
   : getApps()[0];
-
 
 const db = getDatabase(backendApp);
 const productsRef = ref(db, "products");
@@ -35,8 +35,8 @@ get(productsRef)
     console.error("Error retrieving data:", error);
   });
 
-
 const auth = getAuth(backendApp);
+
 let analytics;
 if (typeof window !== "undefined") {
   analytics = getAnalytics(backendApp);

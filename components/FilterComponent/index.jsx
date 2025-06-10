@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
+import { useSizes } from "@/shared/hooks/useSizes";
+import { useColors } from "@/shared/hooks/useColors";
+import { fetchCategories } from "@/firebase/services/categoriesService";
 
-const FilterComponent = ({ onClose }) => {
+const FilterComponent = ({ onClose, onFilterChange, initialFilters }) => {
   const [openSection, setOpenSection] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isMounted, setIsMounted] = useState(true);
@@ -15,43 +18,94 @@ const FilterComponent = ({ onClose }) => {
     category: [],
   });
 
-  // Handle animation sequence on mount
+  const { sizes, loading: sizesLoading } = useSizes();
+  const { colors, loading: colorsLoading } = useColors();
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
   useEffect(() => {
-    // Force a layout/reflow before triggering animation
+    if (initialFilters) {
+      setSelectedFilters(initialFilters);
+    }
+  }, [initialFilters]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const fetchedCategories = await fetchCategories();
+
+        const activeCategories = fetchedCategories
+          .filter((category) => category.is_active)
+          .map((category) => category.name);
+        setCategories(activeCategories);
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
     requestAnimationFrame(() => {
       setIsVisible(true);
     });
   }, []);
 
-  // Handle close with animation
   const handleClose = () => {
     setIsVisible(false);
     setTimeout(() => {
       if (onClose) onClose();
-    }, 300); // Match this with CSS transition duration
+    }, 300);
   };
 
   const filterOptions = {
-    color: ["Red", "Yellow", "Blue", "Green", "Black", "White"],
-    size: ["S", "M", "L", "XL", "XXL"],
-    price: ["Under $50", "$50-$100", "$100-$200", "Over $200"],
-    category: ["Nike", "Adidas", "Puma", "Reebok", "New Balance"],
+    color: colors,
+    size: sizes,
+    price: [t("under_50"), t("50_100"), t("100_200"), t("over_200")],
+    category: categories,
   };
 
   const toggleSection = (section) =>
     setOpenSection(openSection === section ? null : section);
 
-  const handleFilterChange = (section, value) =>
+  const handleFilterChange = (section, value) => {
     setSelectedFilters((prev) => {
       const list = prev[section].includes(value)
         ? prev[section].filter((v) => v !== value)
         : [...prev[section], value];
-      return { ...prev, [section]: list };
+      const newFilters = { ...prev, [section]: list };
+
+      if (onFilterChange) {
+        onFilterChange(newFilters);
+      }
+      return newFilters;
     });
+  };
+
+  const handleApplyFilters = () => {
+    if (onFilterChange) {
+      onFilterChange(selectedFilters);
+    }
+    handleClose();
+  };
+
+  const handleClearFilters = () => {
+    const clearedFilters = {
+      color: [],
+      size: [],
+      price: [],
+      category: [],
+    };
+    setSelectedFilters(clearedFilters);
+    if (onFilterChange) {
+      onFilterChange(clearedFilters);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
-      {/* Overlay with fade transition */}
       <div
         className={`absolute inset-0 bg-black transition-opacity duration-300 ease-in-out ${
           isVisible ? "opacity-50" : "opacity-0"
@@ -68,7 +122,6 @@ const FilterComponent = ({ onClose }) => {
           style={{ willChange: "transform" }}
         >
           <div className="flex h-full flex-col bg-white shadow-xl">
-            {/* Header */}
             <div className="flex items-center justify-between px-4 py-5 border-b">
               <h2 className="text-lg text-gray-900">Filter</h2>
               <button
@@ -80,7 +133,6 @@ const FilterComponent = ({ onClose }) => {
               </button>
             </div>
 
-            {/* Sections */}
             <div className="flex-1 overflow-y-auto py-6 px-4">
               {Object.entries(filterOptions).map(([section, options]) => (
                 <div key={section} className="border-b border-gray-200 py-4">
@@ -107,7 +159,6 @@ const FilterComponent = ({ onClose }) => {
                     </div>
                   </button>
 
-                  {/* Animated content for filter options */}
                   <div
                     className={`
                       mt-4 pl-2 space-y-3 overflow-hidden
@@ -139,23 +190,15 @@ const FilterComponent = ({ onClose }) => {
               ))}
             </div>
 
-            {/* Footer */}
             <div className="flex flex-col gap-2 border-t px-4 py-4">
               <button
-                onClick={handleClose}
+                onClick={handleApplyFilters}
                 className="bg-neutral-800 px-4 py-2 text-sm text-white hover:bg-neutral-600 transition-colors duration-200"
               >
                 {t("apply_filters")}
               </button>
               <button
-                onClick={() =>
-                  setSelectedFilters({
-                    color: [],
-                    size: [],
-                    price: [],
-                    category: [],
-                  })
-                }
+                onClick={handleClearFilters}
                 className="border border-neutral-800 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors duration-200"
               >
                 {t("clear_all")}

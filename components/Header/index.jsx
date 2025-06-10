@@ -8,8 +8,6 @@ import Image from "next/image";
 import { CiSearch } from "react-icons/ci";
 import { useRouter } from "next/router";
 import SearchModal from "../SearchModal";
-import { CiMenuBurger } from "react-icons/ci";
-import { IoMenuOutline } from "react-icons/io5";
 import LanguageSwitcher from "../LanguageSwitcher";
 import MobileMenu from "./MobileMenu";
 import { useTranslation } from "react-i18next";
@@ -22,7 +20,6 @@ function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // While authentication state is loading, show a placeholder or spinner
   if (loading) {
     return (
       <div className="bg-white">
@@ -41,7 +38,7 @@ function Header() {
     <div className="bg-white">
       <Container>
         {/* Desktop Header */}
-        <div className="hidden md:flex justify-between items-center pt-4 h-[100px]">
+        <div className="hidden md:flex justify-between items-center  py-4">
           <div className="flex items-center gap-7 font-gilroy">
             <div
               onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -103,35 +100,42 @@ function Header() {
         </div>
 
         {/* Mobile Header */}
-        <div className="flex md:hidden justify-between items-center py-4 h-[80px]">
+        <div className="flex md:hidden justify-between items-center py-4 h-[80px] w-full">
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-neutral-900 focus:outline-none relative w-6 h-6"
+              onClick={() => {
+                console.log('Menu clicked, current state:', isMobileMenuOpen);
+                setIsMobileMenuOpen(prev => !prev);
+              }}
+              className="text-neutral-900 focus:outline-none relative w-10 h-10 z-50 flex items-center justify-center"
               aria-label={isMobileMenuOpen ? t("menu.close") : t("menu.open")}
+              type="button"
             >
-              <span
-                className={`absolute block w-6 h-px bg-current transition-all duration-300 ${
-                  isMobileMenuOpen ? "rotate-45 top-1/2" : "top-1 -translate-y-1/2"
-                }`}
-              />
-              <span
-                className={`absolute block w-6 h-px bg-current transition-opacity duration-300 ${
-                  isMobileMenuOpen ? "opacity-0" : "opacity-100"
-                }`}
-                style={{ top: "50%" }}
-              />
-              <span
-                className={`absolute block w-6 h-px bg-current transition-all duration-300 ${
-                  isMobileMenuOpen
-                    ? "-rotate-45 top-1/2"
-                    : "bottom-1 translate-y-1/2"
-                }`}
-              />
+              <div className="relative w-6 h-6">
+                <span
+                  className={`absolute block w-6 h-px bg-current transition-all duration-300 ${
+                    isMobileMenuOpen
+                      ? "rotate-45 top-1/2 -translate-y-1/2"
+                      : "top-1"
+                  }`}
+                />
+                <span
+                  className={`absolute block w-6 h-px bg-current transition-opacity duration-300 top-1/2 -translate-y-1/2 ${
+                    isMobileMenuOpen ? "opacity-0" : "opacity-100"
+                  }`}
+                />
+                <span
+                  className={`absolute block w-6 h-px bg-current transition-all duration-300 ${
+                    isMobileMenuOpen
+                      ? "-rotate-45 top-1/2 -translate-y-1/2"
+                      : "bottom-1"
+                  }`}
+                />
+              </div>
             </button>
-            <div
+            <button
               onClick={() => router.push("/")}
-              className="cursor-pointer ml-2"
+              className="cursor-pointer ml-2 focus:outline-none"
               aria-label="Home"
             >
               <Image
@@ -143,35 +147,39 @@ function Header() {
                 quality={100}
                 priority
               />
-            </div>
+            </button>
           </div>
 
-          <div className="flex items-center gap-4 text-neutral-900">
+          <div className="flex items-center gap-1 text-neutral-900">
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="focus:outline-none"
+              className="focus:outline-none w-10 h-10 flex items-center justify-center"
               aria-label={t("nav.search")}
+              type="button"
             >
               <CiSearch className="text-xl" />
             </button>
             <button
               onClick={() => router.push("/wishlist")}
-              className="focus:outline-none"
+              className="focus:outline-none w-10 h-10 flex items-center justify-center"
               aria-label="Wishlist"
+              type="button"
             >
               <PiHeartLight className="text-xl" />
             </button>
             <button
               onClick={() => router.push(accountPath)}
-              className="focus:outline-none"
+              className="focus:outline-none w-10 h-10 flex items-center justify-center"
               aria-label={user ? "Profile" : "Login"}
+              type="button"
             >
               <PiUserLight className="text-xl" />
             </button>
             <button
               onClick={() => router.push("/basket")}
-              className="focus:outline-none"
+              className="focus:outline-none w-10 h-10 flex items-center justify-center"
               aria-label="Basket"
+              type="button"
             >
               <PiBasketLight className="text-xl" />
             </button>
@@ -180,8 +188,14 @@ function Header() {
       </Container>
 
       {/* Modals */}
-      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+      />
     </div>
   );
 }

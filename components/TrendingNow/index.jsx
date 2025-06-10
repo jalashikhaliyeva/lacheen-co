@@ -10,7 +10,7 @@ import { PiHeart } from "react-icons/pi";
 import { PiHeartFill } from "react-icons/pi";
 import ProductCard from "../ProductCard";
 import { useTranslation } from "react-i18next";
-import CustomToast from "../CustomToast";
+import CustomToast from "../CustomToast/CustomToast";
 
 function TrendingNow() {
   const [wishlist, setWishlist] = useState([]);

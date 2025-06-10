@@ -1,6 +1,6 @@
 // contexts/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { auth } from "../../firebase/firebaseClient";
+import { auth } from "../../firebase/backendConfig";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -17,8 +17,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-
-  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);

@@ -10,6 +10,7 @@ import {
   FiChevronDown,
   FiGrid,
 } from "react-icons/fi";
+import { HiOutlineColorSwatch } from "react-icons/hi";
 import { PiUsersThree } from "react-icons/pi";
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase/backendConfig";
@@ -134,6 +135,12 @@ function AdminSidebar() {
       route: "/admin/categories",
     },
     {
+      id: "orders",
+      label: "Orders",
+      icon: <FiShoppingCart size={20} />,
+      route: "/admin/orders",
+    },
+    {
       id: "settings",
       label: "Settings",
       icon: <FiSettings size={20} />,
@@ -150,6 +157,12 @@ function AdminSidebar() {
       label: "Sizes",
       icon: <FiGrid size={20} />,
       route: "/admin/sizes",
+    },
+    {
+      id: "colors",
+      label: "Colors",
+      icon: <HiOutlineColorSwatch size={20} />,
+      route: "/admin/colors",
     },
   ];
 

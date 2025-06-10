@@ -309,7 +309,12 @@ function Information() {
               </div>
               {sale && (
                 <p className="text-sm text-green-600 mt-1">
-                  Product will be discounted by {sale}%
+                  Product will be discounted by {sale}% (New price:
+                  {(
+                    parseFloat(sellingPrice) *
+                    (1 - parseFloat(sale) / 100)
+                  ).toFixed(2)}{" "}
+                  ₼ )
                 </p>
               )}
             </div>

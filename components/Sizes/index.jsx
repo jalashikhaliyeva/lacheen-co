@@ -258,6 +258,11 @@ function SizesList() {
             type="text"
             value={newSize}
             onChange={(e) => setNewSize(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !processing) {
+                handleAddSize();
+              }
+            }}
             placeholder="e.g. 36, 37, M, L"
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
             autoFocus

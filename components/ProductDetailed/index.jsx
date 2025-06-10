@@ -1,54 +1,47 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ActionsProduct from "./ActionsProduct";
 import ProductDetailedSliderVersion2 from "./ProductDetailedSliderVersion2";
 import ProductDetailedSliderVersion3 from "./ProductDetailedSliderVersion3";
 import SliderEmbla from "../EmblaCarouselAdvantage/EmblaCarousel";
 import Container from "../Container";
+import { fetchProducts } from "@/firebase/services/firebaseProductsService";
 
-function ProductDetailed() {
-  const product = {
-    id: 1,
-    name: "Premium Wireless Headphones",
-    price: 299.99,
-    description:
-      "Experience crystal-clear sound with our noise-cancelling wireless headphones. Featuring 30-hour battery life and premium comfort.",
-    images: [
-      "/images/products/IMG_1139.jpg",
-      "/images/13.jpg",
-      "/images/13.jpg",
-      "/images/13.jpg",
-      "/images/13.jpg",
-      "/images/13.jpg",
-    ],
-    features: [
-      "Active Noise Cancellation",
-      "30-hour battery life",
-      "Bluetooth 5.0",
-      "Built-in microphone",
-      "Foldable design",
-    ],
-  };
+function ProductDetailed({ product }) {
+  const [allProducts, setAllProducts] = useState([]);
+  const images = product.images || [];
+  const features = product.features || [];
+  console.log(product, "product");
+
+  useEffect(() => {
+    const loadAllProducts = async () => {
+      try {
+        const products = await fetchProducts();
+        setAllProducts(products);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    loadAllProducts();
+  }, []);
 
   return (
     <>
       <Container>
         <div className="w-full flex flex-col md:flex-row gap-3 relative">
-          {/* Left column - scrollable content */}
           <div className="w-full md:w-[70%]">
             <div className="block md:hidden">
-              <ProductDetailedSliderVersion2 images={product.images} />
+              <ProductDetailedSliderVersion2 images={images} />
             </div>
             <div className="hidden md:block">
-              <ProductDetailedSliderVersion3 images={product.images} />
+              <ProductDetailedSliderVersion3 images={images} />
             </div>
           </div>
 
-          {/* Right column - fixed sidebar */}
           <div className="w-full md:w-[30%]">
             <div className="md:sticky md:top-4">
               {" "}
-              {/* Added sticky positioning */}
-              <ActionsProduct />
+              <ActionsProduct product={product} allProducts={allProducts} />
             </div>
           </div>
         </div>

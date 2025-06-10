@@ -2,14 +2,25 @@ import React from "react";
 import Container from "../Container";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/router";
 
-function CategorySection() {
+function CategorySection({ categories }) {
+
   const { t } = useTranslation();
+  const router = useRouter();
+
+  const handleCategoryClick = (categorySlug) => {
+    router.push(`/products?category=${categorySlug}`);
+  };
+
   return (
     <Container>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 w-full my-4 md:my-10">
         {/* Item 1 */}
-        <div className="relative cursor-pointer aspect-square w-full h-[300px] md:h-[400px] lg:h-[600px] group overflow-hidden ">
+        <div 
+          className="relative cursor-pointer aspect-square w-full h-[300px] md:h-[400px] lg:h-[600px] group overflow-hidden"
+          onClick={() => handleCategoryClick(categories[0].slug)}
+        >
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 via-neutral-900/30 to-transparent z-10" />
           <Image
             src={"/images/17.jpg"}
@@ -22,7 +33,7 @@ function CategorySection() {
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
             <div className="text-center font-gilroy  transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2">
               <h3 className="text-xl font-normal transition-all duration-300 group-hover:tracking-wide">
-                Sandals
+                {categories[0].name}
               </h3>
               <p className="text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] delay-75 mt-1">
                 {t("shop_now")}
@@ -56,7 +67,10 @@ function CategorySection() {
         </div>
 
         {/* Item 3 */}
-        <div className="relative cursor-pointer aspect-square w-full h-[300px] md:h-[400px] lg:h-[600px] group overflow-hidden ">
+        <div 
+          className="relative cursor-pointer aspect-square w-full h-[300px] md:h-[400px] lg:h-[600px] group overflow-hidden"
+          onClick={() => handleCategoryClick(categories[1].slug)}
+        >
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 via-neutral-900/30 to-transparent z-10" />
           <Image
             src={"/images/16.jpg"}
@@ -69,7 +83,7 @@ function CategorySection() {
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
             <div className="text-center font-gilroy transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2">
               <h3 className="text-xl font-normal transition-all duration-300 group-hover:tracking-wide">
-                Flats
+                {categories[1].name}
               </h3>
               <p className="text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] delay-75 mt-1">
                 {t("shop_now")}

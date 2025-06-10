@@ -1,7 +1,9 @@
+// pages/index.js (Updated Home Page)
 import Header from "@/components/Header";
 import NavList from "@/components/NavList";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Hero from "@/components/Hero";
+import HeroV1 from "@/components/Hero-v1";
 import CategorySection from "@/components/CategorySection";
 import Citate from "@/components/Citate";
 import SliderEmbla from "@/components/EmblaCarouselAdvantage/EmblaCarousel";
@@ -10,27 +12,20 @@ import VideoandImage from "@/components/VideoandImage";
 import TrendingNow from "@/components/TrendingNow";
 import Footer from "@/components/Footer";
 import { useAuthClient } from "@/shared/context/AuthContext";
+import { fetchCategories } from "@/firebase/services/categoriesService";
 
-export default function Home() {
+export default function Home({ categories }) {
   const { user } = useAuthClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="relative">
-      <div
-        className={`fixed inset-0 bg-black z-40 transition-opacity duration-300 ease-in-out ${
-          isMenuOpen
-            ? "opacity-45 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
-        style={{ top: "100px" }}
-      />
-
       <main>
         <Header />
-        <NavList onMenuToggle={setIsMenuOpen} />
+        <NavList />
         <Hero />
-        <CategorySection />
+        {/* <HeroV1 /> */}
+        <CategorySection  categories={categories}/>
         <Citate />
         <SliderEmbla />
         <VideoandImage />
@@ -40,3 +35,49 @@ export default function Home() {
     </div>
   );
 }
+
+// Server-side props for SEO and performance
+export async function getServerSideProps() {
+  try {
+    const categories = await fetchCategories();
+    
+    return {
+      props: {
+        categories,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to fetch categories on server:", error);
+    
+    return {
+      props: {
+        categories: [],
+      },
+    };
+  }
+}
+
+// Alternative: Static Generation (if categories don't change often)
+/*
+export async function getStaticProps() {
+  try {
+    const categories = await fetchCategories();
+    
+    return {
+      props: {
+        categories,
+      },
+      revalidate: 3600 // Revalidate every hour
+    };
+  } catch (error) {
+    console.error("Failed to fetch categories on server:", error);
+    
+    return {
+      props: {
+        categories: [],
+      },
+      revalidate: 60 // Retry after 1 minute if failed
+    };
+  }
+}
+*/

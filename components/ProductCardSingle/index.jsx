@@ -1,26 +1,74 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
-import { FiHeart } from "react-icons/fi";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-import { FaHeart } from "react-icons/fa";
-import { IoClose } from "react-icons/io5";
-import { PiHeartLight } from "react-icons/pi";
-import { PiHeart } from "react-icons/pi";
-import { PiHeartFill } from "react-icons/pi";
-import style from "./ProductCard.module.css";
+import { PiHeart, PiHeartFill } from "react-icons/pi";
+import { useRouter } from "next/router";
+
 function ProductCardSingle({
   product,
   isInWishlist,
   onToggleWishlist,
-  imageHeight = 350,
   imageHeightClass = "h-[350px]",
+  availableColors = [],
+  allProducts = [],
 }) {
+  const router = useRouter();
+  console.log(product, "product");
+
+  const images =
+    Array.isArray(product.images) && product.images.length > 0
+      ? product.images.map((img) => img.url || img)
+      : [product.image || "/fallback.jpg"];
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [translateX, setTranslateX] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [hoveredColor, setHoveredColor] = useState(null);
   const imageRef = useRef(null);
+
+  const findVariantByColor = (colorCode) => {
+    if (!colorCode) return null;
+
+    // If current product has this color, return it
+    if (product.color?.code === colorCode) {
+      return product;
+    }
+
+    // Check if current product is a child
+    if (product.is_child === true || product.is_child === "true") {
+      // First check if this color belongs to the parent
+      const parent = allProducts.find((p) => p.id === product.parents_id);
+      if (parent && parent.color?.code === colorCode) {
+        return parent;
+      }
+
+      // Then look for siblings with this color
+      return allProducts.find(
+        (p) =>
+          p.parents_id === product.parents_id && p.color?.code === colorCode
+      );
+    } else {
+      // Look for children with this color
+      return allProducts.find(
+        (p) => p.parents_id === product.id && p.color?.code === colorCode
+      );
+    }
+  };
+
+  const getCurrentImages = () => {
+    if (!hoveredColor) return images;
+
+    const variant = findVariantByColor(hoveredColor);
+    if (!variant) return images;
+
+    return Array.isArray(variant.images) && variant.images.length > 0
+      ? variant.images.map((img) => img.url || img)
+      : [variant.image || "/fallback.jpg"];
+  };
+
+  const currentImages = getCurrentImages();
 
   const handleDotHover = (index) => {
     setCurrentImageIndex(index);
@@ -34,7 +82,6 @@ function ProductCardSingle({
 
   const handleDragMove = (e) => {
     if (!isDragging) return;
-
     const currentX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
     const diff = currentX - startX;
     setTranslateX(diff);
@@ -44,15 +91,12 @@ function ProductCardSingle({
     if (!isDragging) return;
     setIsDragging(false);
 
-    // Determine swipe direction
     if (translateX > 50 && currentImageIndex > 0) {
-      // Swipe right
       setCurrentImageIndex((prev) => prev - 1);
     } else if (
       translateX < -50 &&
-      currentImageIndex < product.images.length - 1
+      currentImageIndex < currentImages.length - 1
     ) {
-      // Swipe left
       setCurrentImageIndex((prev) => prev + 1);
     }
 
@@ -60,7 +104,7 @@ function ProductCardSingle({
   };
 
   const goToNext = () => {
-    if (currentImageIndex < product.images.length - 1) {
+    if (currentImageIndex < currentImages.length - 1) {
       setCurrentImageIndex((prev) => prev + 1);
     }
   };
@@ -71,14 +115,24 @@ function ProductCardSingle({
     }
   };
 
+  const handleProductClick = () => {
+    router.push(`/products/${product.id}`);
+  };
+
+  // --- RENDER ---
   return (
     <div
       className="group"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setHoveredColor(null);
+      }}
+      onClick={handleProductClick}
     >
+      {/* Image container */}
       <div
-        className={`${style.card} relative cursor-pointer aspect-square w-full overflow-hidden ${imageHeightClass}`}
+        className={`relative cursor-pointer aspect-square w-full overflow-hidden ${imageHeightClass}`}
         onMouseDown={handleDragStart}
         onMouseMove={handleDragMove}
         onMouseUp={handleDragEnd}
@@ -87,7 +141,11 @@ function ProductCardSingle({
         onTouchMove={handleDragMove}
         onTouchEnd={handleDragEnd}
       >
-        <div className="absolute inset-0 z-10" />
+        {product.sale && (
+          <div className="absolute top-4 left-4 z-20  text-rose-700 font-clash px-2 py-1 rounded-md text-sm font-medium">
+            -{product.sale}%
+          </div>
+        )}
         <div
           className="relative w-full h-full"
           ref={imageRef}
@@ -96,7 +154,7 @@ function ProductCardSingle({
             transition: isDragging ? "none" : "transform 0.5s ease",
           }}
         >
-          {product.images.map((image, index) => (
+          {currentImages.map((img, index) => (
             <div
               key={index}
               className={`absolute inset-0 transition-opacity duration-500 ${
@@ -104,10 +162,9 @@ function ProductCardSingle({
               }`}
             >
               <Image
-                src={image}
+                src={img}
                 alt={`${product.name} - View ${index + 1}`}
                 fill
-                priority
                 className="object-cover"
                 quality={100}
               />
@@ -115,7 +172,7 @@ function ProductCardSingle({
           ))}
         </div>
 
-        {product.images.length > 1 && (
+        {currentImages.length > 1 && (
           <>
             {currentImageIndex > 0 && (
               <button
@@ -123,20 +180,19 @@ function ProductCardSingle({
                   e.stopPropagation();
                   goToPrev();
                 }}
-                className="absolute cursor-pointer left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full  transition-all duration-300 opacity-0 group-hover:opacity-100"
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all"
                 aria-label="Previous image"
               >
                 <SlArrowLeft className="text-neutral-600 text-2xl" />
               </button>
             )}
-
-            {currentImageIndex < product.images.length - 1 && (
+            {currentImageIndex < currentImages.length - 1 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   goToNext();
                 }}
-                className="absolute right-2 cursor-pointer  top-1/2 -translate-y-1/2 z-20 p-2 rounded-full  transition-all duration-300 opacity-0 group-hover:opacity-100"
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all"
                 aria-label="Next image"
               >
                 <SlArrowRight className="text-neutral-600 text-2xl" />
@@ -146,7 +202,7 @@ function ProductCardSingle({
         )}
 
         <button
-          className="absolute top-4 cursor-pointer right-4 z-20 p-2 rounded-full backdrop-blur-sm transition-all duration-300"
+          className="absolute top-4 right-4 z-20 p-2 rounded-full backdrop-blur-sm transition-all duration-300"
           aria-label="Add to favorites"
           onClick={(e) => {
             e.stopPropagation();
@@ -160,21 +216,19 @@ function ProductCardSingle({
           )}
         </button>
 
-        {product.images.length > 1 && (
+        {currentImages.length > 1 && (
           <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
-            {product.images.map((_, index) => (
+            {currentImages.map((_, idx) => (
               <button
-                key={index}
+                key={idx}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === currentImageIndex
-                    ? "bg-neutral-500 w-2"
+                  idx === currentImageIndex
+                    ? "bg-neutral-500"
                     : "bg-neutral-300 hover:bg-gray-600"
                 }`}
-                onMouseEnter={() => handleDotHover(index)}
-                onClick={() => handleDotHover(index)}
-                aria-label={`View image ${index + 1} of ${
-                  product.images.length
-                }`}
+                onMouseEnter={() => handleDotHover(idx)}
+                onClick={() => handleDotHover(idx)}
+                aria-label={`View image ${idx + 1} of ${currentImages.length}`}
               />
             ))}
           </div>
@@ -182,10 +236,45 @@ function ProductCardSingle({
       </div>
 
       <div className="mt-4 text-start font-gilroy">
-        <h3 className="font-gilroy text-sm md:text-lg">{product.name}</h3>
-        <p className="font-gilroy md:text-sm text-xs text-neutral-700">{`${product.price} ₼`}</p>
+        <h3 className="text-sm md:text-lg">{product.name}</h3>
+
+        <div className="flex items-center gap-2">
+          {product.sale ? (
+            <>
+              <p className="md:text-sm text-xs text-neutral-700 line-through">
+                {product.price} ₼
+              </p>
+              <p className="md:text-sm text-xs text-rose-700 font-medium">
+                {Math.round(
+                  Number(product.price) * (1 - Number(product.sale) / 100)
+                )}{" "}
+                ₼
+              </p>
+            </>
+          ) : (
+            <p className="md:text-sm text-xs text-neutral-700">
+              {product.sellingPrice} ₼
+            </p>
+          )}
+        </div>
+
+        {availableColors.length > 0 && (
+          <div className="flex items-center gap-2 mt-2">
+            {availableColors.map((colObj, i) => (
+              <div
+                key={i}
+                className="w-4 h-4 border cursor-pointer transition-transform hover:scale-110"
+                style={{ backgroundColor: colObj.code }}
+                title={colObj.name}
+                onMouseEnter={() => setHoveredColor(colObj.code)}
+                onMouseLeave={() => setHoveredColor(null)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
 export default ProductCardSingle;

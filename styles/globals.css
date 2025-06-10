@@ -348,3 +348,18 @@ body {
 .hamburger-line {
   transition: all 0.3s ease-in-out;
 }
+
+@keyframes toast {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.animate-toast {
+  animation: toast 0.5s ease-out forwards;
+}

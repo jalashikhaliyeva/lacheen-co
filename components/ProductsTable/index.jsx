@@ -16,6 +16,41 @@ import {
 import { toast } from "react-toastify";
 import DeleteModal from "../DeleteModal";
 
+function ImageCell({ images, name }) {
+  if (!images) return null;
+
+
+  const imgsArray = Array.isArray(images) ? images : Object.values(images);
+  const firstImg = imgsArray[0];
+  let imageUrl = "";
+
+  if (typeof firstImg === "string") {
+    imageUrl = firstImg;
+  } else if (firstImg && typeof firstImg === "object" && firstImg.url) {
+    imageUrl = firstImg.url;
+  }
+
+  if (imageUrl) {
+    return (
+      <img
+        src={imageUrl}
+        alt={name}
+        className="w-12 h-12 object-cover rounded"
+        onError={(e) => {
+          e.currentTarget.onerror = null;
+          e.currentTarget.src = "/path-to-placeholder-image.png";
+        }}
+      />
+    );
+  }
+
+  return (
+    <div className="w-12 h-12 bg-gray-200 p-2 rounded flex items-center justify-center text-xs text-gray-500">
+      No image
+    </div>
+  );
+}
+
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
   useEffect(() => {
@@ -30,7 +65,6 @@ function WomenShoesTable({ mockProducts }) {
 
   const router = useRouter();
 
-  // Format the products and add a unique rowKey for each row.
   const formattedProducts = useMemo(() => {
     return mockProducts.map((product) => ({
       ...product,
@@ -48,7 +82,6 @@ function WomenShoesTable({ mockProducts }) {
     setProducts(formattedProducts);
   }, [formattedProducts]);
 
-  // Local states for filters, search and pagination
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [productIdFilter, setProductIdFilter] = useState("");
@@ -61,13 +94,10 @@ function WomenShoesTable({ mockProducts }) {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  // deleteTarget will be either { type: 'single', row } or { type: 'multiple' }
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // State to track selected rows (we will store a unique row key)
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-  // Refs for filter dropdowns
   const dropdownRefs = {
     productId: useRef(null),
     category: useRef(null),
@@ -76,10 +106,8 @@ function WomenShoesTable({ mockProducts }) {
     color: useRef(null),
   };
 
-  // Build display rows (including variants) and add a "rowKey" property
   const displayProducts = useMemo(() => {
     return products.reduce((acc, product) => {
-      // For the main product row, rowKey is the product id.
       acc.push({
         ...product,
         isVariant: false,
@@ -95,7 +123,6 @@ function WomenShoesTable({ mockProducts }) {
             parentId: product.id,
             status:
               variant.status !== undefined ? variant.status : product.status,
-            // Compose a unique key from parent and variant id
             rowKey: `${product.id}-${variant.id}`,
           });
         });
@@ -104,7 +131,6 @@ function WomenShoesTable({ mockProducts }) {
     }, []);
   }, [products]);
 
-  // Unique options for Category and Color
   const categoryOptions = useMemo(() => {
     return Array.from(new Set(products.map((p) => p.category)));
   }, [products]);
@@ -112,19 +138,17 @@ function WomenShoesTable({ mockProducts }) {
   const statusOptions = ["active", "deactive"];
 
   const colorOptions = useMemo(() => {
-    const colorsMap = {};
+    const colorsSet = new Set();
     products.forEach((p) => {
-      if (p.color) colorsMap[p.color] = p.color;
+      if (p.color) colorsSet.add(p.color);
       if (p.variants && p.variants.length > 0) {
         p.variants.forEach((variant) => {
-          if (variant.color) colorsMap[variant.color] = variant.color;
+          if (variant.color) colorsSet.add(variant.color);
         });
       }
     });
-    return Object.entries(colorsMap).map(([code, name]) => ({ code, name }));
+    return Array.from(colorsSet);
   }, [products]);
-
-  // Close any open filter dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (openFilter) {
@@ -138,7 +162,6 @@ function WomenShoesTable({ mockProducts }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [openFilter, dropdownRefs]);
 
-  // Filter data based on search and applied filters
   const filteredData = useMemo(() => {
     return displayProducts.filter((product) => {
       const searchMatch =
@@ -185,7 +208,6 @@ function WomenShoesTable({ mockProducts }) {
     displayProducts,
   ]);
 
-  // Pagination
   const pageCount = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
     currentPage * itemsPerPage,
@@ -194,7 +216,6 @@ function WomenShoesTable({ mockProducts }) {
   const handlePageClick = (selectedPage) =>
     setCurrentPage(selectedPage.selected);
 
-  // Toggle a row selection by its rowKey
   const toggleRowSelection = (rowKey) => {
     setSelectedRowKeys((prev) =>
       prev.includes(rowKey)
@@ -203,19 +224,18 @@ function WomenShoesTable({ mockProducts }) {
     );
   };
 
-  // "Select all" in current page
   const handleSelectAll = () => {
     const paginatedRowKeys = paginatedData.map((row) => row.rowKey);
     const allSelected = paginatedRowKeys.every((key) =>
       selectedRowKeys.includes(key)
     );
     if (allSelected) {
-      // Deselect these rows
+
       setSelectedRowKeys((prev) =>
         prev.filter((key) => !paginatedRowKeys.includes(key))
       );
     } else {
-      // Add any missing row keys
+
       setSelectedRowKeys((prev) => [
         ...prev,
         ...paginatedRowKeys.filter((key) => !prev.includes(key)),
@@ -223,7 +243,7 @@ function WomenShoesTable({ mockProducts }) {
     }
   };
 
-  // Helper: find the full row object (from displayProducts) by rowKey
+
   const getRowByKey = (rowKey) =>
     displayProducts.find((row) => row.rowKey === rowKey);
 
@@ -232,7 +252,7 @@ function WomenShoesTable({ mockProducts }) {
     try {
       if (deleteTarget.type === "single") {
         await deleteProduct(deleteTarget.row.id);
-        // mirror your existing success‐path state updates:
+
         setProducts((prev) =>
           prev
             .map((prod) => {
@@ -262,7 +282,7 @@ function WomenShoesTable({ mockProducts }) {
           })
           .filter(Boolean);
         await deleteMultipleProducts(selectedFirebaseIds);
-        // mirror your existing multi‐delete success path:
+
         setProducts((prev) =>
           prev
             .map((prod) => {
@@ -292,13 +312,13 @@ function WomenShoesTable({ mockProducts }) {
     }
   };
 
-  // Instead of calling handleSingleDelete directly:
+
   const confirmSingleDelete = (row) => {
     setDeleteTarget({ type: "single", row });
     setShowDeleteModal(true);
   };
 
-  // Instead of calling handleDeleteSelected directly:
+
   const confirmDeleteSelected = () => {
     setDeleteTarget({ type: "multiple" });
     setShowDeleteModal(true);
@@ -315,9 +335,20 @@ function WomenShoesTable({ mockProducts }) {
     setCurrentPage(0);
   };
 
+  const renderSafely = (value) => {
+    if (value === null || value === undefined) {
+      return "N/A";
+    }
+    if (typeof value === "object") {
+
+      return value.name || value.code || value.value || JSON.stringify(value);
+    }
+    return value.toString();
+  };
+
   return (
     <div className="pt-2">
-      {/* Pass down selected count and deletion callback to ActionsProductTable */}
+
       <ActionsProductTable
         products={products}
         selectedCount={selectedRowKeys.length}
@@ -325,7 +356,7 @@ function WomenShoesTable({ mockProducts }) {
       />
 
       <div className="p-4 my-5 border border-neutral-300 font-gilroy rounded-lg bg-white relative">
-        {/* Global search and reset */}
+
         <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-4 gap-2">
           <div className="relative w-full sm:w-1/3">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -351,12 +382,12 @@ function WomenShoesTable({ mockProducts }) {
           </button>
         </div>
 
-        {/* Table */}
+
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead className="bg-gray-100">
               <tr>
-                {/* Checkbox column header for selection */}
+
                 <th className="px-4 py-2 text-left">
                   <input
                     type="checkbox"
@@ -370,7 +401,7 @@ function WomenShoesTable({ mockProducts }) {
                   />
                 </th>
 
-                {/* Other headers */}
+
                 <th className="px-4 py-2 text-left">Şəkil</th>
                 <th className="px-4 py-2 text-left relative">
                   <div
@@ -507,6 +538,7 @@ function WomenShoesTable({ mockProducts }) {
                   >
                     Rəng <IoFunnelOutline className="text-sm" />
                   </div>
+
                   {openFilter === "color" && (
                     <div
                       ref={dropdownRefs.color}
@@ -515,28 +547,28 @@ function WomenShoesTable({ mockProducts }) {
                     >
                       {colorOptions.map((color) => (
                         <label
-                          key={color.code}
+                          key={color}
                           className="flex items-center gap-2 px-2 py-1 hover:bg-gray-200 rounded cursor-pointer"
                         >
                           <input
                             type="checkbox"
-                            checked={colorFilter.includes(color.code)}
+                            checked={colorFilter.includes(color)}
                             onChange={(e) => {
                               if (e.target.checked) {
-                                setColorFilter((prev) => [...prev, color.code]);
+                                setColorFilter((prev) => [...prev, color]);
                               } else {
                                 setColorFilter((prev) =>
-                                  prev.filter((c) => c !== color.code)
+                                  prev.filter((c) => c !== color)
                                 );
                               }
                               setCurrentPage(0);
                             }}
                           />
                           <span
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: color.code }}
+                            className="w-3 h-3 rounded-full border"
+                            style={{ backgroundColor: color }}
                           ></span>
-                          {color.name}
+                          {color}
                         </label>
                       ))}
                     </div>
@@ -584,7 +616,7 @@ function WomenShoesTable({ mockProducts }) {
                     </div>
                   )}
                 </th>
-                <th className="px-4 py-2 text-left">Bax</th>
+                {/* <th className="px-4 py-2 text-left">Bax</th> */}
               </tr>
             </thead>
             <tbody>
@@ -594,7 +626,6 @@ function WomenShoesTable({ mockProducts }) {
                     key={row.rowKey}
                     className="hover:bg-slate-100 transition-colors border-b border-neutral-300"
                   >
-                    {/* Checkbox cell */}
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
@@ -603,27 +634,11 @@ function WomenShoesTable({ mockProducts }) {
                       />
                     </td>
                     <td className="px-4 py-3">
-                      {row.images &&
-                      row.images.length > 0 &&
-                      typeof row.images[0] === "object" ? (
-                        <img
-                          src={row.images[0].url}
-                          alt={row.name}
-                          className="w-12 h-12 object-cover rounded"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "/path-to-placeholder-image.png";
-                          }}
-                        />
-                      ) : (
-                        <div className="w-12 h-12 bg-gray-200 p-2 rounded flex items-center justify-center text-xs text-gray-500">
-                          No image
-                        </div>
-                      )}
+                      <ImageCell images={row.images} name={row.name} />
                     </td>
                     <td className="px-4 py-3">{row.barcode}</td>
                     <td className="px-4 py-3">{row.name}</td>
-                    <td className="px-4 py-3">{row.category}</td>
+                    <td className="px-4 py-3">{renderSafely(row.category)}</td>
                     <td className="px-4 py-3">₼ {row.price.toFixed(2)}</td>
                     <td className="px-4 py-3">
                       ₼ {row.sellingPrice.toFixed(2)}
@@ -631,8 +646,28 @@ function WomenShoesTable({ mockProducts }) {
                     <td className="px-4 py-3">{row.stock}</td>
                     <td className="px-4 py-3">{row.sale}%</td>
 
-                    <td className="px-4 py-5 flex items-center gap-2">
-                      {row.color}
+                    <td className="px-4 py-5">
+                      {(() => {
+                        const hex =
+                          typeof row.color === "string"
+                            ? row.color
+                            : row.color.code;
+
+                        const label =
+                          typeof row.color === "object"
+                            ? row.color.name
+                            : row.color;
+
+                        return (
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: hex }}
+                            />
+
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-4">
@@ -646,7 +681,7 @@ function WomenShoesTable({ mockProducts }) {
                             }}
                             className="cursor-pointer "
                           />
-                          {/* Edit */}
+
                         </div>
                         <div className="px-2 py-2 flex items-center justify-center gap-2 bg-neutral-300 text-neutral-600 rounded-md text-base">
                           <BsTrash3
@@ -663,13 +698,13 @@ function WomenShoesTable({ mockProducts }) {
                           className="sr-only peer"
                           checked={row.status === "active"}
                           onChange={async () => {
-                            // Toggle is_active status and update Firebase
+
                             const newIsActive = row.status !== "active";
                             try {
                               await updateProduct(row.id, {
                                 is_active: newIsActive,
                               });
-                              // Update local state. (The logic is similar to your current code.)
+
                               setProducts((prev) =>
                                 prev.map((prod) => {
                                   if (row.isVariant) {
@@ -713,7 +748,7 @@ function WomenShoesTable({ mockProducts }) {
                         <div className="w-11 h-6 bg-rose-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:bg-teal-400 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                       </label>
                     </td>
-                    <td className="px-4 py-4 flex-end text-end">
+                    {/* <td className="px-4 py-4 flex-end text-end">
                       <button
                         onClick={() =>
                           router.push({
@@ -723,10 +758,10 @@ function WomenShoesTable({ mockProducts }) {
                         }
                         className="text-blue-500 hover:underline cursor-pointer"
                       >
-                        {/* <LiaSearchPlusSolid className="text-2xl" /> */}
+
                         More
                       </button>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
               ) : (
@@ -740,7 +775,7 @@ function WomenShoesTable({ mockProducts }) {
           </table>
         </div>
 
-        {/* Bottom controls: items per page and pagination */}
+
         <div className="flex flex-col sm:flex-row justify-between items-center mt-4">
           <div className="flex items-center gap-2">
             <label htmlFor="itemsPerPage" className="text-sm">

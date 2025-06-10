@@ -46,8 +46,6 @@ function Products() {
         (product) => product.category_id === query.category
       );
       filterType = `category-${query.category}`;
-      // You might want to fetch the category name here if you want to display it
-      // setCategoryName(categoryNameFromSomewhere);
     }
 
     setFilteredProducts(filtered);
@@ -73,7 +71,6 @@ function Products() {
           <Container>
             <div className="pt-7">
               <Breadcrumbs />
-              {/* Your page content goes here */}
             </div>
 
             {filteredProducts.length === 0 && activeFilter !== "all" ? (

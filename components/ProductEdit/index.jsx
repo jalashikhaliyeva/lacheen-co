@@ -1,10 +1,13 @@
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-import { updateProduct, createProduct } from "@/firebase/services/firebaseProductsService";
+import {
+  updateProduct,
+  createProduct,
+} from "@/firebase/services/firebaseProductsService";
 import { useContext, useState } from "react";
 import { ProductContext } from "@/shared/context/ProductContext";
-import Combination from "./Combination";
-import Information from "./Information";
+import Combination from "../ProductCreate/Combination";
+import Information from "../ProductCreate/Information";
 
 function ProductEditTabs() {
   const {
@@ -17,7 +20,6 @@ function ProductEditTabs() {
   const [activeTab, setActiveTab] = useState("information");
 
   const baseButtonClass = "text-lg font-gilroy p-2 cursor-pointer font-base";
-  // const activeButtonClass = "bg-[#567C8D] text-[#F5EFEB] rounded-md";
   const activeButtonClass = "text-teal-700 border-b-2 border-teal-700 pb-1";
 
   const handleUpdateProduct = async () => {
@@ -45,12 +47,14 @@ function ProductEditTabs() {
     // 3. Determine active status based on completeness
     const isActive = hasRequiredFields && hasImages;
 
-    // Prepare the main product data (preserve is_new flag)
+    // Prepare the main product data (preserve is_new flag and ensure color consistency)
     const mainProductData = {
       ...informationData,
       is_child: false, // Main product flag
       is_active: isActive,
-      is_new: informationData.is_new,
+      is_new: informationData.is_new, // Preserve the "new" flag
+      // Ensure color is stored consistently with name and code
+      color: informationData.selectedColor || { name: "", code: "" },
     };
 
     try {
@@ -60,11 +64,21 @@ function ProductEditTabs() {
       // 2. Update or create variant entries if any are defined.
       if (combinationData.variants && combinationData.variants.length > 0) {
         for (const variant of combinationData.variants) {
-          // Create an updated variant object that preserves the user changes.
+          // Use the variant data and inherit category and barcode from parent
           const updatedVariantData = {
-            ...variant,
+            ...variant, // Preserves updated name, images, and other fields
             parents_id: mainProductData.id,
             is_child: true,
+            // Inherit category and barcode from parent product
+            category: informationData.category,
+            barcode: informationData.barcode,
+            // Also inherit description if variant doesn't have one
+            description: variant.description || informationData.description,
+            // Ensure color is stored with both name and code
+            color: variant.colorObject || {
+              name: variant.color || "",
+              code: "",
+            },
           };
 
           // If the variant already exists, update it; otherwise, create it.
@@ -78,21 +92,23 @@ function ProductEditTabs() {
 
       // 3. Reset the context data for a clean form.
       setInformationData({
+        id: "",
         name: "",
         description: "",
-        price: "",
-        sellingPrice: "",
-        barcode: "",
+        price: 0,
+        sale: 0,
+        sellingPrice: 0,
         quantity: "",
         category: "",
+        color: { name: "", code: "" },
         images: [],
         sizes: [],
+        is_active: true,
+        is_child: false,
         colors: [],
-        selectedColor: [],
+        selectedColor: null,
         is_new: false,
       });
-
-      // 4. Clear the combination data.
       setCombinationData({
         colors: [],
         selectedColor: [],
@@ -122,7 +138,7 @@ function ProductEditTabs() {
 
   return (
     <div>
-      <div className="flex flex-row  items-center justify-between">
+      <div className="flex flex-row items-center justify-between">
         <div className="flex flex-row gap-3">
           <button
             className={`${baseButtonClass} ${

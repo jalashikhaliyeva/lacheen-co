@@ -3,13 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { SlArrowLeft, SlArrowRight, SlPlus } from "react-icons/sl";
 import ProductImageModal from "./ProductImageModal";
 
-const ProductDetailedSliderVersion2 = () => {
-  const images = [
-    "/images/13.jpg",
-    "/images/14.jpg",
-    "/images/15.jpg",
-    "/images/16.jpg",
-  ];
+const ProductDetailedSliderVersion2 = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState(0);

@@ -27,7 +27,7 @@ function ProductEdit() {
         })
         .catch((error) => console.error("Error in fetchProductById:", error));
     }
-  }, [router.isReady, id, setInformationData]);
+  }, [router.isReady, id, setInformationData, router.query]);
 
   return (
     <ProtectedRoute>

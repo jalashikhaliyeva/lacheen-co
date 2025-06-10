@@ -1,34 +1,82 @@
 import Header from "@/components/Header";
 import NavList from "@/components/NavList";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Footer from "@/components/Footer";
-import ProductsListHeader from "@/components/ProductsList/ProductsListHeader";
-import ProductList from "@/components/ProductsList";
 import ProductDetailed from "@/components/ProductDetailed";
 import Container from "@/components/Container";
+import { useRouter } from "next/router";
+import { fetchProductById } from "@/firebase/services/firebaseProductsService";
 
-export default function Products() {
+export default function ProductSingle() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [layout, setLayout] = useState("grid2");
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const router = useRouter();
+  const { slug } = router.query;
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!slug) return;
+      
+      try {
+        setLoading(true);
+        const productData = await fetchProductById(slug);
+        console.log(productData, "productData");
+        
+        setProduct(productData);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setError("Failed to load product");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="relative">
+        <main>
+          <Header />
+          <NavList />
+          <Container>
+            <div className="flex items-center justify-center min-h-[50vh]">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+            </div>
+          </Container>
+          <Footer />
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="relative">
+        <main>
+          <Header />
+          <NavList />
+          <Container>
+            <div className="flex items-center justify-center min-h-[50vh]">
+              <p className="text-red-500">{error}</p>
+            </div>
+          </Container>
+          <Footer />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
-      <div
-        className={`fixed inset-0 bg-black z-40 transition-opacity duration-300 ease-in-out ${
-          isMenuOpen
-            ? "opacity-45 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
-        style={{ top: "100px" }}
-      />
-
       <main>
         <Header />
-        <NavList onMenuToggle={setIsMenuOpen} />
-
-       
-          <ProductDetailed />
-       
-
+        <NavList />
+        {product && <ProductDetailed product={product} />}
         <Footer />
       </main>
     </div>

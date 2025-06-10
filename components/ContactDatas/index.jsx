@@ -3,41 +3,18 @@ import { PiPhoneCallThin } from "react-icons/pi";
 import { CiLocationOn } from "react-icons/ci";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 import Container from "../Container";
+import { useFAQItems } from "@/shared/mock/faqItems";
+import { useTranslation } from "react-i18next";
 
 function ContactDatas() {
   const [activeIndex, setActiveIndex] = useState(null);
-
+  const faqItems = useFAQItems();
   const toggleFAQ = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
-  const faqItems = [
-    {
-      question: "What are your business hours?",
-      answer:
-        "Our business hours are from 9:00 AM to 6:00 PM, Monday through Friday. We are closed on weekends and public holidays.",
-    },
-    {
-      question: "How can I schedule an appointment?",
-      answer:
-        "You can schedule an appointment by calling us at +994 51 777 72 85 or by visiting our location during business hours.",
-    },
-    {
-      question: "Do you offer emergency services?",
-      answer:
-        "Yes, we offer emergency services outside of normal business hours. Please call our emergency line at +994 51 777 72 86 for immediate assistance.",
-    },
-    {
-      question: "What payment methods do you accept?",
-      answer:
-        "We accept cash, credit cards (Visa, MasterCard), and mobile payment options. Payment is due at the time of service.",
-    },
-    {
-      question: "Is there parking available at your location?",
-      answer:
-        "Yes, we have dedicated parking spaces for our customers at both of our locations. Parking is free for the duration of your visit.",
-    },
-  ];
+  const { t } = useTranslation();
+
 
   return (
     <>
@@ -46,12 +23,10 @@ function ContactDatas() {
           <div className="flex flex-col gap-10 lg:w-1/2 w-full">
             <div className="flex flex-col gap-4">
               <h1 className="font-normal uppercase text-xl md:text-2xl">
-                Call us
+                {t("call_us")}
               </h1>
               <p className="text-neutral-500 text-sm max-w-[450px]">
-                Have questions about our shoe collection or need style advice?
-                Our friendly customer service team is ready to assist you with
-                any inquiries about sizes, styles, or special orders.
+                {t("experience_our_latest_shoe_collections_in_person_at_our_comfortable_retail_stores")}
               </p>
 
               <div className="flex items-center gap-2">
@@ -64,12 +39,10 @@ function ContactDatas() {
 
             <div className="flex flex-col gap-4">
               <h1 className="font-normal uppercase text-xl md:text-2xl">
-                Visit us
+                {t("visit_us")}
               </h1>
               <p className="text-neutral-500 text-sm max-w-[450px]">
-                Experience our latest shoe collections in person at our
-                comfortable retail stores. Our knowledgeable staff will help you
-                find the perfect fit and style for any occasion.
+                {t("have_questions_about_our_shoe_collection_or_need_style_advice")}
               </p>
 
               <div className="flex items-center gap-2">
@@ -95,7 +68,7 @@ function ContactDatas() {
 
           <div className="lg:w-1/2 w-full lg:pl-8">
             <h1 className="font-normal uppercase text-xl md:text-2xl mb-6">
-              Frequently Asked Questions
+              {t("frequently_asked_questions")}
             </h1>
             <div className="space-y-0">
               {faqItems.map((item, index) => (
