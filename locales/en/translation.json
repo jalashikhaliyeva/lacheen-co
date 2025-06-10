@@ -254,5 +254,7 @@
   "show_all": "Show all",
   "pending": "Pending",
   "confirmed": "Confirmed",
-  "cancelled": "Cancelled"
+  "cancelled": "Cancelled",
+    "please_login_to_view_basket": "Please login to view basket",
+  "your_items_will_be_safe_until_you_return": "Your items will be safe until you return"
 }

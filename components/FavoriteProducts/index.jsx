@@ -8,10 +8,10 @@ import { useAuthClient } from "@/shared/context/AuthContext";
 import { ArrowRight, Heart, Plus } from "lucide-react";
 import CustomToast from "../CustomToast/CustomToast";
 
-function FavoriteProducts({ layout, wishlistItems = [], onWishlistUpdate }) {
+function FavoriteProducts({ layout, wishlistItems = [], onWishlistUpdate, loading }) {
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const loaderRef = useRef(null);
   const ITEMS_PER_PAGE = 8;
   const [showToast, setShowToast] = useState(false);
@@ -60,7 +60,7 @@ function FavoriteProducts({ layout, wishlistItems = [], onWishlistUpdate }) {
         const target = entries[0];
         if (
           target.isIntersecting &&
-          !loading &&
+          !loadingMore &&
           visibleProducts.length < wishlistItems.length
         ) {
           loadMoreProducts();
@@ -78,10 +78,10 @@ function FavoriteProducts({ layout, wishlistItems = [], onWishlistUpdate }) {
         observer.unobserve(loaderRef.current);
       }
     };
-  }, [visibleProducts, loading, wishlistItems]);
+  }, [visibleProducts, loadingMore, wishlistItems]);
 
   const loadMoreProducts = () => {
-    setLoading(true);
+    setLoadingMore(true);
 
     setTimeout(() => {
       const nextPage = page + 1;
@@ -91,7 +91,7 @@ function FavoriteProducts({ layout, wishlistItems = [], onWishlistUpdate }) {
 
       setVisibleProducts(newProducts);
       setPage(nextPage);
-      setLoading(false);
+      setLoadingMore(false);
     }, 800);
   };
 
@@ -134,6 +134,14 @@ function FavoriteProducts({ layout, wishlistItems = [], onWishlistUpdate }) {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-700 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   if (wishlistItems.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center py-20 px-8 relative overflow-hidden">
@@ -167,7 +175,7 @@ function FavoriteProducts({ layout, wishlistItems = [], onWishlistUpdate }) {
           </p>
           <button
             onClick={handleNavigate}
-            className="group  text-rose-700 px-8 py-3 rounded-full font-gilroy font-medium transform transition-all duration-300 hover:scale-105 "
+            className="group  text-rose-700 cursor-pointer px-8 py-3 rounded-full font-gilroy font-medium transform transition-all duration-300 hover:scale-105 "
           >
             {t("wishlist.discover_more")}
             <ArrowRight className="inline-block ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -207,7 +215,7 @@ function FavoriteProducts({ layout, wishlistItems = [], onWishlistUpdate }) {
         ref={loaderRef}
         className="flex justify-center items-center p-4 mb-8"
       >
-        {loading && visibleProducts.length < wishlistItems.length && (
+        {loadingMore && visibleProducts.length < wishlistItems.length && (
           <div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-700 rounded-full animate-spin"></div>
         )}
       </div>

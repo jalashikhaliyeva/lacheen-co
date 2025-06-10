@@ -19,13 +19,14 @@ export default function Wishlist() {
     if (user) {
       try {
         const items = await getWishlist(user.uid);
-        console.log(items, "items");
         setWishlistItems(items);
       } catch (error) {
         console.error("Error fetching wishlist:", error);
       } finally {
         setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
@@ -42,17 +43,14 @@ export default function Wishlist() {
       <main>
         <Header />
         <NavList />
-        {!loading && wishlistItems.length > 0 && <WishlistSection wishlistItems={wishlistItems} />}
-        {loading ? (
-          <div className="flex justify-center items-center min-h-[400px]">
-            <div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-700 rounded-full animate-spin"></div>
-          </div>
-        ) : (
-          <FavoriteProducts 
-            wishlistItems={wishlistItems} 
-            onWishlistUpdate={handleWishlistUpdate}
-          />
+        {!loading && wishlistItems.length > 0 && (
+          <WishlistSection wishlistItems={wishlistItems} />
         )}
+        <FavoriteProducts 
+          wishlistItems={wishlistItems} 
+          onWishlistUpdate={handleWishlistUpdate}
+          loading={loading}
+        />
         <Footer />
       </main>
     </div>

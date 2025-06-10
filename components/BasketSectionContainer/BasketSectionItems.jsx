@@ -60,13 +60,6 @@ function BasketSectionItems() {
     document.body.style.overflow = "auto";
   };
 
-  if (!user) {
-    return (
-      <div className="text-center py-8">
-        <p>{t("please_login_to_view_basket")}</p>
-      </div>
-    );
-  }
 
   if (basketItems.length === 0) {
     return (

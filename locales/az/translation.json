@@ -254,5 +254,7 @@
   "show_all": "Hamısını göstər",
   "pending": "Gözləmədə",
   "confirmed": "Təsdiq olundu",
-  "cancelled": "Ləğv edilib"
+  "cancelled": "Ləğv edilib",
+  "please_login_to_view_basket": "Səbətə baxmaq üçün daxil olun",
+  "your_items_will_be_safe_until_you_return": "Daxil olmaqla səbətinizdə olan məhsullarınız qorunacaq"
 }
