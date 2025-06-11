@@ -20,6 +20,9 @@ const backendApp = !getApps().length
   ? initializeApp(backendConfig)
   : getApps()[0];
 
+// For backward compatibility
+const app = backendApp;
+
 const db = getDatabase(backendApp);
 const productsRef = ref(db, "products");
 
@@ -42,4 +45,4 @@ if (typeof window !== "undefined") {
   analytics = getAnalytics(backendApp);
 }
 
-export { backendApp, db, auth, analytics };
+export { backendApp, app, db, auth, analytics };
