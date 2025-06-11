@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import Container from "../Container";
 import Image from "next/image";
 import { FiHeart } from "react-icons/fi";
@@ -12,37 +12,11 @@ import ProductCard from "../ProductCard";
 import { useTranslation } from "react-i18next";
 import CustomToast from "../CustomToast/CustomToast";
 
-function TrendingNow() {
+function TrendingNow({ products = [] }) {
   const [wishlist, setWishlist] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [toastProduct, setToastProduct] = useState(null);
   const { t } = useTranslation();
-  const products = [
-    {
-      id: 1,
-      name: "Speedy 25",
-      price: "150",
-      images: ["/images/IMG_2928.jpg", "/images/IMG_2927.jpg"],
-    },
-    {
-      id: 2,
-      name: "Speedy 30",
-      price: "150",
-      images: ["/images/IMG_2931.jpg", "/images/IMG_2932.jpg"],
-    },
-    {
-      id: 3,
-      name: "Speedy Bandoulière 25",
-      price: "150",
-      images: ["/images/IMG_2929.jpg", "/images/IMG_2925.jpg"],
-    },
-    {
-      id: 4,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-  ];
 
   const toggleWishlist = (product, e) => {
     e.preventDefault();
@@ -64,7 +38,6 @@ function TrendingNow() {
 
   return (
     <Container>
-
       <CustomToast
         show={showToast}
         onClose={closeToast}

@@ -16,13 +16,13 @@ function ProductEdit() {
   const { setInformationData } = useContext(ProductContext);
   useEffect(() => {
     if (!router.isReady) return;
-    console.log("Router query:", router.query);
-    console.log(id, "id from router");
+    // console.log("Router query:", router.query);
+    // console.log(id, "id from router");
 
     if (id) {
       fetchProductById(id)
         .then((productData) => {
-          console.log("Product data retrieved:", productData);
+          // console.log("Product data retrieved:", productData);
           setInformationData(productData);
         })
         .catch((error) => console.error("Error in fetchProductById:", error));

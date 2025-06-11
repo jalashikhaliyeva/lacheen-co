@@ -1,7 +1,6 @@
 import Image from "next/image";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { SlArrowLeft, SlArrowRight, SlPlus } from "react-icons/sl";
-import ProductImageModal from "./ProductImageModal";
 
 const ProductDetailedSliderVersion2 = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -11,20 +10,29 @@ const ProductDetailedSliderVersion2 = ({ images }) => {
   const [prevTranslate, setPrevTranslate] = useState(0);
   const sliderRef = useRef(null);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalStartIndex, setModalStartIndex] = useState(0);
-  // compute X position from mouse or touch event
+  //  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [modalStartIndex, setModalStartIndex] = useState(0);
+
+  const normalizedImages = images
+    .map((image) => {
+      if (typeof image === "string") {
+        return image;
+      } else if (image && image.url) {
+        return image.url;
+      }
+      return "";
+    })
+    .filter((url) => url !== "");
+
   const getPositionX = (e) =>
     e.type.includes("mouse") ? e.pageX : e.touches[0].clientX;
 
-  // start dragging
   const handleDragStart = useCallback((e) => {
     const posX = getPositionX(e);
     setStartPos(posX);
     setIsDragging(true);
   }, []);
 
-  // while dragging
   const handleDragMove = useCallback(
     (e) => {
       if (!isDragging) return;
@@ -35,23 +43,20 @@ const ProductDetailedSliderVersion2 = ({ images }) => {
     [isDragging, startPos, prevTranslate]
   );
 
-  // end drag, snap to slide
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
     const movedBy = currentTranslate - prevTranslate;
     const threshold = sliderRef.current.clientWidth * 0.2;
 
-    if (movedBy < -threshold && currentIndex < images.length - 1) {
+    if (movedBy < -threshold && currentIndex < normalizedImages.length - 1) {
       setCurrentIndex((idx) => idx + 1);
     } else if (movedBy > threshold && currentIndex > 0) {
       setCurrentIndex((idx) => idx - 1);
     } else {
-      // snap back
       setCurrentTranslate(prevTranslate);
     }
-  }, [currentTranslate, prevTranslate, currentIndex, images.length]);
+  }, [currentTranslate, prevTranslate, currentIndex, normalizedImages.length]);
 
-  // update translate when index changes
   useEffect(() => {
     const slideWidth = sliderRef.current.clientWidth;
     const newTranslate = -currentIndex * slideWidth;
@@ -59,10 +64,12 @@ const ProductDetailedSliderVersion2 = ({ images }) => {
     setPrevTranslate(newTranslate);
   }, [currentIndex]);
 
-  // keyboard navigation
   useEffect(() => {
     const handleKey = (e) => {
-      if (e.key === "ArrowRight" && currentIndex < images.length - 1) {
+      if (
+        e.key === "ArrowRight" &&
+        currentIndex < normalizedImages.length - 1
+      ) {
         setCurrentIndex((idx) => idx + 1);
       } else if (e.key === "ArrowLeft" && currentIndex > 0) {
         setCurrentIndex((idx) => idx - 1);
@@ -70,15 +77,15 @@ const ProductDetailedSliderVersion2 = ({ images }) => {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [currentIndex, images.length]);
+  }, [currentIndex, normalizedImages.length]);
 
   const prev = () => currentIndex > 0 && setCurrentIndex((idx) => idx - 1);
   const next = () =>
-    currentIndex < images.length - 1 && setCurrentIndex((idx) => idx + 1);
+    currentIndex < normalizedImages.length - 1 &&
+    setCurrentIndex((idx) => idx + 1);
 
   return (
     <div className="w-full mx-auto md:mb-20 select-none">
-      {/* Main slider */}
       <div
         className="relative w-full overflow-hidden md:h-[640px] touch-pan-y"
         ref={sliderRef}
@@ -98,7 +105,7 @@ const ProductDetailedSliderVersion2 = ({ images }) => {
           onTouchMove={handleDragMove}
           onTouchEnd={handleDragEnd}
         >
-          {images.map((src, i) => (
+          {normalizedImages.map((src, i) => (
             <div
               key={i}
               className="relative min-w-full flex items-center justify-center h-full"
@@ -113,16 +120,11 @@ const ProductDetailedSliderVersion2 = ({ images }) => {
                 width={500}
                 height={600}
                 className="object-contain pointer-events-none"
-                // onClick={() => {
-                //   setModalStartIndex(i);
-                //   setIsModalOpen(true);
-                // }}
               />
             </div>
           ))}
         </div>
 
-        {/* Nav buttons */}
         {currentIndex > 0 && (
           <button
             onClick={prev}
@@ -132,7 +134,7 @@ const ProductDetailedSliderVersion2 = ({ images }) => {
             <SlArrowLeft size={24} />
           </button>
         )}
-        {currentIndex < images.length - 1 && (
+        {currentIndex < normalizedImages.length - 1 && (
           <button
             onClick={next}
             aria-label="Next"
@@ -143,9 +145,8 @@ const ProductDetailedSliderVersion2 = ({ images }) => {
         )}
       </div>
 
-      {/* Thumbnails */}
       <div className="flex justify-center mt-4 gap-2">
-        {images.map((src, i) => (
+        {normalizedImages.map((src, i) => (
           <button
             key={i}
             onClick={() => setCurrentIndex(i)}
@@ -166,12 +167,12 @@ const ProductDetailedSliderVersion2 = ({ images }) => {
           </button>
         ))}
       </div>
-      <ProductImageModal
-        images={images}
+      {/* <ProductImageModal
+        images={normalizedImages}
         initialIndex={modalStartIndex}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-      />
+      /> */}
     </div>
   );
 };

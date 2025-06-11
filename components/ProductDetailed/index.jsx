@@ -10,7 +10,6 @@ function ProductDetailed({ product }) {
   const [allProducts, setAllProducts] = useState([]);
   const images = product.images || [];
   const features = product.features || [];
-  console.log(product, "product");
 
   useEffect(() => {
     const loadAllProducts = async () => {

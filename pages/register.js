@@ -13,8 +13,10 @@ import TrendingNow from "@/components/TrendingNow";
 import Footer from "@/components/Footer";
 import LoginForm from "@/components/LoginForm";
 import RegisterForm from "@/components/RegisterForm";
+import { fetchCategories } from "@/firebase/services/categoriesService";
+import { fetchProducts } from "@/firebase/services/firebaseProductsService";
 
-export default function Register() {
+export default function Register({ categories, modalNewProducts }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -29,7 +31,7 @@ export default function Register() {
       />
 
       <main>
-        <Header />
+        <Header modalNewProducts={modalNewProducts} categories={categories} />
         <NavList onMenuToggle={setIsMenuOpen} />
         <RegisterForm />
 
@@ -37,4 +39,38 @@ export default function Register() {
       </main>
     </div>
   );
+}
+
+export async function getServerSideProps() {
+  try {
+    const [categories, allProducts] = await Promise.all([
+      fetchCategories(),
+      fetchProducts(),
+    ]);
+
+    const last10Products = allProducts.slice(0, 10);
+
+    const newProducts = allProducts.filter((p) => p.is_new).slice(-4);
+
+    const modalNewProducts = allProducts.filter((p) => p.is_new).slice(-6);
+
+    return {
+      props: {
+        categories,
+        products: last10Products,
+        newProducts,
+        modalNewProducts,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to fetch data on server:", error);
+    return {
+      props: {
+        categories: [],
+        products: [],
+        newProducts: [],
+        modalNewProducts: [],
+      },
+    };
+  }
 }

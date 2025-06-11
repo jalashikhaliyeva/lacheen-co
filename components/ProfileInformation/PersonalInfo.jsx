@@ -16,7 +16,6 @@ import { useTranslation } from "react-i18next";
 import { createOrUpdateUserProfile, getUserProfile } from "@/firebase/services/firebaseUserService";
 import CustomToast from "../CustomToast/CustomToast";
 function PersonalInfo({ user }) {
-  console.log(user, "user");
   
   const router = useRouter();
   const { t } = useTranslation();

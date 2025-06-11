@@ -164,6 +164,10 @@ function ProductList({
     });
   }, [allProducts, activeFilters]);
 
+
+  
+
+  
   useEffect(() => {
     setVisibleProducts(filteredProducts.slice(0, ITEMS_PER_PAGE));
   }, [filteredProducts]);
@@ -213,13 +217,13 @@ function ProductList({
   const getGridClasses = () => {
     switch (layout) {
       case "full":
-        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-2";
+        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3 md:gap-5";
       case "grid2":
-        return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
-      case "grid3":
-        return "grid-cols-3 md:grid-cols-4 lg:grid-cols-6";
+        return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5";
+      case "grid3": 
+        return "grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5";
       default:
-        return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+        return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-3 md:gap-5";
     }
   };
 
@@ -406,13 +410,13 @@ function ProductList({
           <div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-700 rounded-full animate-spin"></div>
         )}
 
-        {!loading &&
+        {/* {!loading &&
           visibleProducts.length >= filteredProducts.length &&
           filteredProducts.length > ITEMS_PER_PAGE && (
             <p className="text-gray-500 text-sm">
               You've reached the end of the results
             </p>
-          )}
+          )} */}
       </div>
     </>
   );

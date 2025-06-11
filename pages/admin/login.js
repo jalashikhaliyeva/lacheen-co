@@ -22,15 +22,15 @@ function AdminLogin() {
     }
 
     setLoading(true);
-    console.log(auth, "auth");
-    console.log(email, "email");
-    console.log(password, "password");
+    // console.log(auth, "auth");
+    // console.log(email, "email");
+    // console.log(password, "password");
     try {
       await signInWithEmailAndPassword(auth, email, password);
 
       router.push("/admin");
     } catch (error) {
-      console.log(error, "error");
+      // console.log(error, "error");
       const errorMessage = "Login failed. Please try again.";
       toast.error(errorMessage);
     } finally {

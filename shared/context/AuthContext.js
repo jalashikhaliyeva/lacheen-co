@@ -46,7 +46,7 @@ export function AuthProvider({ children }) {
     return result.user;
   };
 
-  console.log(user, "user");
+  // console.log(user, "user");
 
   const logout = () => signOut(auth);
 

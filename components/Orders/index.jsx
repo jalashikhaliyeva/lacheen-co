@@ -94,7 +94,6 @@ function OrdersUserSingle() {
     return <div className="text-center py-4">{t("no_orders_found")}</div>;
   }
 
-  console.log(orders);
 
   return (
     <div className="space-y-6">

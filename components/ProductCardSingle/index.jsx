@@ -13,7 +13,6 @@ function ProductCardSingle({
   allProducts = [],
 }) {
   const router = useRouter();
-  console.log(product, "product");
 
   const images =
     Array.isArray(product.images) && product.images.length > 0
@@ -210,9 +209,9 @@ function ProductCardSingle({
           }}
         >
           {isInWishlist ? (
-            <PiHeartFill className="text-neutral-600" size={18} />
+            <PiHeartFill className="text-neutral-600 cursor-pointer" size={18} />
           ) : (
-            <PiHeart className="text-gray-700" size={18} />
+            <PiHeart className="text-gray-700 cursor-pointer" size={18} />
           )}
         </button>
 
@@ -242,11 +241,11 @@ function ProductCardSingle({
           {product.sale ? (
             <>
               <p className="md:text-sm text-xs text-neutral-700 line-through">
-                {product.price} ₼
+                {product.sellingPrice} ₼
               </p>
               <p className="md:text-sm text-xs text-rose-700 font-medium">
                 {Math.round(
-                  Number(product.price) * (1 - Number(product.sale) / 100)
+                  Number(product.sellingPrice) * (1 - Number(product.sale) / 100)
                 )}{" "}
                 ₼
               </p>

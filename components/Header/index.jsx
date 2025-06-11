@@ -13,8 +13,10 @@ import MobileMenu from "./MobileMenu";
 import { useTranslation } from "react-i18next";
 import { useAuthClient } from "@/shared/context/AuthContext";
 
-function Header() {
-  const { user, loading } = useAuthClient();
+function Header({ modalNewProducts, categories }) {
+  console.log(categories, "categories");
+
+  const { user, loading, logout } = useAuthClient();
   const { t } = useTranslation();
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -107,7 +109,6 @@ function Header() {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log('Menu clicked, current state:', isMobileMenuOpen);
                   setIsMobileMenuOpen(!isMobileMenuOpen);
                 }}
                 onTouchStart={(e) => {
@@ -230,8 +231,12 @@ function Header() {
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
+        newProducts={modalNewProducts}
+        categories={categories}
       />
       <MobileMenu
+        onLogout={logout}
+        user={user}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
       />

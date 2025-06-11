@@ -5,8 +5,10 @@ import ProfileInformation from "@/components/ProfileInformation";
 import Footer from "@/components/Footer";
 import { useAuthClient } from "@/shared/context/AuthContext";
 import { useRouter } from "next/router";
+import { fetchCategories } from "@/firebase/services/categoriesService";
+import { fetchProducts } from "@/firebase/services/firebaseProductsService";
 
-export default function Profile() {
+export default function Profile({ categories, modalNewProducts }) {
   const { user, logout, loading } = useAuthClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
@@ -27,8 +29,11 @@ export default function Profile() {
         >
           <circle
             className="opacity-25"
-            cx="12" cy="12" r="10"
-            stroke="currentColor" strokeWidth="4"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
           />
           <path
             className="opacity-75"
@@ -52,7 +57,7 @@ export default function Profile() {
       />
 
       <main>
-        <Header />
+        <Header modalNewProducts={modalNewProducts} categories={categories} />
         <NavList onMenuToggle={setIsMenuOpen} />
 
         <ProfileInformation
@@ -66,4 +71,38 @@ export default function Profile() {
       </main>
     </div>
   );
+}
+
+export async function getServerSideProps() {
+  try {
+    const [categories, allProducts] = await Promise.all([
+      fetchCategories(),
+      fetchProducts(),
+    ]);
+
+    const last10Products = allProducts.slice(0, 10);
+
+    const newProducts = allProducts.filter((p) => p.is_new).slice(-4);
+
+    const modalNewProducts = allProducts.filter((p) => p.is_new).slice(-6);
+
+    return {
+      props: {
+        categories,
+        products: last10Products,
+        newProducts,
+        modalNewProducts,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to fetch data on server:", error);
+    return {
+      props: {
+        categories: [],
+        products: [],
+        newProducts: [],
+        modalNewProducts: [],
+      },
+    };
+  }
 }

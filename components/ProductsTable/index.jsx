@@ -61,7 +61,6 @@ function useDebounce(value, delay) {
 }
 
 function WomenShoesTable({ mockProducts }) {
-  console.log(mockProducts, "mockProducts");
 
   const router = useRouter();
 

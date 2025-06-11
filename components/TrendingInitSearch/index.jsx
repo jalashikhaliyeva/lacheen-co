@@ -12,56 +12,12 @@ import ProductCard from "../ProductCard";
 import { useTranslation } from "react-i18next";
 import CustomToast from "../CustomToast/CustomToast";
 
-function TrendingInitSearch() {
+function TrendingInitSearch({ newProducts }) {
+  const useFlex = newProducts.length < 6;
   const { t } = useTranslation();
   const [wishlist, setWishlist] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [toastProduct, setToastProduct] = useState(null);
-
-  const products = [
-    {
-      id: 1,
-      name: "Speedy 25",
-      price: "150",
-      images: ["/images/13.jpg", "/images/12.jpg"],
-    },
-    {
-      id: 2,
-      name: "Speedy 30",
-      price: "150",
-      images: ["/images/IMG_2931.jpg", "/images/IMG_2932.jpg"],
-    },
-    {
-      id: 3,
-      name: "Speedy Bandoulière 25",
-      price: "150",
-      images: [
-        "/images/products/IMG_1168.jpg",
-        "/images/products/IMG_1169.jpg",
-      ],
-    },
-    {
-      id: 4,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_2926.jpg", "/images/IMG_2930.jpg"],
-    },
-    {
-      id: 5,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: [
-        "/images/products/IMG_1155.jpg",
-        "/images/products/IMG_1154.jpg",
-      ],
-    },
-    {
-      id: 6,
-      name: "Speedy Bandoulière 30",
-      price: "150",
-      images: ["/images/IMG_7794.jpg"],
-    },
-  ];
 
   const toggleWishlist = (product) => {
     if (wishlist.some((item) => item.id === product.id)) {
@@ -86,7 +42,7 @@ function TrendingInitSearch() {
         onClose={closeToast}
         product={toastProduct}
         message={t("wishlist.added")}
-      linkText={t("wishlist.access")}
+        linkText={t("wishlist.access")}
         linkHref="/wishlist"
       />
 
@@ -95,13 +51,22 @@ function TrendingInitSearch() {
           {t("you_might_also_like")}
         </p>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full pt-2 px-4 md:px-20">
-          {products.map((product) => (
+        <div
+          className={`
+        pt-2 px-4 md:px-20 gap-4
+        ${
+          useFlex
+            ? "flex flex-wrap justify-center"
+            : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
+        }
+      `}
+        >
+          {newProducts.map((product) => (
             <ProductCard
-              imageHeight={240}
               key={product.id}
+              imageHeight={240}
               product={product}
-              isInWishlist={wishlist.some((item) => item.id === product.id)}
+              isInWishlist={wishlist.some((i) => i.id === product.id)}
               onToggleWishlist={() => toggleWishlist(product)}
             />
           ))}

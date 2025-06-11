@@ -5,8 +5,17 @@ import Image from "next/image";
 import LanguageSwitcher from "../LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import { useCategories } from "@/shared/context/CategoriesContext";
+import {
+  PiHeartLight,
+  PiUserLight,
+  PiBasketLight,
+  PiCalendarLight,
+  PiGiftLight,
+} from "react-icons/pi";
+import { PiPackage } from "react-icons/pi";
+import { SlLocationPin } from "react-icons/sl";
 
-const MobileMenu = ({ isOpen, onClose }) => {
+const MobileMenu = ({ isOpen, onClose, user, onLogout }) => {
   const router = useRouter();
   const { categories, loading, error } = useCategories();
   const { t } = useTranslation();
@@ -25,6 +34,36 @@ const MobileMenu = ({ isOpen, onClose }) => {
     },
     { id: "viewAll", label: t("nav.view_all") || "View all", is_active: true },
   ];
+
+  const profileMenuItems = user
+    ? [
+        {
+          id: "personal",
+          label: t("personal_information") || "Personal Information",
+          icon: <PiUserLight className="text-xl" />,
+        },
+        {
+          id: "orders",
+          label: t("orders") || "Orders",
+          icon: <PiPackage className="text-xl" />,
+        },
+        {
+          id: "basket",
+          label: t("basket") || "Basket",
+          icon: <PiBasketLight className="text-xl" />,
+        },
+        {
+          id: "wishlist",
+          label: t("wishlist_title") || "Wishlist",
+          icon: <PiHeartLight className="text-xl" />,
+        },
+        {
+          id: "address",
+          label: t("address_details") || "Address Details",
+          icon: <SlLocationPin className="text-xl" />,
+        },
+      ]
+    : [];
 
   const categoryItems = categories
     .filter((category) => category.is_active)
@@ -46,8 +85,18 @@ const MobileMenu = ({ isOpen, onClose }) => {
     return `/products?category=${item.id}`;
   };
 
+  const handleProfileItemClick = (itemId) => {
+    if (itemId === "basket") {
+      router.push("/basket");
+    } else if (itemId === "wishlist") {
+      router.push("/wishlist");
+    } else {
+      router.push(`/profile?tab=${itemId}`);
+    }
+    onClose();
+  };
+
   const isActive = (itemId) => {
-    // Only apply active state logic if we are on the /products page
     if (!isProductsPage) {
       return false;
     }
@@ -95,7 +144,7 @@ const MobileMenu = ({ isOpen, onClose }) => {
               </button>
             </div>
 
-            <div className="flex items-center justify-center pt-5 w-full">
+            <div className="flex items-center pt-5.5 w-full">
               <Image
                 src="/images/logo/lacheen-logo.png"
                 width={300}
@@ -131,6 +180,34 @@ const MobileMenu = ({ isOpen, onClose }) => {
                 </li>
               ))}
             </ul>
+
+            {/* Profile Section */}
+            {user && (
+              <div className="pt-4 border-t border-gray-200">
+                <h3 className="text-lg font-normal mb-3">{t("my_account") || "My Account"}</h3>
+                <ul className="flex flex-col gap-3">
+                  {profileMenuItems.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        onClick={() => handleProfileItemClick(item.id)}
+                        className="flex items-center gap-3 text-lg py-2 hover:text-neutral-600 transition-colors w-full text-left"
+                      >
+                        {item.icon}
+                        {item.label}
+                      </button>
+                    </li>
+                  ))}
+                  <li>
+                    <button
+                      onClick={onLogout}
+                      className="w-full border border-neutral-200 text-neutral-700 py-2 transition-colors hover:bg-neutral-50 mt-4"
+                    >
+                      {t("logout") || "Logout"}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
 
             <div className="pt-4 border-t border-gray-200">
               <LanguageSwitcher mobile />

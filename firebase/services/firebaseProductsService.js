@@ -17,10 +17,15 @@ export const fetchProducts = async () => {
     const snapshot = await get(productsRef);
     if (snapshot.exists()) {
       const fetchedProducts = snapshot.val();
-      console.log(fetchedProducts, "fetchedProducts");
-      return fetchedProducts ? Object.values(fetchedProducts) : [];
+      // console.log(fetchedProducts, "fetchedProducts");
+      // Convert to array, filter active products, and sort by ID in descending order
+      const productsArray = fetchedProducts ? Object.values(fetchedProducts) : [];
+      const activeProducts = productsArray.filter(product => 
+        product.is_active !== false && product.is_active !== "false"
+      );
+      return activeProducts.sort((a, b) => b.id.localeCompare(a.id));
     } else {
-      console.log("No data available");
+      // console.log("No data available");
       return [];
     }
   } catch (error) {
@@ -42,7 +47,7 @@ export const updateProduct = async (id, updatedData) => {
 
   try {
     await update(productRef, updatedData);
-    console.log("Product updated successfully");
+    // console.log("Product updated successfully");
     return true;
   } catch (error) {
     console.error("Error updating product:", error);
@@ -71,7 +76,7 @@ export const createProduct = async (productData) => {
       productData.id = newProductRef.key;
       await set(newProductRef, productData);
     }
-    console.log("Product created successfully");
+    // console.log("Product created successfully");
     return productData;
   } catch (error) {
     console.error("Error creating product:", error);
@@ -91,7 +96,7 @@ export const fetchProductById = async (id) => {
 
   try {
     const snapshot = await get(productRef);
-    console.log(snapshot, "snapshot fetch product by id");
+    // console.log(snapshot, "snapshot fetch product by id");
     if (snapshot.exists()) {
       return snapshot.val();
     } else {
@@ -126,7 +131,7 @@ export const fetchRelatedProducts = async (commonParentId) => {
       );
       return relatedProducts;
     } else {
-      console.log("No products available");
+      // console.log("No products available");
       return [];
     }
   } catch (error) {
@@ -147,7 +152,7 @@ export const deleteProduct = async (id) => {
 
   try {
     await remove(productRef);
-    console.log("Product deleted successfully");
+    // console.log("Product deleted successfully");
     return true;
   } catch (error) {
     console.error("Error deleting product:", error);
@@ -171,7 +176,7 @@ export const deleteMultipleProducts = async (ids) => {
 
   try {
     await update(ref(db), updates);
-    console.log("Multiple products deleted successfully");
+    // console.log("Multiple products deleted successfully");
     return true;
   } catch (error) {
     console.error("Error deleting multiple products:", error);
@@ -186,7 +191,7 @@ export const fetchProductsByCategory = async (categorySlug) => {
   try {
     const snapshot = await get(productsRef);
     if (!snapshot.exists()) {
-      console.log("🚫 Heç bir məhsul yoxdur.");
+      // console.log("🚫 Heç bir məhsul yoxdur.");
       return [];
     }
 
@@ -216,10 +221,10 @@ export const fetchProductsByCategory = async (categorySlug) => {
       return matchesCategory && isActive;
     });
 
-    console.log(
-      `🛒 Category slug="${categorySlug}" üçün tapılan filtrlənmiş məhsullar:`,
-      filteredProducts
-    );
+    // console.log(
+    //   `🛒 Category slug="${categorySlug}" üçün tapılan filtrlənmiş məhsullar:`,
+    //   filteredProducts
+    // );
     return filteredProducts;
   } catch (error) {
     console.error(
@@ -258,10 +263,10 @@ export const fetchProductsByFilter = async (filter) => {
           );
       }
 
-      console.log(`Products with filter "${filter}":`, filteredProducts);
+      // console.log(`Products with filter "${filter}":`, filteredProducts);
       return filteredProducts;
     } else {
-      console.log("No products available");
+      // console.log("No products available");
       return [];
     }
   } catch (error) {

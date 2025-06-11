@@ -26,9 +26,9 @@ const productsRef = ref(db, "products");
 get(productsRef)
   .then((snapshot) => {
     if (snapshot.exists()) {
-      console.log("Products data:", snapshot.val());
+      // console.log("Products data:", snapshot.val());
     } else {
-      console.log("No data available");
+      // console.log("No data available");
     }
   })
   .catch((error) => {

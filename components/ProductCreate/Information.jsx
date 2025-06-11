@@ -21,7 +21,7 @@ import { useSizes } from "@/shared/hooks/useSizes";
 
 function Information() {
   const { informationData, setInformationData } = useContext(ProductContext);
-  const [discountEnabled, setDiscountEnabled] = useState(false);
+  const [discountEnabled, setDiscountEnabled] = useState(informationData.sale && informationData.sale !== "");
 
   const {
     name,
@@ -36,6 +36,11 @@ function Information() {
     selectedColor,
     sale,
   } = informationData;
+
+  // Update discountEnabled when sale value changes
+  useEffect(() => {
+    setDiscountEnabled(sale && sale !== "");
+  }, [sale]);
 
   // ── CATEGORY SETUP ───────────────────────────────────────────────────────────
   const categoryRef = useRef(null);
@@ -99,7 +104,7 @@ function Information() {
 
   // ── COLORS SETUP ──────────────────────────────────────────────────────────────
   // Fetch full color objects from Firebase, keep only `is_active === true`.
-  // Later we’ll render a swatch + name.
+  // Later we'll render a swatch + name.
   const [availableColors, setAvailableColors] = useState([]);
   const [loadingColors, setLoadingColors] = useState(true);
 

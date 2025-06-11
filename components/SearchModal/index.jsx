@@ -6,84 +6,133 @@ import { IoClose } from "react-icons/io5";
 import { AnimatePresence, motion } from "framer-motion";
 import TrendingInitSearch from "../TrendingInitSearch";
 import { useTranslation } from "react-i18next";
+import { searchProducts } from "@/firebase/services/searchService";
+import debounce from "lodash/debounce";
 
-export default function SearchModal({ isOpen, onClose }) {
+export default function SearchModal({
+  isOpen,
+  onClose,
+  newProducts,
+  categories,
+}) {
   const { t } = useTranslation();
-  // State to ensure code runs only on client (prevent SSR mismatch)
   const [mounted, setMounted] = useState(false);
-  // Controlled input value for search query
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState({
+    products: [],
+    categories: [],
+    sizes: [],
+    colors: [],
+  });
+  const [isSearching, setIsSearching] = useState(false);
   const router = useRouter();
+
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-    // Cleanup
+    document.body.style.overflow = isOpen ? "hidden" : "auto";
     return () => {
       document.body.style.overflow = "auto";
     };
   }, [isOpen]);
-  // Run once on mount: flag that client is ready
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Clear the input when 'X' button is clicked
   const handleClear = () => {
     setSearchQuery("");
+    setSearchResults({
+      products: [],
+      categories: [],
+      sizes: [],
+      colors: [],
+    });
   };
 
-  // If not on client, don't render anything
+  const debouncedSearch = debounce(async (query) => {
+    if (!query.trim()) {
+      setSearchResults({
+        products: [],
+        categories: [],
+        sizes: [],
+        colors: [],
+      });
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const results = await searchProducts(query);
+      setSearchResults(results);
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, 300);
+
+  useEffect(() => {
+    debouncedSearch(searchQuery);
+    return () => debouncedSearch.cancel();
+  }, [searchQuery]);
+
+  const handleResultClick = (type, item) => {
+    switch (type) {
+      case "category":
+        router.push(`/category/${item.slug}`);
+        break;
+      case "product":
+        router.push(`/products/${item.id}`);
+        break;
+      case "size":
+      case "color":
+        router.push({
+          pathname: "/products",
+          query: { [type]: item.value || item.name },
+        });
+        break;
+    }
+    onClose();
+  };
+
   if (!mounted) return null;
 
-  // Use createPortal to attach modal elements directly under document.body
+  // filter out inactive categories first
+  const activeCats = categories?.filter((cat) => cat.is_active !== false) || [];
+  // then take the last three (or fewer if there aren't three)
+  const trendingCats = activeCats.slice(-3);
+
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop: dark overlay with fade effect */}
+        <div className="font-gilroy">
           <motion.div
             className="fixed inset-0 bg-black/40 z-[100]"
-            onClick={onClose} // Clicking backdrop closes modal
-            initial={{ opacity: 0 }} // Starting state for animation
-            animate={{ opacity: 0.8 }} // Animated to 50% opacity
-            exit={{ opacity: 0 }} // Fade out on exit
-            transition={{ duration: 0.6 }} // Duration of fade
+            onClick={onClose}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.8 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
           />
 
           <motion.div
             className="fixed inset-0 z-[101] flex items-start justify-center"
-            initial={{ y: "-100%", opacity: 0 }} // Start above viewport, invisible
-            animate={{ y: "0%", opacity: 1 }} // Slide into place and fade in
-            exit={{ y: "-100%", opacity: 0 }} // Slide up and fade out on close
+            initial={{ y: "-100%", opacity: 0 }}
+            animate={{ y: "0%", opacity: 1 }}
+            exit={{ y: "-100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 40 }}
             onClick={onClose}
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="
-                   relative
-                   bg-white
-                   w-full
-                   max-w-full
-                   h-full
-                   md:max-h-[770px] 
-                 rounded-none
-                   shadow-lg
-                   overflow-y-auto 
-                   -webkit-overflow-scrolling-touch 
-                 "
+              className="relative bg-white w-full max-w-full h-full md:max-h-[770px] rounded-none shadow-lg overflow-y-auto -webkit-overflow-scrolling-touch"
             >
               <button
                 onClick={onClose}
-                className="absolute top-4 cursor-pointer right-4 text-2xl z-10"
+                className="absolute top-4 right-4 text-2xl z-10 cursor-pointer"
               >
                 <IoClose />
               </button>
 
-              {/* Logo section: clicking redirects home */}
               <div
                 className="flex items-center justify-center h-[100px] cursor-pointer"
                 onClick={() => router.push({ pathname: "/" })}
@@ -98,55 +147,245 @@ export default function SearchModal({ isOpen, onClose }) {
                 />
               </div>
 
-              {/* Main content: heading and input */}
               <div className="flex flex-col items-center h-full px-6">
-                {/* Heading text */}
                 <h2 className="text-2xl md:text-4xl font-gilroy my-8">
                   {t("what_are_you_looking_for")}
                 </h2>
-                {/* Search input container */}
                 <div className="w-full relative max-w-4xl">
                   <input
                     type="text"
-                    placeholder="Search products..."
+                    placeholder="Search products, categories, sizes, colors..."
                     className="w-full font-gilroy border rounded-full border-black py-3 px-4 text-lg focus:outline-none transition"
                     autoFocus
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                  {/* Clear (X) button appears when there's text */}
                   {searchQuery && (
                     <button
                       onClick={handleClear}
-                      className="absolute right-6 cursor-pointer top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
+                      className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
                     >
                       <IoClose className="text-xl" />
                     </button>
                   )}
-                  {/* Search icon inside input (non-interactive) */}
-                  {/* <div className="absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                    <TfiSearch className="text-xl text-gray-400" />
-                  </div> */}
                 </div>
 
-                {/* Trending searches list */}
-                <div className="flex flex-row gap-4 mt-4 font-gilroy text-sm">
-                  <h2 className="uppercase"> {t("trending_searches")}:</h2>
-                  {["Sneakers", "Flats", "Sandals"].map((term) => (
-                    <button
-                      key={term}
-                      onClick={() => setSearchQuery(term)}
-                      className="lowercase cursor-pointer text-neutral-600 hover:text-neutral-800 transition"
-                    >
-                      {term}
-                    </button>
-                  ))}
-                </div>
-                <TrendingInitSearch />
+                {/* Search Results */}
+                {searchQuery && (
+                  <div className="w-full max-w-4xl mt-4">
+                    {isSearching ? (
+                      <div className="text-center py-4">{t("searching")}</div>
+                    ) : (
+                      <>
+                        {/* Products from Categories */}
+                        {searchResults.categories.length > 0 && (
+                          <div className="mb-4">
+                            <h3 className="text-lg  mb-2">
+                              {t("products_from_categories")}:{" "}
+                              {searchResults.categories
+                                .map((c) => c.name)
+                                .join(", ")}
+                            </h3>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                              {searchResults.products
+                                .filter((product) =>
+                                  searchResults.categories.some(
+                                    (cat) =>
+                                      product.category?.toLowerCase() ===
+                                      cat.name.toLowerCase()
+                                  )
+                                )
+                                .map((product) => (
+                                  <div
+                                    key={product.id}
+                                    onClick={() =>
+                                      handleResultClick("product", product)
+                                    }
+                                    className="cursor-pointer hover:opacity-80 transition"
+                                  >
+                                    <div className="aspect-square relative">
+                                      <Image
+                                        src={
+                                          product.images?.[0]?.url ||
+                                          product.images?.[0] ||
+                                          "/images/placeholder.png"
+                                        }
+                                        alt={product.name}
+                                        fill
+                                        className="object-cover rounded-lg"
+                                      />
+                                    </div>
+                                    <h4 className="mt-2 text-sm font-medium">
+                                      {product.name}
+                                    </h4>
+                                    <p className="text-gray-600">
+                                      {product.price} AZN
+                                    </p>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Products with matching Sizes */}
+                        {searchResults.sizes.length > 0 && (
+                          <div className="mb-4">
+                            <h3 className="text-lg  mb-2">
+                              {t("products_in_size")}:{" "}
+                              {searchResults.sizes
+                                .map((s) => s.value)
+                                .join(", ")}
+                            </h3>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                              {searchResults.products
+                                .filter((product) =>
+                                  searchResults.sizes.some((size) =>
+                                    product.sizes?.some(
+                                      (s) =>
+                                        s.toLowerCase() ===
+                                        size.value.toLowerCase()
+                                    )
+                                  )
+                                )
+                                .map((product) => (
+                                  <div
+                                    key={product.id}
+                                    onClick={() =>
+                                      handleResultClick("product", product)
+                                    }
+                                    className="cursor-pointer hover:opacity-80 transition"
+                                  >
+                                    <div className="aspect-square relative">
+                                      <Image
+                                        src={
+                                          product.images?.[0]?.url ||
+                                          product.images?.[0] ||
+                                          "/images/placeholder.png"
+                                        }
+                                        alt={product.name}
+                                        fill
+                                        className="object-cover rounded-lg"
+                                      />
+                                    </div>
+                                    <h4 className="mt-2 text-sm font-medium">
+                                      {product.name}
+                                    </h4>
+                                    <p className="text-gray-600">
+                                      {product.price} AZN
+                                    </p>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Products with matching Colors */}
+                        {searchResults.colors.length > 0 && (
+                          <div className="mb-4">
+                            <h3 className="text-lg  mb-2">
+                              {t("products_in_color")}:{" "}
+                              {searchResults.colors
+                                .map((c) => c.name)
+                                .join(", ")}
+                            </h3>
+                            {console.log(
+                              "Search Results Colors:",
+                              searchResults.colors
+                            )}
+                            {console.log(
+                              "All Products:",
+                              searchResults.products
+                            )}
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                              {searchResults.products
+                                .filter((product) => {
+                                  const hasMatchingColor = product.colors?.some(
+                                    (productColor) =>
+                                      searchResults.colors.some(
+                                        (searchColor) =>
+                                          productColor.toLowerCase() ===
+                                          searchColor.name.toLowerCase()
+                                      )
+                                  );
+                                  console.log(
+                                    "Product:",
+                                    product.name,
+                                    "Colors:",
+                                    product.colors,
+                                    "Has Matching Color:",
+                                    hasMatchingColor
+                                  );
+                                  return hasMatchingColor;
+                                })
+                                .map((product) => (
+                                  <div
+                                    key={product.id}
+                                    onClick={() =>
+                                      handleResultClick("product", product)
+                                    }
+                                    className="cursor-pointer hover:opacity-80 transition"
+                                  >
+                                    <div className="aspect-square relative">
+                                      <Image
+                                        src={
+                                          product.images?.[0]?.url ||
+                                          product.images?.[0] ||
+                                          "/images/placeholder.png"
+                                        }
+                                        alt={product.name}
+                                        fill
+                                        className="object-cover rounded-lg"
+                                      />
+                                    </div>
+                                    <h4 className="mt-2 text-sm font-medium">
+                                      {product.name}
+                                    </h4>
+                                    <p className="text-gray-600">
+                                      {product.price} AZN
+                                    </p>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {!isSearching &&
+                          searchResults.products.length === 0 &&
+                          searchResults.categories.length === 0 &&
+                          searchResults.sizes.length === 0 &&
+                          searchResults.colors.length === 0 && (
+                            <div className="text-center py-4 text-gray-500">
+                              {t("no_results_found")}
+                            </div>
+                          )}
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* Trending searches from last 3 categories */}
+                {!searchQuery && (
+                  <div className="flex flex-row gap-4 mt-4 font-gilroy text-sm">
+                    <h2 className="uppercase">{t("trending_searches")}:</h2>
+                    {trendingCats.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSearchQuery(cat.name)}
+                        className="lowercase cursor-pointer text-neutral-600 hover:text-neutral-800 transition"
+                      >
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {!searchQuery && (
+                  <TrendingInitSearch newProducts={newProducts} />
+                )}
               </div>
             </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>,
     document.body

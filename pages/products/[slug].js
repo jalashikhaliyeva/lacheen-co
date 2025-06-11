@@ -5,9 +5,10 @@ import Footer from "@/components/Footer";
 import ProductDetailed from "@/components/ProductDetailed";
 import Container from "@/components/Container";
 import { useRouter } from "next/router";
-import { fetchProductById } from "@/firebase/services/firebaseProductsService";
+import { fetchProductById, fetchProducts } from "@/firebase/services/firebaseProductsService";
+import { fetchCategories } from "@/firebase/services/categoriesService";
 
-export default function ProductSingle() {
+export default function ProductSingle({ categories, modalNewProducts }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -74,11 +75,48 @@ export default function ProductSingle() {
   return (
     <div className="relative">
       <main>
-        <Header />
+        <Header modalNewProducts={modalNewProducts} categories={categories} />
         <NavList />
         {product && <ProductDetailed product={product} />}
         <Footer />
       </main>
     </div>
   );
+}
+
+
+
+
+export async function getServerSideProps() {
+  try {
+    const [categories, allProducts] = await Promise.all([
+      fetchCategories(),
+      fetchProducts(),
+    ]);
+
+    const last10Products = allProducts.slice(0, 10);
+
+    const newProducts = allProducts.filter((p) => p.is_new).slice(-4);
+
+    const modalNewProducts = allProducts.filter((p) => p.is_new).slice(-6);
+
+    return {
+      props: {
+        categories,
+        products: last10Products,
+        newProducts,
+        modalNewProducts,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to fetch data on server:", error);
+    return {
+      props: {
+        categories: [],
+        products: [],
+        newProducts: [],
+        modalNewProducts: [],
+      },
+    };
+  }
 }

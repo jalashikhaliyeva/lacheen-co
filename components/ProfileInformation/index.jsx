@@ -57,7 +57,7 @@ function ProfileInformation({ user, orders, onLogout, initialTab = "personal" })
     <Container>
       <div className="w-full flex flex-col md:flex-row gap-5 my-10 mx-auto relative">
         {/* Sidebar Navigation */}
-        <div className="w-full md:w-[20%] flex gap-3 flex-col md:sticky md:top-10 md:self-start">
+        <div className="hidden md:flex w-full md:w-[20%]  gap-3 flex-col md:sticky md:top-10 md:self-start">
           <div
             className={`font-gilroy text-lg py-3 px-5 ${
               activeTab === "personal"

@@ -256,5 +256,11 @@
   "confirmed": "Təsdiq olundu",
   "cancelled": "Ləğv edilib",
   "please_login_to_view_basket": "Səbətə baxmaq üçün daxil olun",
-  "your_items_will_be_safe_until_you_return": "Daxil olmaqla səbətinizdə olan məhsullarınız qorunacaq"
+  "your_items_will_be_safe_until_you_return": "Daxil olmaqla səbətinizdə olan məhsullarınız qorunacaq",
+  "my_account": "Mənim hesabım",
+  "products_in_size": "Ölçü üzrə olan məhsullar",
+  "products_in_color": "Rəng üzrə olan məhsullar",
+  "products_from_categories": "Kateqoriya üzrə olan məhsullar",
+  "searching": "Axtarılır...",
+  "no_results_found": "Nəticə tapılmadı"
 }

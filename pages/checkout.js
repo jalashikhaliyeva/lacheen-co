@@ -15,8 +15,10 @@ import Header from "@/components/Header";
 import NavList from "@/components/NavList";
 import Container from "@/components/Container";
 import { fetchSizes } from "@/firebase/services/sizeService";
+import { fetchCategories } from "@/firebase/services/categoriesService";
+import { fetchProducts } from "@/firebase/services/firebaseProductsService";
 
-function CheckoutPage() {
+export default function CheckoutPage({ categories, modalNewProducts }) {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useTranslation();
@@ -307,7 +309,7 @@ function CheckoutPage() {
         onClose={() => setShowToast(false)}
         message={toastMessage}
       />
-      <Header />
+      <Header modalNewProducts={modalNewProducts} categories={categories} />
       <NavList onMenuToggle={setIsMenuOpen} />
 
       <Container>
@@ -665,4 +667,38 @@ function CheckoutPage() {
   );
 }
 
-export default CheckoutPage;
+
+
+export async function getServerSideProps() {
+  try {
+    const [categories, allProducts] = await Promise.all([
+      fetchCategories(),
+      fetchProducts(),
+    ]);
+
+    const last10Products = allProducts.slice(0, 10);
+
+    const newProducts = allProducts.filter((p) => p.is_new).slice(-4);
+
+    const modalNewProducts = allProducts.filter((p) => p.is_new).slice(-6);
+
+    return {
+      props: {
+        categories,
+        products: last10Products,
+        newProducts,
+        modalNewProducts,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to fetch data on server:", error);
+    return {
+      props: {
+        categories: [],
+        products: [],
+        newProducts: [],
+        modalNewProducts: [],
+      },
+    };
+  }
+}

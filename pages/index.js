@@ -1,84 +1,77 @@
-// pages/index.js (Updated Home Page)
+// pages/index.js
 import { useState } from "react";
 import Header from "@/components/Header";
 import NavList from "@/components/NavList";
 import Hero from "@/components/Hero";
-// import HeroV1 from "@/components/Hero-v1";
 import CategorySection from "@/components/CategorySection";
 import Citate from "@/components/Citate";
 import SliderEmbla from "@/components/EmblaCarouselAdvantage/EmblaCarousel";
-// import VideoSection from "@/components/VideoSection";
 import VideoandImage from "@/components/VideoandImage";
 import TrendingNow from "@/components/TrendingNow";
 import Footer from "@/components/Footer";
 import { useAuthClient } from "@/shared/context/AuthContext";
 import { fetchCategories } from "@/firebase/services/categoriesService";
+import { fetchProducts } from "@/firebase/services/firebaseProductsService";
 
-export default function Home({ categories }) {
+export default function Home({
+  categories,
+  products,
+  newProducts,       
+  modalNewProducts,  
+}) {
   const { user } = useAuthClient();
-  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="relative">
       <main>
-        <Header />
-        <NavList onMenuToggle={setIsMenuOpen}  />
+        <Header modalNewProducts={modalNewProducts} categories={categories}  />
+
+        <NavList onMenuToggle={setIsMenuOpen} />
         <Hero />
-        {/* <HeroV1 /> */}
-        <CategorySection  categories={categories}/>
+        <CategorySection categories={categories} />
         <Citate />
-        <SliderEmbla />
+        <SliderEmbla products={products} />
         <VideoandImage />
-        <TrendingNow />
+
+        <TrendingNow products={newProducts} />
+
         <Footer />
       </main>
     </div>
   );
 }
 
-// Server-side props for SEO and performance
 export async function getServerSideProps() {
   try {
-    const categories = await fetchCategories();
-    
-    return {
-      props: {
-        categories,
-      },
-    };
-  } catch (error) {
-    console.error("Failed to fetch categories on server:", error);
-    
-    return {
-      props: {
-        categories: [],
-      },
-    };
-  }
-}
+    const [categories, allProducts] = await Promise.all([
+      fetchCategories(),
+      fetchProducts(),
+    ]);
 
-// Alternative: Static Generation (if categories don't change often)
-/*
-export async function getStaticProps() {
-  try {
-    const categories = await fetchCategories();
-    
+    const last10Products = allProducts.slice(0, 10);
+
+    const newProducts = allProducts.filter((p) => p.is_new).slice(-4);
+
+    const modalNewProducts = allProducts.filter((p) => p.is_new).slice(-6);
+
     return {
       props: {
         categories,
+        products: last10Products,
+        newProducts,
+        modalNewProducts,
       },
-      revalidate: 3600 // Revalidate every hour
     };
   } catch (error) {
-    console.error("Failed to fetch categories on server:", error);
-    
+    console.error("Failed to fetch data on server:", error);
     return {
       props: {
         categories: [],
+        products: [],
+        newProducts: [],
+        modalNewProducts: [],
       },
-      revalidate: 60 // Retry after 1 minute if failed
     };
   }
 }
-*/

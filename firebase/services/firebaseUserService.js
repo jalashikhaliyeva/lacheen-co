@@ -59,7 +59,7 @@ export const createOrUpdateUserProfile = async (userId, userData) => {
         updatedAt: timestamp,
       });
     }
-    console.log("User profile updated successfully");
+    // console.log("User profile updated successfully");
     return true;
   } catch (error) {
     console.error("Error creating/updating user profile:", error);

@@ -60,7 +60,7 @@ function ProductDetailed() {
       });
   }, [productData]);
 
-  console.log(productData, "productData");
+  // console.log(productData, "productData");
   
 
   // Render a spinner while loading.
