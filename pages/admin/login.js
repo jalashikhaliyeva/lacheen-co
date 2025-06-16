@@ -42,10 +42,10 @@ function AdminLogin() {
     <div className="bg-[#f9fafb]">
       <Container>
         <div className="flex   items-center justify-center  min-h-screen py-8">
-          <div className="flex shadow-lg flex-col-reverse md:flex-row rounded-lg overflow-hidden w-full max-w-3xl">
+          <div className="flex shadow-lg flex-col-reverse md:flex-row rounded-lg overflow-hidden w-full max-w-4xl">
             <div className="relative flex-1 aspect-[2/3]">
               <Image
-                src="/images/illustration.jpg"
+                src="/images/img.jpg"
                 alt="Illustration"
                 fill
                 className="object-cover"
