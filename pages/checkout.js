@@ -185,16 +185,94 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
   };
 
   const handleEnterNewPhone = () => {
-    setUseExistingPhone(false);
+    console.log('Before state update:', { showPhoneInput, useExistingPhone, phoneNumberConfirmed });
+    
+    // Clear the phone number when entering a new one
+    setPhoneNumber('');
     setPhoneNumberConfirmed(false);
-    // Keep the existing phone number in the input
-    setPhoneNumber(phoneNumber);
+    setUseExistingPhone(false);
+    setShowPhoneInput(true);
+    
     // Clear any phone-related errors
     setErrors((prev) => ({
       ...prev,
       phoneSelection: undefined,
       phoneNumber: undefined,
     }));
+
+    // Force a re-render after state updates
+    setTimeout(() => {
+      console.log('After state update:', { showPhoneInput, useExistingPhone, phoneNumberConfirmed });
+    }, 0);
+  };
+
+  // Add useEffect to monitor state changes
+  useEffect(() => {
+    console.log('State changed:', { showPhoneInput, useExistingPhone, phoneNumberConfirmed });
+  }, [showPhoneInput, useExistingPhone, phoneNumberConfirmed]);
+
+  // Modify the phone number input section rendering
+  const renderPhoneInput = () => {
+    console.log('Rendering phone input with states:', { showPhoneInput, useExistingPhone, phoneNumberConfirmed });
+    
+    // If we have a phone number and haven't confirmed it yet, show the selection UI
+    if (phoneNumber && !phoneNumberConfirmed) {
+      return (
+        <div className="space-y-4">
+          <div className={`p-4 border ${errors.phoneSelection ? "border-red-500" : "border-neutral-200"} bg-neutral-50`}>
+            <p className="text-neutral-700 mb-2">{t("existing_phone_number")}</p>
+            <p className="text-neutral-900 font-medium mb-4">{formatPhoneNumber(phoneNumber)}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleUseExistingPhone}
+                className="px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
+              >
+                {t("use_this_number")}
+              </button>
+              <button
+                onClick={handleEnterNewPhone}
+                className="px-4 py-2 border border-neutral-200 hover:border-neutral-400 transition-colors"
+              >
+                {t("enter_new_number")}
+              </button>
+            </div>
+            {errors.phoneSelection && (
+              <p className="text-red-500 text-sm mt-2">{errors.phoneSelection}</p>
+            )}
+          </div>
+        </div>
+      );
+    }
+    
+    // If showPhoneInput is true or we're entering a new number, show the input
+    if (showPhoneInput || (!useExistingPhone && !phoneNumberConfirmed)) {
+      return (
+        <div className="mb-4">
+          <label className="block text-sm text-neutral-700 mb-1">
+            {t("phone_number")}
+          </label>
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600">
+              +994
+            </div>
+            <input
+              type="tel"
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
+              className={`w-full pl-12 pr-3 py-2 border ${
+                errors.phoneNumber ? "border-red-500" : "border-neutral-300"
+              } focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent`}
+              placeholder="xx xxx xx xx"
+            />
+          </div>
+          {errors.phoneNumber && (
+            <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>
+          )}
+        </div>
+      );
+    }
+    
+    return null;
   };
 
   const validateForm = () => {
@@ -402,70 +480,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
               {/* Add phone number input if needed */}
               <div className="my-6">
                 <h2 className="text-xl mb-4">{t("contact_information")}</h2>
-                {phoneNumber && !useExistingPhone && !phoneNumberConfirmed ? (
-                  <div className="space-y-4">
-                    <div
-                      className={`p-4 border ${
-                        errors.phoneSelection
-                          ? "border-red-500"
-                          : "border-neutral-200"
-                      }  bg-neutral-50`}
-                    >
-                      <p className="text-neutral-700 mb-2">
-                        {t("existing_phone_number")}
-                      </p>
-                      <p className="text-neutral-900 font-medium mb-4">
-                        {formatPhoneNumber(phoneNumber)}
-                      </p>
-                      <div className="flex gap-3">
-                        <button
-                          onClick={handleUseExistingPhone}
-                          className="px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
-                        >
-                          {t("use_this_number")}
-                        </button>
-                        <button
-                          onClick={handleEnterNewPhone}
-                          className="px-4 py-2 border border-neutral-200 hover:border-neutral-400 transition-colors"
-                        >
-                          {t("enter_new_number")}
-                        </button>
-                      </div>
-                      {errors.phoneSelection && (
-                        <p className="text-red-500 text-sm mt-2">
-                          {errors.phoneSelection}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mb-4">
-                    <label className="block text-sm text-neutral-700 mb-1">
-                      {t("phone_number")}
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600">
-                        +994
-                      </div>
-                      <input
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={handlePhoneNumberChange}
-                        className={`w-full pl-12 pr-3 py-2 border ${
-                          errors.phoneNumber
-                            ? "border-red-500"
-                            : "border-neutral-300"
-                        }  focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent`}
-                        placeholder="xx xxx xx xx"
-                      />
-                    </div>
-                    {errors.phoneNumber && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.phoneNumber}
-                      </p>
-                    )}
-                  </div>
-                )}
+                {renderPhoneInput()}
               </div>
 
               {/* Description Input */}
