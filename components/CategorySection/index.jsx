@@ -1,17 +1,73 @@
-import React from "react";
+import { useRouter } from "next/router";
+import { useTranslation } from "react-i18next";
 import Container from "../Container";
 import Image from "next/image";
-import { useTranslation } from "react-i18next";
-import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
 
-function CategorySection({ categories }) {
-
+function CategorySection({ categories, categoriesSettings }) {
   const { t } = useTranslation();
   const router = useRouter();
+  const videoRef = useRef(null);
+  const videoContainerRef = useRef(null);
+  const [isVideoVisible, setIsVideoVisible] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
 
   const handleCategoryClick = (categorySlug) => {
     router.push(`/products?category=${categorySlug}`);
   };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsVideoVisible(entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0.1,
+        rootMargin: "0px"
+      }
+    );
+
+    if (videoContainerRef.current) {
+      observer.observe(videoContainerRef.current);
+    }
+
+    return () => {
+      if (videoContainerRef.current) {
+        observer.unobserve(videoContainerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isVideoVisible || !videoRef.current) return;
+
+    const video = videoRef.current;
+    
+    // Handle video play
+    const playVideo = async () => {
+      try {
+        await video.play();
+      } catch (err) {
+        console.log("Video play failed:", err);
+        setHasVideoError(true);
+      }
+    };
+
+    // Handle video loading
+    const handleLoaded = () => {
+      playVideo().catch(console.error);
+    };
+
+    video.addEventListener('loadedmetadata', handleLoaded);
+    video.addEventListener('canplay', handleLoaded);
+
+    return () => {
+      video.removeEventListener('loadedmetadata', handleLoaded);
+      video.removeEventListener('canplay', handleLoaded);
+    };
+  }, [isVideoVisible]);
 
   return (
     <Container>
@@ -23,15 +79,17 @@ function CategorySection({ categories }) {
         >
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 via-neutral-900/30 to-transparent z-10" />
           <Image
-            src={"/images/17.jpg"}
-            alt="category lacheen.co"
+            src={categoriesSettings?.images?.[0] || "/images/17.jpg"}
+            alt={categories[0].name}
             fill
-            priority
-            className="object-cover transition-transform duration-500 ease-out "
-            quality={100}
+            loading="lazy"
+            className="object-cover transition-transform duration-500 ease-out"
+            quality={85}
+            placeholder="blur"
+            blurDataURL="/images/placeholder.jpg"
           />
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
-            <div className="text-center font-gilroy  transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2">
+            <div className="text-center font-gilroy transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2">
               <h3 className="text-xl font-normal transition-all duration-300 group-hover:tracking-wide">
                 {categories[0].name}
               </h3>
@@ -43,25 +101,42 @@ function CategorySection({ categories }) {
         </div>
 
         {/* Item 2 - Video */}
-        <div className="relative cursor-pointer aspect-square w-full h-[340px] md:h-[400px] lg:h-[600px] group overflow-hidden">
+        <div 
+          ref={videoContainerRef}
+          className="relative cursor-pointer aspect-square w-full h-[340px] md:h-[400px] lg:h-[600px] group overflow-hidden"
+        >
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 via-neutral-900/30 to-transparent z-10" />
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/images/video-lacheen.MP4" type="video/mp4" />
-          </video>
-          <div className="absolute  left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
+          
+          {/* Fallback image if video fails to load */}
+          {hasVideoError ? (
+            <Image
+              src="/images/video-fallback.jpg" // Add a fallback image
+              alt="Video fallback"
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+              preload="metadata"
+              poster="/images/video-poster.jpg" // Add a poster image
+            >
+              <source 
+                src={categoriesSettings?.video || "/images/video-lacheen.MP4"} 
+                type="video/mp4" 
+              />
+              Your browser does not support the video tag.
+            </video>
+          )}
+          
+          <div className="absolute left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
             <div className="text-center font-gilroy transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2">
-              {/* <h3 className="text-3xl font-normal transition-all duration-300 group-hover:tracking-wide">
-                Lacheen Shoes - Symbol of Excellence
-              </h3> */}
-              {/* <p className="text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] delay-75 mt-1">
-                Shop Now
-              </p> */}
+              {/* Optional: Add any text you want to display over the video */}
             </div>
           </div>
         </div>
@@ -73,12 +148,14 @@ function CategorySection({ categories }) {
         >
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 via-neutral-900/30 to-transparent z-10" />
           <Image
-            src={"/images/16.jpg"}
-            alt="category lacheen.co"
+            src={categoriesSettings?.images?.[1] || "/images/16.jpg"}
+            alt={categories[1].name}
             fill
-            priority
-            className="object-cover transition-transform duration-500 ease-out "
-            quality={100}
+            loading="lazy"
+            className="object-cover transition-transform duration-500 ease-out"
+            quality={85}
+            placeholder="blur"
+            blurDataURL="/images/placeholder.jpg"
           />
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
             <div className="text-center font-gilroy transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2">

@@ -284,5 +284,10 @@
   "deliver": "Çatdırılıb statusunu qeyd edin",
   "morning": "Gündüz",
   "afternoon": "Axşam",
-  "evening": "Gecə"
+  "evening": "Gecə",
+  "search_results": "Axtarış nəticələri",
+  "found_categories": "Tapılmış kateqoriyalar",
+  "found_sizes": "Tapılmış ölçülər",
+  "found_colors": "Tapılmış rənglər",
+  "no_results_found": "Nəticə tapılmadı"
 }

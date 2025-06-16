@@ -12,12 +12,16 @@ import Footer from "@/components/Footer";
 import { useAuthClient } from "@/shared/context/AuthContext";
 import { fetchCategories } from "@/firebase/services/categoriesService";
 import { fetchProducts } from "@/firebase/services/firebaseProductsService";
+import { fetchSectionData } from "@/firebase/services/settingsService";
 
 export default function Home({
   categories,
   products,
   newProducts,       
-  modalNewProducts,  
+  modalNewProducts,
+  heroSettings,
+  categoriesSettings,
+  attitudeSettings,
 }) {
   const { user } = useAuthClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,11 +31,11 @@ export default function Home({
       <main>
         <Header modalNewProducts={modalNewProducts} categories={categories}  />
         <NavList onMenuToggle={setIsMenuOpen} />
-        <Hero />
-        <CategorySection categories={categories} />
+        <Hero heroSettings={heroSettings} />
+        <CategorySection categories={categories}     categoriesSettings={categoriesSettings}  />
         <Citate />
         <SliderEmbla products={products} />
-        <VideoandImage />
+        <VideoandImage attitudeSettings={attitudeSettings} />
         <TrendingNow products={newProducts} />
         <Footer />
       </main>
@@ -39,17 +43,18 @@ export default function Home({
   );
 }
 
-export async function getServerSideProps() {
+export async function getServerSideProps({ locale }) {
   try {
-    const [categories, allProducts] = await Promise.all([
+    const [categories, allProducts, heroSettings, categoriesSettings , attitudeSettings] = await Promise.all([
       fetchCategories(),
       fetchProducts(),
+      fetchSectionData('hero'),
+      fetchSectionData('categories'), // Add this line
+      fetchSectionData('attitude'),
     ]);
 
     const last10Products = allProducts.slice(0, 10);
-
     const newProducts = allProducts.filter((p) => p.is_new).slice(-4);
-
     const modalNewProducts = allProducts.filter((p) => p.is_new).slice(-6);
 
     return {
@@ -58,6 +63,9 @@ export async function getServerSideProps() {
         products: last10Products,
         newProducts,
         modalNewProducts,
+        heroSettings: heroSettings || null,
+        categoriesSettings: categoriesSettings || null, // Add this line
+        attitudeSettings: attitudeSettings || null, // Add this line
       },
     };
   } catch (error) {
@@ -68,6 +76,9 @@ export async function getServerSideProps() {
         products: [],
         newProducts: [],
         modalNewProducts: [],
+        heroSettings: null,
+        categoriesSettings: null, // Add this line
+        attitudeSettings: null, // Add this line
       },
     };
   }

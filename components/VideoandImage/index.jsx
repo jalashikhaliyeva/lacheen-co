@@ -5,7 +5,7 @@ import { Playfair_Display, Cormorant } from "next/font/google";
 const playfair = Playfair_Display({ subsets: ["latin"] });
 const cormorant = Cormorant({ subsets: ["latin"], weight: "400" });
 
-function VideoandImage() {
+function VideoandImage({ attitudeSettings }) {
   return (
     <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-8 items-start">
       {/* Image Container */}
@@ -19,7 +19,7 @@ function VideoandImage() {
           <div className="relative aspect-square w-full h-[300px] sm:h-[400px] md:h-[440px] group overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-t from-neutral-600/70 via-neutral-900/30 to-transparent z-10" />
             <Image
-              src={"/images/IMG_8682.jpg"}
+              src={attitudeSettings?.image || "/images/IMG_8682.jpg"} // Use from settings or fallback
               alt="category lacheen.co"
               fill
               priority
@@ -41,7 +41,10 @@ function VideoandImage() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/images/video2-lacheen.MP4" type="video/mp4" />
+          <source 
+            src={attitudeSettings?.video || "/images/video2-lacheen.MP4"} // Use from settings or fallback
+            type="video/mp4" 
+          />
         </video>
         <div className="absolute left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
           <div className="text-center font-gilroy transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2"></div>

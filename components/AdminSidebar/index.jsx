@@ -144,12 +144,12 @@ function AdminSidebar({ toggleSidebar }) {
       icon: <FiShoppingCart size={20} />,
       route: "/admin/orders",
     },
-    // {
-    //   id: "settings",
-    //   label: "Settings",
-    //   icon: <FiSettings size={20} />,
-    //   route: "/admin/settings",
-    // },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: <FiSettings size={20} />,
+      route: "/admin/settings",
+    },
     {
       id: "client",
       label: "Users",
