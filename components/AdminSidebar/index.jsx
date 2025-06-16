@@ -18,7 +18,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { fetchCategories } from "@/firebase/services/categoriesService";
 
-function AdminSidebar() {
+function AdminSidebar({ toggleSidebar }) {
   const router = useRouter();
   const [activeItem, setActiveItem] = useState("dashboard");
   const [productsOpen, setProductsOpen] = useState(false);
@@ -89,6 +89,10 @@ function AdminSidebar() {
     }
     setActiveItem(id);
     router.push(route);
+    // Close sidebar on mobile after clicking a menu item
+    if (window.innerWidth < 768) {
+      toggleSidebar();
+    }
   };
 
   const menuItems = [
@@ -140,12 +144,12 @@ function AdminSidebar() {
       icon: <FiShoppingCart size={20} />,
       route: "/admin/orders",
     },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: <FiSettings size={20} />,
-      route: "/admin/settings",
-    },
+    // {
+    //   id: "settings",
+    //   label: "Settings",
+    //   icon: <FiSettings size={20} />,
+    //   route: "/admin/settings",
+    // },
     {
       id: "client",
       label: "Users",

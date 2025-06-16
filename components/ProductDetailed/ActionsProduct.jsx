@@ -173,7 +173,7 @@ function ActionsProduct({ product, allProducts }) {
     if (!user) {
       setToastMessage(t("please_login_first"));
       setShowToast(true);
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
@@ -187,15 +187,15 @@ function ActionsProduct({ product, allProducts }) {
       setIsAddingToBasket(true);
       const productWithSize = {
         ...product,
-        selectedSize
+        selectedSize,
       };
       await addToBasket(user.uid, productWithSize);
       await loadBasketItems(); // Reload basket items after adding
       setToastMessage(t("added_to_basket"));
       setShowToast(true);
-      router.push('/basket');
+      router.push("/basket");
     } catch (error) {
-      console.error('Error adding to basket:', error);
+      console.error("Error adding to basket:", error);
       setToastMessage(t("error_adding_to_basket"));
       setShowToast(true);
     } finally {
@@ -214,7 +214,9 @@ function ActionsProduct({ product, allProducts }) {
       />
       <div className="flex flex-col gap-1 md:gap-4 w-full font-gilroy bg-white p-4 md:p-5 border-neutral-200">
         <div className="flex flex-row gap-2 items-center justify-between">
-          <h2 className=" uppercase block text-lg md:text-xl">{product.name}</h2>
+          <h2 className=" uppercase block text-lg md:text-xl">
+            {product.name}
+          </h2>
           <h2 className=" uppercase block text-sm md:text-base">
             {product.barcode}
           </h2>
@@ -298,7 +300,10 @@ function ActionsProduct({ product, allProducts }) {
         {/* Mobile size selector */}
         <div className="md:hidden">
           <div className="flex justify-between items-center mt-2">
-            <button onClick={toggleDetails} className="text-sm text-neutral-600">
+            <button
+              onClick={toggleDetails}
+              className="text-sm text-neutral-600"
+            >
               {showDetails ? t("hide_sizes") : t("show_available_sizes")}
             </button>
             <button onClick={toggleDetails}>
@@ -335,11 +340,11 @@ function ActionsProduct({ product, allProducts }) {
               disabled={!selectedSize || isAddingToBasket}
               onClick={handleAddToBasket}
             >
-              {isAddingToBasket 
-                ? t("adding_to_basket") 
+              {isAddingToBasket
+                ? t("adding_to_basket")
                 : selectedSize
-                  ? t("add_to_cart")
-                  : t("select_size") || "Select Size"}
+                ? t("add_to_cart")
+                : t("select_size_before_adding_to_basket") || "Select Size"}
             </button>
           </div>
           <div className="cursor-pointer py-2 px-2 border border-black bg-black text-center">

@@ -10,6 +10,7 @@ import Spinner from "@/components/Spinner";
 import { AuthProvider } from "@/shared/context/AuthContext";
 import { CategoriesProvider } from "@/shared/context/CategoriesContext";
 import { BasketProvider } from "@/shared/context/BasketContext";
+import { recordPageView } from "@/firebase/services/firebaseAnalyticsService";
 
 export default function App({ Component, pageProps }) {
   const { categories: initialCategories = [], ...otherProps } = pageProps;
@@ -24,18 +25,27 @@ export default function App({ Component, pageProps }) {
       }
     };
 
-    const handleRouteChangeEnd = () => {
+    const handleRouteChangeEnd = (url) => {
       setLoading(false);
     };
+
+    const handleRouteChange = (url) => {
+      recordPageView(url);
+    };
+
+    // Record initial page view
+    recordPageView(router.asPath);
 
     router.events.on("routeChangeStart", handleRouteChangeStart);
     router.events.on("routeChangeComplete", handleRouteChangeEnd);
     router.events.on("routeChangeError", handleRouteChangeEnd);
+    router.events.on("routeChangeComplete", handleRouteChange);
 
     return () => {
       router.events.off("routeChangeStart", handleRouteChangeStart);
       router.events.off("routeChangeComplete", handleRouteChangeEnd);
       router.events.off("routeChangeError", handleRouteChangeEnd);
+      router.events.off("routeChangeComplete", handleRouteChange);
     };
   }, [router]);
 

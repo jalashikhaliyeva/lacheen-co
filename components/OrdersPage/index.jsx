@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { FiChevronDown, FiX } from "react-icons/fi";
 import { fetchSizes } from "@/firebase/services/sizeService";
-
+import { useTranslation } from "react-i18next";
 const cancelReasons = [
   "The sizes are out of stock",
   "We currently do not have this model in this size",
@@ -70,6 +70,7 @@ function CustomDropdown({ options, value, onChange, placeholder }) {
 }
 
 function OrdersPage() {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -192,6 +193,20 @@ function OrdersPage() {
     }
   };
 
+  const handleDeliverOrder = async (orderId) => {
+    try {
+      const db = getDatabase(app);
+      const orderRef = ref(db, `all-orders/${orderId}`);
+      await update(orderRef, {
+        status: "delivered",
+        deliveredAt: new Date().toISOString(),
+      });
+      fetchOrders();
+    } catch (error) {
+      console.error("Error marking order as delivered:", error);
+    }
+  };
+
   const handleCancelOrder = async () => {
     if (!selectedOrder) return;
 
@@ -219,22 +234,27 @@ function OrdersPage() {
 
   const filteredOrders = orders.filter((order) => {
     const searchLower = searchQuery.toLowerCase();
-    
+
     // Search in order ID
     if (order.id.toLowerCase().includes(searchLower)) return true;
-    
+
     // Search in user info
     if (
       order.userInfo?.name?.toLowerCase().includes(searchLower) ||
       order.userInfo?.phone?.toLowerCase().includes(searchLower)
-    ) return true;
-    
+    )
+      return true;
+
     // Search in items
-    if (order.items?.some(item => 
-      item.id.toLowerCase().includes(searchLower) ||
-      item.name.toLowerCase().includes(searchLower)
-    )) return true;
-    
+    if (
+      order.items?.some(
+        (item) =>
+          item.id.toLowerCase().includes(searchLower) ||
+          item.name.toLowerCase().includes(searchLower)
+      )
+    )
+      return true;
+
     return false;
   });
 
@@ -247,26 +267,26 @@ function OrdersPage() {
   }
 
   return (
-    <div className="pt-8">
+    <div className="pt-8 mt-10">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Orders Management</h1>
         <div className="relative w-1/2">
-  <input
-    type="text"
-    placeholder="Search by name, order ID, item ID, item name, or phone"
-    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-  />
-  {searchQuery && (
-    <button
-      onClick={() => setSearchQuery("")}
-      className="absolute inset-y-0 right-2 flex items-center justify-center p-1"
-    >
-      <FiX className="h-5 w-5 text-gray-500 hover:text-gray-700" />
-    </button>
-  )}
-</div>
+          <input
+            type="text"
+            placeholder="Search by name, order ID, item ID, item name, or phone"
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute inset-y-0 right-2 flex items-center justify-center p-1"
+            >
+              <FiX className="h-5 w-5 text-gray-500 hover:text-gray-700" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-x-auto">
@@ -285,7 +305,7 @@ function OrdersPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Sizes
               </th>
-           
+
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Payment
               </th>
@@ -298,7 +318,7 @@ function OrdersPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-          {[...filteredOrders].reverse().map((order) => (
+            {[...filteredOrders].reverse().map((order) => (
               <tr
                 key={order.id}
                 ref={
@@ -311,27 +331,38 @@ function OrdersPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <div className="flex flex-col gap-6 justify-between">
                     <div className="flex flex-col">
-                    <span className="font-medium">Order ID: {order.id}</span>
-                    <span className="text-gray-500">
-                      {format(new Date(order.createdAt), "MMM dd, yyyy HH:mm")}
-                    </span>
+                      <span className="font-medium">Order ID: {order.id}</span>
+                      <span className="text-gray-500">
+                        {format(
+                          new Date(order.createdAt),
+                          "MMM dd, yyyy HH:mm"
+                        )}
+                      </span>
                     </div>
-                  
+
                     <div className="space-y-1">
-                    <div>Time: {order.deliveryDetails?.timeRange || "N/A"}</div>
-               
-                    <div>Address: {order.userInfo?.address || "N/A"}</div>
-                    <div className="text-amber-800 italic">
-                      {order.deliveryDetails?.description || "No description"}
+                      <div>
+                        Time: {order.deliveryDetails?.timeRange || "N/A"}
+                      </div>
+
+                      <div>Address: {order.userInfo?.address || "N/A"}</div>
+                      <div className="text-amber-800 italic">
+                        {order.deliveryDetails?.description || "No description"}
+                      </div>
                     </div>
-                  </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900">
                   <div className="space-y-1">
-                    <div className="font-medium">{order.userInfo?.name || "N/A"}</div>
-                    <div className="text-gray-500">{order.userInfo?.email || "N/A"}</div>
-                    <div className="text-gray-500">{order.userInfo?.phone || "N/A"}</div>
+                    <div className="font-medium">
+                      {order.userInfo?.name || "N/A"}
+                    </div>
+                    <div className="text-gray-500">
+                      {order.userInfo?.email || "N/A"}
+                    </div>
+                    <div className="text-gray-500">
+                      {order.userInfo?.phone || "N/A"}
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900">
@@ -371,7 +402,7 @@ function OrdersPage() {
                       {item.name} |{" "}
                       <span className="font-medium font-gilroy">
                         {" "}
-                       # {item.id}{" "}
+                        # {item.id}{" "}
                       </span>
                       - <br></br>{" "}
                       {order.deliveryDetails?.selectedSizes?.map(
@@ -388,7 +419,7 @@ function OrdersPage() {
                     </div>
                   ))}
                 </td>
-               
+
                 <td className="px-6 py-4 text-sm text-gray-900">
                   <div className="space-y-1">
                     <div>Method: {order.payment?.method || "N/A"}</div>
@@ -406,6 +437,8 @@ function OrdersPage() {
                         ? "bg-green-100 text-green-800"
                         : order.status === "cancelled"
                         ? "bg-red-100 text-red-800"
+                        : order.status === "delivered"
+                        ? "bg-blue-100 text-blue-800"
                         : "bg-yellow-100 text-yellow-800"
                     }`}
                   >
@@ -414,7 +447,8 @@ function OrdersPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   {order.status !== "confirmed" &&
-                    order.status !== "cancelled" && (
+                    order.status !== "cancelled" &&
+                    order.status !== "delivered" && (
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleConfirmOrder(order.id)}
@@ -433,6 +467,14 @@ function OrdersPage() {
                         </button>
                       </div>
                     )}
+                  {order.status === "confirmed" && (
+                    <button
+                      onClick={() => handleDeliverOrder(order.id)}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
+                      {t("deliver")}
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

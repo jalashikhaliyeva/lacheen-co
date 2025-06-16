@@ -26,16 +26,13 @@ export default function Home({
     <div className="relative">
       <main>
         <Header modalNewProducts={modalNewProducts} categories={categories}  />
-
         <NavList onMenuToggle={setIsMenuOpen} />
         <Hero />
         <CategorySection categories={categories} />
         <Citate />
         <SliderEmbla products={products} />
         <VideoandImage />
-
         <TrendingNow products={newProducts} />
-
         <Footer />
       </main>
     </div>

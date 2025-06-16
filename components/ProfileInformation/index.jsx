@@ -5,18 +5,12 @@ import {
   PiHeartLight,
   PiUserLight,
   PiBasketLight,
-  PiCalendarLight,
-  PiGiftLight,
 } from "react-icons/pi";
 import { PiPackage } from "react-icons/pi";
-import { TfiSearch } from "react-icons/tfi";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { SlLocationPin } from "react-icons/sl";
 import PersonalInfo from "./PersonalInfo";
 import AddressDetails from "./AddressDetails";
 import { useTranslation } from "react-i18next";
-import { LucidePackageCheck } from "lucide-react";
 import OrdersUserSingle from "../Orders";
 
 function ProfileInformation({ user, orders, onLogout, initialTab = "personal" }) {

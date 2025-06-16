@@ -112,7 +112,7 @@ function ProductCard({
               }`}
             >
               <Image
-                src={typeof image === 'string' ? image : image.url}
+                src={typeof image === "string" ? image : image.url}
                 alt={`${product.name} - View ${index + 1}`}
                 fill
                 priority

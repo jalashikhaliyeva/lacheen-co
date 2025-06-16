@@ -125,49 +125,49 @@ function ProductList({
     loadProducts();
   }, [selectedCategory]);
 
-  const filteredProducts = useMemo(() => {
-    return allProducts.filter((product) => {
-      const colorMatch =
-        activeFilters.color.length === 0 ||
-        (product.color && activeFilters.color.includes(product.color.name)) ||
-        (product.selectedColor &&
-          activeFilters.color.includes(product.selectedColor));
+// In ProductList.js, update the filteredProducts useMemo function
+// Replace the price filter section with this:
 
-      const sizeMatch =
-        activeFilters.size.length === 0 ||
-        (product.sizes &&
-          product.sizes.some((size) => activeFilters.size.includes(size)));
+const filteredProducts = useMemo(() => {
+  return allProducts.filter((product) => {
+    const colorMatch =
+      activeFilters.color.length === 0 ||
+      (product.color && activeFilters.color.includes(product.color.name)) ||
+      (product.selectedColor &&
+        activeFilters.color.includes(product.selectedColor));
 
-      // Price filter
-      const priceMatch =
-        activeFilters.price.length === 0 ||
-        activeFilters.price.some((range) => {
-          const productPrice = parseFloat(product.price);
-          if (range === "Under $50") {
-            return productPrice < 50;
-          } else if (range === "$50-$100") {
-            return productPrice >= 50 && productPrice <= 100;
-          } else if (range === "$100-$200") {
-            return productPrice >= 100 && productPrice <= 200;
-          } else if (range === "Over $200") {
-            return productPrice > 200;
-          }
-          return false;
-        });
+    const sizeMatch =
+      activeFilters.size.length === 0 ||
+      (product.sizes &&
+        product.sizes.some((size) => activeFilters.size.includes(size)));
 
-      // Category filter
-      const categoryMatch =
-        activeFilters.category.length === 0 ||
-        (product.category && activeFilters.category.includes(product.category));
+    // Fixed Price filter - use translated keys or standardized values
+    const priceMatch =
+      activeFilters.price.length === 0 ||
+      activeFilters.price.some((range) => {
+        const productPrice = parseFloat(product.price);
+        
+        // Check against translated strings
+        if (range === t("under_50") || range === "Under $50") {
+          return productPrice < 50;
+        } else if (range === t("50_100") || range === "$50-$100") {
+          return productPrice >= 50 && productPrice <= 100;
+        } else if (range === t("100_200") || range === "$100-$200") {
+          return productPrice >= 100 && productPrice <= 200;
+        } else if (range === t("over_200") || range === "Over $200") {
+          return productPrice > 200;
+        }
+        return false;
+      });
 
-      return colorMatch && sizeMatch && priceMatch && categoryMatch;
-    });
-  }, [allProducts, activeFilters]);
+    // Category filter
+    const categoryMatch =
+      activeFilters.category.length === 0 ||
+      (product.category && activeFilters.category.includes(product.category));
 
-
-  
-
-  
+    return colorMatch && sizeMatch && priceMatch && categoryMatch;
+  });
+}, [allProducts, activeFilters, t]); // Add 't' to dependencies
   useEffect(() => {
     setVisibleProducts(filteredProducts.slice(0, ITEMS_PER_PAGE));
   }, [filteredProducts]);
@@ -220,7 +220,7 @@ function ProductList({
         return "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3 md:gap-5";
       case "grid2":
         return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5";
-      case "grid3": 
+      case "grid3":
         return "grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5";
       default:
         return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-3 md:gap-5";
@@ -348,19 +348,19 @@ function ProductList({
         <div className="text-center max-w-md">
           <div className="text-6xl mb-4">📦</div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            No products found
+            {t("no_products_found")}
           </h3>
           <p className="text-gray-600 mb-6">
             {selectedCategory && selectedCategory !== "viewAll"
-              ? `No products found in "${selectedCategory}" category`
-              : "No products match your filters"}
+              ? `${t("no_products_found_for")} "${selectedCategory}"`
+              : t("no_results_found")}
           </p>
           {selectedCategory && selectedCategory !== "viewAll" && (
             <a
               href="/products"
               className="inline-block px-6 py-2 bg-neutral-800 text-white rounded hover:bg-neutral-700 transition-colors"
             >
-              View All Products
+              {t("view_all_products")}
             </a>
           )}
         </div>

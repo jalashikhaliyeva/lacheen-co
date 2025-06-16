@@ -18,7 +18,6 @@ function BasketSectionContainer() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center py-8 w-full font-gilroy relative overflow-hidden">
-        {/* Floating shopping cart icons animation */}
         <div className="absolute inset-0 pointer-events-none">
           {[...Array(6)].map((_, i) => (
             <span

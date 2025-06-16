@@ -39,7 +39,7 @@ function ProductDetailed({ product }) {
 
           <div className="w-full md:w-[30%]">
             <div className="md:sticky md:top-4">
-              {" "}
+            
               <ActionsProduct product={product} allProducts={allProducts} />
             </div>
           </div>

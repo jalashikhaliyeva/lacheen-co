@@ -81,6 +81,11 @@ function OrdersUserSingle() {
     }
   };
 
+  const handleItemImageClick = (itemId) => {
+    const itemUrl = `/products/${itemId}`;
+    window.open(itemUrl, '_blank');
+  };
+
   const filteredOrders = orders.filter((order) => {
     if (selectedFilter === "all") return true;
     return order.status === selectedFilter;
@@ -93,7 +98,6 @@ function OrdersUserSingle() {
   if (orders.length === 0) {
     return <div className="text-center py-4">{t("no_orders_found")}</div>;
   }
-
 
   return (
     <div className="space-y-6">
@@ -226,7 +230,9 @@ function OrdersUserSingle() {
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-12 h-12 object-cover "
+                        className="w-12 h-12 object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => handleItemImageClick(item.id)}
+                        title={t("click_to_view_product")}
                       />
                       <div>
                         <p className="font-normal">{item.name}</p>

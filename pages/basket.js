@@ -15,11 +15,9 @@ export default function Basket({ categories, modalNewProducts }) {
       <main>
         <Header modalNewProducts={modalNewProducts} categories={categories} />
         <NavList />
-
         <Container>
           <BasketSectionContainer />
         </Container>
-
         <Footer />
       </main>
     </div>

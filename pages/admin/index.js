@@ -19,7 +19,7 @@ import WomenShoesTable from "@/components/ProductsTable";
 import RecentOrdersTable from "@/components/RecentOrdersTable";
 
 export default function AdminDashboard() {
-  const { user } = useAuth();  //admin auth
+  const { user } = useAuth(); //admin auth
   const router = useRouter();
 
   if (!user)
@@ -45,7 +45,6 @@ export default function AdminDashboard() {
               <LastUsers />
             </div>
           </div>
-    
         </Container>
       </AdminLayout>
     </div>

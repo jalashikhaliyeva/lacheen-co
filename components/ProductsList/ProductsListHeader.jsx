@@ -8,13 +8,20 @@ import Container from "../Container";
 import FilterComponent from "../FilterComponent";
 import { useTranslation } from "react-i18next";
 
-function ProductsListHeader({ layout, setLayout, selectedCategory, onFilterChange, activeFilters }) {
+function ProductsListHeader({
+  layout,
+  setLayout,
+  selectedCategory,
+  onFilterChange,
+  activeFilters,
+}) {
   const { t } = useTranslation();
   const [showFilter, setShowFilter] = useState(false);
 
   const getCategoryDisplayName = (category) => {
-    if (!category || category === "viewAll") return t("nav.view_all") || "All Products";
-    
+    if (!category || category === "viewAll")
+      return t("nav.view_all") || "All Products";
+
     switch (category) {
       case "new":
         return t("nav.new") || "New Products";
@@ -25,9 +32,9 @@ function ProductsListHeader({ layout, setLayout, selectedCategory, onFilterChang
     }
   };
 
-  const shouldShowCategoryTitle = selectedCategory && selectedCategory !== "viewAll";
+  const shouldShowCategoryTitle =
+    selectedCategory && selectedCategory !== "viewAll";
 
-  // Calculate total number of active filters
   const activeFilterCount = Object.values(activeFilters || {}).reduce(
     (total, filters) => total + filters.length,
     0
@@ -71,8 +78,8 @@ function ProductsListHeader({ layout, setLayout, selectedCategory, onFilterChang
       </Container>
 
       {showFilter && (
-        <FilterComponent 
-          onClose={() => setShowFilter(false)} 
+        <FilterComponent
+          onClose={() => setShowFilter(false)}
           onFilterChange={onFilterChange}
           initialFilters={activeFilters}
         />

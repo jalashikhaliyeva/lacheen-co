@@ -1,110 +1,4 @@
-// import React from "react";
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   Legend,
-//   ResponsiveContainer,
-// } from "recharts";
-
-// // Sample data for each month with values falling in the range of the Y-axis ticks.
-// const data = [
-//   { month: "Jan", sales: 20, products: 40, visitors: 30 },
-//   { month: "Feb", sales: 25, products: 42, visitors: 35 },
-//   { month: "Mar", sales: 30, products: 38, visitors: 40 },
-//   { month: "Apr", sales: 35, products: 45, visitors: 40 },
-//   { month: "May", sales: 40, products: 50, visitors: 45 },
-//   { month: "Jun", sales: 45, products: 44, visitors: 35 },
-//   { month: "Jul", sales: 40, products: 42, visitors: 30 },
-//   { month: "Aug", sales: 35, products: 40, visitors: 25 },
-//   { month: "Sep", sales: 30, products: 38, visitors: 30 },
-//   { month: "Oct", sales: 25, products: 36, visitors: 35 },
-//   { month: "Nov", sales: 20, products: 40, visitors: 40 },
-//   { month: "Dec", sales: 15, products: 42, visitors: 45 },
-// ];
-
-// // Custom tooltip component that displays static values on hover.
-// const CustomTooltip = ({ active }) => {
-//   if (active) {
-//     return (
-//       <div
-//         style={{
-//           backgroundColor: "rgba(255,255,255,0.9)",
-//           border: "1px solid #ccc",
-//           padding: "10px",
-//           borderRadius: "5px",
-//           boxShadow: "0px 0px 8px rgba(0,0,0,0.1)",
-//         }}
-//       >
-//         <p style={{ margin: 0 }}>Visitors: 4</p>
-//         <p style={{ margin: 0 }}>Sales: 2</p>
-//         <p style={{ margin: 0 }}>Products: 40</p>
-//       </div>
-//     );
-//   }
-//   return null;
-// };
-
-// const SalesProductsVisitorsChart = () => {
-//   return (
-//     <div
-//       style={{
-//         width: "100%",
-//         height: "500px",
-//         padding: "20px",
-//         backgroundColor: "#f9f9f9",
-//       }}
-//     >
-//       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-//         Monthly Sales, Products, and Visitors
-//       </h2>
-//       <ResponsiveContainer width="100%" height="100%">
-//         <LineChart
-//           data={data}
-//           margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-//         >
-//           <CartesianGrid strokeDasharray="3 3" />
-//           <XAxis dataKey="month" />
-//           {/* YAxis with predefined tick values for improved readability */}
-//           <YAxis ticks={[10, 15, 20, 25, 30, 35, 40, 45, 50]} />
-//           <Tooltip content={<CustomTooltip />} />
-//           <Legend />
-//           {/* Sales line in orange */}
-//           <Line
-//             type="monotone"
-//             dataKey="sales"
-//             stroke="#FFA500"
-//             dot={{ r: 5 }}
-//             activeDot={{ r: 8 }}
-//           />
-//           {/* Products line in blue */}
-//           <Line
-//             type="monotone"
-//             dataKey="products"
-//             stroke="#0000FF"
-//             dot={{ r: 5 }}
-//             activeDot={{ r: 8 }}
-//           />
-//           {/* Visitors line in green */}
-//           <Line
-//             type="monotone"
-//             dataKey="visitors"
-//             stroke="#008000"
-//             dot={{ r: 5 }}
-//             activeDot={{ r: 8 }}
-//           />
-//         </LineChart>
-//       </ResponsiveContainer>
-//     </div>
-//   );
-// };
-
-// export default SalesProductsVisitorsChart;
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -115,22 +9,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-
-// Monthly data for the chart
-const data = [
-  { month: "Jan", sales: 20, products: 40, visitors: 30 },
-  { month: "Feb", sales: 25, products: 42, visitors: 35 },
-  { month: "Mar", sales: 30, products: 38, visitors: 40 },
-  { month: "Apr", sales: 35, products: 45, visitors: 40 },
-  { month: "May", sales: 40, products: 50, visitors: 45 },
-  { month: "Jun", sales: 45, products: 44, visitors: 35 },
-  { month: "Jul", sales: 40, products: 42, visitors: 30 },
-  { month: "Aug", sales: 35, products: 40, visitors: 25 },
-  { month: "Sep", sales: 30, products: 38, visitors: 30 },
-  { month: "Oct", sales: 25, products: 36, visitors: 35 },
-  { month: "Nov", sales: 20, products: 40, visitors: 40 },
-  { month: "Dec", sales: 15, products: 42, visitors: 45 },
-];
+import { getOrderStatistics } from "@/firebase/services/firebaseOrderService";
+import { fetchProducts } from "@/firebase/services/firebaseProductsService";
+import { getPageViewStatistics } from "@/firebase/services/firebaseAnalyticsService";
+import { getDatabase, ref, get } from "firebase/database";
+import { app } from "@/firebase/backendConfig";
 
 // Custom tooltip to display dynamic data for the hovered month
 const CustomTooltip = ({ active, payload, label }) => {
@@ -188,26 +71,89 @@ const renderLegend = (props) => {
 };
 
 const StackedAreaChart = () => {
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch all required data
+        const [orderStats, products, pageViews] = await Promise.all([
+          getOrderStatistics(),
+          fetchProducts(),
+          getPageViewStatistics()
+        ]);
+
+        // Get the last 12 months
+        const months = Array.from({ length: 12 }, (_, i) => {
+          const date = new Date();
+          date.setMonth(date.getMonth() - i);
+          return date.toLocaleString('default', { month: 'short' });
+        }).reverse();
+
+        // Get all orders from Firebase
+        const db = getDatabase(app);
+        const ordersRef = ref(db, "all-orders");
+        const ordersSnapshot = await get(ordersRef);
+        const allOrders = ordersSnapshot.exists() ? ordersSnapshot.val() : {};
+
+        // Create chart data with proper monthly calculations
+        const data = months.map(month => {
+          // Calculate number of orders for this month
+          const monthSales = Object.values(allOrders).reduce((total, order) => {
+            const orderDate = new Date(order.createdAt);
+            const orderMonth = orderDate.toLocaleString('default', { month: 'short' });
+            if (orderMonth === month && (order.status === 'confirmed' || order.status === 'delivered')) {
+              return total + 1; // Count each order as 1 instead of adding amount
+            }
+            return total;
+          }, 0);
+
+          return {
+            month,
+            sales: monthSales,
+            products: products.length || 0,
+            visitors: pageViews[month] || 0
+          };
+        });
+
+        setChartData(data);
+      } catch (error) {
+        console.error("Error fetching chart data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="bg-white border border-neutral-300 mt-5 rounded-lg p-5">
+        <p>Loading chart data...</p>
+      </div>
+    );
+  }
+
   return (
     <div
-    className="bg-white border border-neutral-300 mt-5 rounded-lg "
+      className="bg-white border border-neutral-300 mt-5 rounded-lg"
       style={{
         width: "100%",
         height: "500px",
         padding: "20px",
-       
       }}
     >
       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
         Monthly Sales, Products, and Visitors
       </h2>
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+        <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
-          <YAxis ticks={[10, 15, 20, 25, 30, 35, 40, 45, 50]} />
+          <YAxis />
           <Tooltip content={<CustomTooltip />} />
-          {/* Add custom legend to display colored dots with labels */}
           <Legend content={renderLegend} />
           <Area
             type="monotone"

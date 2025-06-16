@@ -1,27 +1,21 @@
 import React, { useState } from "react";
 import Container from "../Container";
-import Image from "next/image";
-import { FiHeart } from "react-icons/fi";
-import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-import { FaHeart } from "react-icons/fa";
-import { IoClose } from "react-icons/io5";
-import { PiHeartLight } from "react-icons/pi";
-import { PiHeart } from "react-icons/pi";
-import { PiHeartFill } from "react-icons/pi";
 import ProductCard from "../ProductCard";
 import { useTranslation } from "react-i18next";
 import CustomToast from "../CustomToast/CustomToast";
+import { useRouter } from "next/router";
 
 function TrendingNow({ products = [] }) {
   const [wishlist, setWishlist] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [toastProduct, setToastProduct] = useState(null);
+  const router = useRouter();
   const { t } = useTranslation();
 
   const toggleWishlist = (product, e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (wishlist.some((item) => item.id === product.id)) {
       setWishlist(wishlist.filter((item) => item.id !== product.id));
     } else {
@@ -67,18 +61,19 @@ function TrendingNow({ products = [] }) {
         </div>
 
         <button
-          className="py-2 px-4 mt-7 border cursor-pointer font-gilroy border-neutral-900 text-neutral-800 
-                    relative overflow-hidden 
-                    hover:text-white 
-                    transition-all duration-300
-                    hover:border-neutral-900
-                    before:content-[''] before:absolute before:top-0 before:left-0 
-                    before:w-0 before:h-full before:bg-neutral-900 
-                    before:-z-10 before:transition-all before:duration-300
-                    hover:before:w-full"
-        >
-          {t("discover_more")}
-        </button>
+      onClick={() => router.push("/products")}
+      className="py-2 px-4 mt-7 border cursor-pointer font-gilroy border-neutral-900 text-neutral-800 
+                relative overflow-hidden 
+                hover:text-white 
+                transition-all duration-300
+                hover:border-neutral-900
+                before:content-[''] before:absolute before:top-0 before:left-0 
+                before:w-0 before:h-full before:bg-neutral-900 
+                before:-z-10 before:transition-all before:duration-300
+                hover:before:w-full"
+    >
+      {t("discover_more")}
+    </button>
       </div>
     </Container>
   );

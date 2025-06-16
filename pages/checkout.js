@@ -8,7 +8,10 @@ import { useBasket } from "@/shared/context/BasketContext";
 import { LiaCheckSolid, LiaPlusSolid } from "react-icons/lia";
 import { getUserAddresses } from "@/firebase/services/firebaseAddressService";
 import { createOrder } from "@/firebase/services/firebaseOrderService";
-import { createOrUpdateUserProfile, getUserProfile } from "@/firebase/services/firebaseUserService";
+import {
+  createOrUpdateUserProfile,
+  getUserProfile,
+} from "@/firebase/services/firebaseUserService";
 import AddressForm from "@/components/AddressForm/AddressForm";
 import CustomToast from "@/components/CustomToast/CustomToast";
 import Header from "@/components/Header";
@@ -17,13 +20,14 @@ import Container from "@/components/Container";
 import { fetchSizes } from "@/firebase/services/sizeService";
 import { fetchCategories } from "@/firebase/services/categoriesService";
 import { fetchProducts } from "@/firebase/services/firebaseProductsService";
+import { clearBasket } from "@/firebase/services/basketService";
 
 export default function CheckoutPage({ categories, modalNewProducts }) {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useTranslation();
   const { user } = useAuthClient();
-  const { basketItems } = useBasket();
+  const { basketItems, updateBasketItems } = useBasket();
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -173,10 +177,10 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
     // Keep the existing phone number
     setPhoneNumber(phoneNumber);
     // Clear any phone-related errors
-    setErrors(prev => ({
+    setErrors((prev) => ({
       ...prev,
       phoneSelection: undefined,
-      phoneNumber: undefined
+      phoneNumber: undefined,
     }));
   };
 
@@ -186,10 +190,10 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
     // Keep the existing phone number in the input
     setPhoneNumber(phoneNumber);
     // Clear any phone-related errors
-    setErrors(prev => ({
+    setErrors((prev) => ({
       ...prev,
       phoneSelection: undefined,
-      phoneNumber: undefined
+      phoneNumber: undefined,
     }));
   };
 
@@ -211,7 +215,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
     if (phoneNumber && !useExistingPhone && !phoneNumberConfirmed) {
       newErrors.phoneSelection = t("select_phone_option_required");
     }
-    if (!phoneNumberConfirmed && (showPhoneInput && !phoneNumber)) {
+    if (!phoneNumberConfirmed && showPhoneInput && !phoneNumber) {
       newErrors.phoneNumber = t("phone_number_required");
     }
 
@@ -242,7 +246,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
         userInfo: {
           name: user.displayName || selectedAddress.fullName,
           email: user.email,
-          phone: formatPhoneNumber(phoneNumber), // Ensure we send the formatted phone number
+          phone: formatPhoneNumber(phoneNumber),
           address: selectedAddress.address,
           city: selectedAddress.city,
           postalCode: selectedAddress.postalCode,
@@ -271,6 +275,12 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
       };
 
       await createOrder(orderData);
+
+      // Clear the basket after successful order placement
+      await clearBasket(user.uid);
+      // Update the basket context state to reflect the cleared basket
+      updateBasketItems([]);
+
       setToastMessage(t("order_placed_successfully"));
       setShowToast(true);
 
@@ -286,9 +296,6 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
       setTimeout(() => {
         router.push("/profile?tab=orders");
       }, 1500);
-
-      // Clear basket after successful order
-      // You'll need to implement this in your basket context
     } catch (error) {
       console.error("Error placing order:", error);
       setToastMessage(t("error_placing_order"));
@@ -397,7 +404,13 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                 <h2 className="text-xl mb-4">{t("contact_information")}</h2>
                 {phoneNumber && !useExistingPhone && !phoneNumberConfirmed ? (
                   <div className="space-y-4">
-                    <div className={`p-4 border ${errors.phoneSelection ? 'border-red-500' : 'border-neutral-200'}  bg-neutral-50`}>
+                    <div
+                      className={`p-4 border ${
+                        errors.phoneSelection
+                          ? "border-red-500"
+                          : "border-neutral-200"
+                      }  bg-neutral-50`}
+                    >
                       <p className="text-neutral-700 mb-2">
                         {t("existing_phone_number")}
                       </p>
@@ -419,7 +432,9 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                         </button>
                       </div>
                       {errors.phoneSelection && (
-                        <p className="text-red-500 text-sm mt-2">{errors.phoneSelection}</p>
+                        <p className="text-red-500 text-sm mt-2">
+                          {errors.phoneSelection}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -437,13 +452,17 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                         value={phoneNumber}
                         onChange={handlePhoneNumberChange}
                         className={`w-full pl-12 pr-3 py-2 border ${
-                          errors.phoneNumber ? 'border-red-500' : 'border-neutral-300'
+                          errors.phoneNumber
+                            ? "border-red-500"
+                            : "border-neutral-300"
                         }  focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent`}
                         placeholder="xx xxx xx xx"
                       />
                     </div>
                     {errors.phoneNumber && (
-                      <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.phoneNumber}
+                      </p>
                     )}
                   </div>
                 )}
@@ -666,8 +685,6 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
     </div>
   );
 }
-
-
 
 export async function getServerSideProps() {
   try {

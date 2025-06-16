@@ -7,8 +7,10 @@ import { fetchProducts } from "@/firebase/services/firebaseProductsService";
 import Spinner from "@/components/Spinner";
 import { useRouter } from "next/router";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { useTranslation } from "react-i18next";
 
 function Products() {
+  const { t } = useTranslation();
   const [products, setProducts] = useState(null);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
@@ -77,8 +79,8 @@ function Products() {
               <div className="p-8 text-center">
                 <h3 className="text-xl font-medium">
                   {activeFilter.startsWith("category")
-                    ? `No products found in this category`
-                    : `No ${activeFilter} products found`}
+                    ? t("no_products_found_in_this_category")
+                    : t("no_products_found", { filter: activeFilter })}
                 </h3>
               </div>
             ) : (

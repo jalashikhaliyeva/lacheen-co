@@ -96,10 +96,45 @@ export default function SearchModal({
 
   if (!mounted) return null;
 
-  // filter out inactive categories first
   const activeCats = categories?.filter((cat) => cat.is_active !== false) || [];
-  // then take the last three (or fewer if there aren't three)
   const trendingCats = activeCats.slice(-3);
+
+  // Helper function to get products for a specific section
+  const getProductsForSection = (sectionType) => {
+    switch (sectionType) {
+      case 'categories':
+        return searchResults.products.filter((product) =>
+          searchResults.categories.some(
+            (cat) => product.category?.toLowerCase() === cat.name.toLowerCase()
+          )
+        );
+      case 'sizes':
+        return searchResults.products.filter((product) =>
+          searchResults.sizes.some((size) =>
+            product.sizes?.some(
+              (s) => (s || '').toLowerCase() === (size.value || '').toLowerCase()
+            )
+          )
+        );
+      case 'colors':
+        return searchResults.products.filter((product) =>
+          searchResults.colors.some((color) =>
+            product.colors?.some(
+              (productColor) => 
+                (productColor || '').toLowerCase() === (color.name || '').toLowerCase()
+            )
+          )
+        );
+      default:
+        return [];
+    }
+  };
+
+  // Check if we have any results
+  const hasResults = searchResults.products.length > 0 || 
+                    searchResults.categories.length > 0 || 
+                    searchResults.sizes.length > 0 || 
+                    searchResults.colors.length > 0;
 
   return createPortal(
     <AnimatePresence>
@@ -177,187 +212,81 @@ export default function SearchModal({
                       <div className="text-center py-4">{t("searching")}</div>
                     ) : (
                       <>
-                        {/* Products from Categories */}
+                        {/* All Products Results - Show all matching products */}
+                        {searchResults.products.length > 0 && (
+                          <div className="mb-6">
+                            <h3 className="text-lg mb-2">
+                              {t("search_results")} ({searchResults.products.length})
+                            </h3>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                              {searchResults.products.map((product) => (
+                                <div
+                                  key={product.id}
+                                  onClick={() =>
+                                    handleResultClick("product", product)
+                                  }
+                                  className="cursor-pointer hover:opacity-80 transition"
+                                >
+                                  <div className="aspect-square relative">
+                                    <Image
+                                      src={
+                                        product.images?.[0]?.url ||
+                                        product.images?.[0] ||
+                                        "/images/placeholder.png"
+                                      }
+                                      alt={product.name}
+                                      fill
+                                      className="object-cover rounded-lg"
+                                    />
+                                  </div>
+                                  <h4 className="mt-2 text-sm font-medium">
+                                    {product.name}
+                                  </h4>
+                                  <p className="text-gray-600">
+                                    {product.price} AZN
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Show specific category results if found */}
                         {searchResults.categories.length > 0 && (
                           <div className="mb-4">
-                            <h3 className="text-lg  mb-2">
-                              {t("products_from_categories")}:{" "}
-                              {searchResults.categories
-                                .map((c) => c.name)
-                                .join(", ")}
+                            <h3 className="text-lg mb-2">
+                              {t("found_categories")}:{" "}
+                              {searchResults.categories.map((c) => c.name).join(", ")}
                             </h3>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                              {searchResults.products
-                                .filter((product) =>
-                                  searchResults.categories.some(
-                                    (cat) =>
-                                      product.category?.toLowerCase() ===
-                                      cat.name.toLowerCase()
-                                  )
-                                )
-                                .map((product) => (
-                                  <div
-                                    key={product.id}
-                                    onClick={() =>
-                                      handleResultClick("product", product)
-                                    }
-                                    className="cursor-pointer hover:opacity-80 transition"
-                                  >
-                                    <div className="aspect-square relative">
-                                      <Image
-                                        src={
-                                          product.images?.[0]?.url ||
-                                          product.images?.[0] ||
-                                          "/images/placeholder.png"
-                                        }
-                                        alt={product.name}
-                                        fill
-                                        className="object-cover rounded-lg"
-                                      />
-                                    </div>
-                                    <h4 className="mt-2 text-sm font-medium">
-                                      {product.name}
-                                    </h4>
-                                    <p className="text-gray-600">
-                                      {product.price} AZN
-                                    </p>
-                                  </div>
-                                ))}
-                            </div>
                           </div>
                         )}
 
-                        {/* Products with matching Sizes */}
+                        {/* Show specific size results if found */}
                         {searchResults.sizes.length > 0 && (
                           <div className="mb-4">
-                            <h3 className="text-lg  mb-2">
-                              {t("products_in_size")}:{" "}
-                              {searchResults.sizes
-                                .map((s) => s.value)
-                                .join(", ")}
+                            <h3 className="text-lg mb-2">
+                              {t("found_sizes")}:{" "}
+                              {searchResults.sizes.map((s) => s.value).join(", ")}
                             </h3>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                              {searchResults.products
-                                .filter((product) =>
-                                  searchResults.sizes.some((size) =>
-                                    product.sizes?.some(
-                                      (s) =>
-                                        s.toLowerCase() ===
-                                        size.value.toLowerCase()
-                                    )
-                                  )
-                                )
-                                .map((product) => (
-                                  <div
-                                    key={product.id}
-                                    onClick={() =>
-                                      handleResultClick("product", product)
-                                    }
-                                    className="cursor-pointer hover:opacity-80 transition"
-                                  >
-                                    <div className="aspect-square relative">
-                                      <Image
-                                        src={
-                                          product.images?.[0]?.url ||
-                                          product.images?.[0] ||
-                                          "/images/placeholder.png"
-                                        }
-                                        alt={product.name}
-                                        fill
-                                        className="object-cover rounded-lg"
-                                      />
-                                    </div>
-                                    <h4 className="mt-2 text-sm font-medium">
-                                      {product.name}
-                                    </h4>
-                                    <p className="text-gray-600">
-                                      {product.price} AZN
-                                    </p>
-                                  </div>
-                                ))}
-                            </div>
                           </div>
                         )}
 
-                        {/* Products with matching Colors */}
+                        {/* Show specific color results if found */}
                         {searchResults.colors.length > 0 && (
                           <div className="mb-4">
-                            <h3 className="text-lg  mb-2">
-                              {t("products_in_color")}:{" "}
-                              {searchResults.colors
-                                .map((c) => c.name)
-                                .join(", ")}
+                            <h3 className="text-lg mb-2">
+                              {t("found_colors")}:{" "}
+                              {searchResults.colors.map((c) => c.name).join(", ")}
                             </h3>
-                            {console.log(
-                              "Search Results Colors:",
-                              searchResults.colors
-                            )}
-                            {console.log(
-                              "All Products:",
-                              searchResults.products
-                            )}
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                              {searchResults.products
-                                .filter((product) => {
-                                  const hasMatchingColor = product.colors?.some(
-                                    (productColor) =>
-                                      searchResults.colors.some(
-                                        (searchColor) =>
-                                          productColor.toLowerCase() ===
-                                          searchColor.name.toLowerCase()
-                                      )
-                                  );
-                                  console.log(
-                                    "Product:",
-                                    product.name,
-                                    "Colors:",
-                                    product.colors,
-                                    "Has Matching Color:",
-                                    hasMatchingColor
-                                  );
-                                  return hasMatchingColor;
-                                })
-                                .map((product) => (
-                                  <div
-                                    key={product.id}
-                                    onClick={() =>
-                                      handleResultClick("product", product)
-                                    }
-                                    className="cursor-pointer hover:opacity-80 transition"
-                                  >
-                                    <div className="aspect-square relative">
-                                      <Image
-                                        src={
-                                          product.images?.[0]?.url ||
-                                          product.images?.[0] ||
-                                          "/images/placeholder.png"
-                                        }
-                                        alt={product.name}
-                                        fill
-                                        className="object-cover rounded-lg"
-                                      />
-                                    </div>
-                                    <h4 className="mt-2 text-sm font-medium">
-                                      {product.name}
-                                    </h4>
-                                    <p className="text-gray-600">
-                                      {product.price} AZN
-                                    </p>
-                                  </div>
-                                ))}
-                            </div>
                           </div>
                         )}
 
-                        {!isSearching &&
-                          searchResults.products.length === 0 &&
-                          searchResults.categories.length === 0 &&
-                          searchResults.sizes.length === 0 &&
-                          searchResults.colors.length === 0 && (
-                            <div className="text-center py-4 text-gray-500">
-                              {t("no_results_found")}
-                            </div>
-                          )}
+                        {/* No results message */}
+                        {!isSearching && !hasResults && (
+                          <div className="text-center py-4 text-gray-500">
+                            {t("no_results_found")}
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
@@ -365,20 +294,23 @@ export default function SearchModal({
 
                 {/* Trending searches from last 3 categories */}
                 {!searchQuery && (
-                  <div className="flex flex-row gap-4 mt-4 font-gilroy text-sm">
-                    <h2 className="uppercase">{t("trending_searches")}:</h2>
-                    {trendingCats.map((cat) => (
-                      <button
-                        key={cat.id}
-                        onClick={() => setSearchQuery(cat.name)}
-                        className="lowercase cursor-pointer text-neutral-600 hover:text-neutral-800 transition"
-                      >
-                        {cat.name}
-                      </button>
-                    ))}
+                  <div className="mt-4 font-gilroy text-sm">
+                    <h2 className="uppercase mb-2">
+                      {t("trending_searches")}:
+                    </h2>
+                    <div className="flex flex-row gap-4 overflow-x-auto pb-2 whitespace-nowrap scrollbar-hide">
+                      {trendingCats.map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => setSearchQuery(cat.name)}
+                          className="lowercase cursor-pointer text-neutral-600 hover:text-neutral-800 transition"
+                        >
+                          {cat.name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
-
                 {!searchQuery && (
                   <TrendingInitSearch newProducts={newProducts} />
                 )}

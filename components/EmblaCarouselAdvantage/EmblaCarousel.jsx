@@ -9,10 +9,11 @@ import { GoArrowLeft, GoArrowRight } from "react-icons/go";
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 import { useTranslation } from "react-i18next";
+import Link from "next/link";
 
 const SliderEmbla = ({ products }) => {
 
-  console.log(products, "products");
+  // console.log(products, "products");
   
   const { t } = useTranslation();
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -96,6 +97,7 @@ const SliderEmbla = ({ products }) => {
               key={product.id}
               className={`${styles.embla__slide} lg:flex-[0_0_35%] px-2`}
             >
+               <Link href={`/products/${product.id}`}>
               <div className="group flex flex-col w-full bg-white rounded-lg transition-transform duration-300 cursor-pointer">
                 <Image
                   src={
@@ -114,7 +116,7 @@ const SliderEmbla = ({ products }) => {
               <p className="uppercase pt-3 font-poppins text-xs md:text-lg">
                 {product.name}
               </p>
-            </div>
+            </Link></div>
           ))}
         </div>
       </div>

@@ -40,28 +40,67 @@ export const searchProducts = async (query) => {
 
     // Search in categories
     results.categories = categories.filter(category => 
-      category.name.toLowerCase().includes(normalizedQuery) &&
+      category.name && category.name.toLowerCase().includes(normalizedQuery) &&
       category.is_active !== false
     );
 
     // Search in sizes
     results.sizes = sizes.filter(size => 
-      size.value.toLowerCase().includes(normalizedQuery) &&
+      size.value && size.value.toLowerCase().includes(normalizedQuery) &&
       size.is_active !== false
     );
 
     // Search in colors
     results.colors = colors.filter(color => 
-      color.name.toLowerCase().includes(normalizedQuery) &&
+      color.name && color.name.toLowerCase().includes(normalizedQuery) &&
       color.is_active !== false
     );
 
-    // Search in products
-    results.products = activeProducts.filter(product => {
-      const productName = product.name?.toLowerCase() || '';
-      const productCategory = product.category?.toLowerCase() || '';
-      const productSizes = product.sizes?.map(size => size.toLowerCase()) || [];
-      const productColors = product.colors?.map(color => color.toLowerCase()) || [];
+    // Helper function to normalize and extract colors from a product
+    const getProductColors = (product) => {
+      let productColors = [];
+      
+      if (Array.isArray(product.colors)) {
+        productColors = product.colors
+          .filter(color => color != null)
+          .map(color => color.toString().toLowerCase().trim());
+      } else if (typeof product.colors === 'string' && product.colors.trim()) {
+        productColors = [product.colors.toLowerCase().trim()];
+      } else if (product.color && typeof product.color === 'string') {
+        // Check if there's a singular 'color' field
+        productColors = [product.color.toLowerCase().trim()];
+      }
+      
+      return productColors.filter(color => color.length > 0);
+    };
+
+    // Helper function to normalize and extract sizes from a product
+    const getProductSizes = (product) => {
+      let productSizes = [];
+      
+      if (Array.isArray(product.sizes)) {
+        productSizes = product.sizes
+          .filter(size => size != null)
+          .map(size => size.toString().toLowerCase().trim());
+      } else if (typeof product.sizes === 'string' && product.sizes.trim()) {
+        productSizes = [product.sizes.toLowerCase().trim()];
+      } else if (product.size && typeof product.size === 'string') {
+        // Check if there's a singular 'size' field
+        productSizes = [product.size.toLowerCase().trim()];
+      }
+      
+      return productSizes.filter(size => size.length > 0);
+    };
+
+    // Create a Set to store unique product IDs to avoid duplicates
+    const uniqueProductIds = new Set();
+    
+    // Search in products directly by name, category, size, and color
+    const directMatchingProducts = activeProducts.filter(product => {
+      const productName = (product.name || '').toLowerCase();
+      const productCategory = (product.category || '').toLowerCase();
+      const productColors = getProductColors(product);
+      const productSizes = getProductSizes(product);
 
       const matchesName = productName.includes(normalizedQuery);
       const matchesCategory = productCategory.includes(normalizedQuery);
@@ -71,56 +110,65 @@ export const searchProducts = async (query) => {
       return matchesName || matchesCategory || matchesSize || matchesColor;
     });
 
-    // If we have color results, also show products with those colors
-    if (results.colors.length > 0) {
-      console.log('Found colors:', results.colors);
-      const colorNames = results.colors.map(color => color.name.toLowerCase());
-      console.log('Color names to search for:', colorNames);
-      const productsWithColors = activeProducts.filter(product => {
-        const productColors = product.colors?.map(color => color.toLowerCase()) || [];
-        console.log('Product:', product.name, 'has colors:', productColors);
-        const matches = productColors.some(color => colorNames.includes(color));
-        console.log('Product matches:', matches);
-        return matches;
-      });
-      
-      console.log('Products with matching colors:', productsWithColors);
-      
-      // Merge with existing product results, removing duplicates
-      const allProducts = [...results.products, ...productsWithColors];
-      results.products = Array.from(new Map(allProducts.map(item => [item.id, item])).values());
-      console.log('Final products after color matching:', results.products);
-    }
+    // Add direct matching products
+    directMatchingProducts.forEach(product => {
+      if (product.id) {
+        uniqueProductIds.add(product.id);
+      }
+    });
 
-    // If we have size results, also show products with those sizes
-    if (results.sizes.length > 0) {
-      const sizeValues = results.sizes.map(size => size.value.toLowerCase());
-      const productsWithSizes = activeProducts.filter(product => 
-        product.sizes?.some(size => 
-          sizeValues.includes(size.toLowerCase())
-        )
-      );
-      
-      // Merge with existing product results, removing duplicates
-      const allProducts = [...results.products, ...productsWithSizes];
-      results.products = Array.from(new Map(allProducts.map(item => [item.id, item])).values());
-    }
-
-    // If we have category results, also show products from those categories
+    // If we have category results, add products from those categories
     if (results.categories.length > 0) {
       const categoryNames = results.categories.map(cat => cat.name.toLowerCase());
-      const productsFromCategories = activeProducts.filter(product => 
-        categoryNames.includes(product.category?.toLowerCase())
-      );
-      
-      // Merge with existing product results, removing duplicates
-      const allProducts = [...results.products, ...productsFromCategories];
-      results.products = Array.from(new Map(allProducts.map(item => [item.id, item])).values());
+      activeProducts.forEach(product => {
+        const productCategory = (product.category || '').toLowerCase();
+        if (categoryNames.includes(productCategory) && product.id) {
+          uniqueProductIds.add(product.id);
+        }
+      });
     }
+
+    // If we have size results, add products with those sizes
+    if (results.sizes.length > 0) {
+      const sizeValues = results.sizes.map(size => size.value.toLowerCase());
+      activeProducts.forEach(product => {
+        const productSizes = getProductSizes(product);
+        const hasMatchingSize = productSizes.some(size => sizeValues.includes(size));
+        if (hasMatchingSize && product.id) {
+          uniqueProductIds.add(product.id);
+        }
+      });
+    }
+
+    // If we have color results, add products with those colors
+    if (results.colors.length > 0) {
+      const colorNames = results.colors.map(color => color.name.toLowerCase());
+      activeProducts.forEach(product => {
+        const productColors = getProductColors(product);
+        const hasMatchingColor = productColors.some(color => {
+          // Try exact match first
+          if (colorNames.includes(color)) return true;
+          
+          // Try partial match (color contains search term or vice versa)
+          return colorNames.some(searchColor => 
+            color.includes(searchColor) || searchColor.includes(color)
+          );
+        });
+        
+        if (hasMatchingColor && product.id) {
+          uniqueProductIds.add(product.id);
+        }
+      });
+    }
+
+    // Convert Set back to array of products
+    results.products = activeProducts.filter(product => 
+      product.id && uniqueProductIds.has(product.id)
+    );
 
     return results;
   } catch (error) {
     console.error("Error searching products:", error);
     throw error;
   }
-}; 
+};

@@ -18,7 +18,7 @@ function CategorySection({ categories }) {
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 w-full my-4 md:my-10">
         {/* Item 1 */}
         <div 
-          className="relative cursor-pointer aspect-square w-full h-[300px] md:h-[400px] lg:h-[600px] group overflow-hidden"
+          className="relative cursor-pointer aspect-square w-full h-[340px] md:h-[400px] lg:h-[600px] group overflow-hidden"
           onClick={() => handleCategoryClick(categories[0].slug)}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 via-neutral-900/30 to-transparent z-10" />
@@ -43,7 +43,7 @@ function CategorySection({ categories }) {
         </div>
 
         {/* Item 2 - Video */}
-        <div className="relative cursor-pointer aspect-square w-full h-[300px] md:h-[400px] lg:h-[600px] group overflow-hidden">
+        <div className="relative cursor-pointer aspect-square w-full h-[340px] md:h-[400px] lg:h-[600px] group overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 via-neutral-900/30 to-transparent z-10" />
           <video
             autoPlay
@@ -68,7 +68,7 @@ function CategorySection({ categories }) {
 
         {/* Item 3 */}
         <div 
-          className="relative cursor-pointer aspect-square w-full h-[300px] md:h-[400px] lg:h-[600px] group overflow-hidden"
+          className="relative cursor-pointer aspect-square w-full h-[340px] md:h-[400px] lg:h-[600px] group overflow-hidden"
           onClick={() => handleCategoryClick(categories[1].slug)}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 via-neutral-900/30 to-transparent z-10" />
