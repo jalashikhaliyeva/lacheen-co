@@ -77,7 +77,7 @@ function Products() {
 
             {filteredProducts.length === 0 && activeFilter !== "all" ? (
               <div className="p-8 text-center">
-                <h3 className="text-xl font-medium">
+                <h3 className="text-xl font-normal font-gilroy">
                   {activeFilter.startsWith("category")
                     ? t("no_products_found_in_this_category")
                     : t("no_products_found", { filter: activeFilter })}

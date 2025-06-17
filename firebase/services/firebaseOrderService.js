@@ -7,6 +7,7 @@ import {
   update,
 } from "firebase/database";
 import { app } from "@/firebase/backendConfig";
+import { sendOrderEmail } from "./emailService";
 
 /**
  * Creates a new order in Firebase
@@ -25,6 +26,17 @@ export const createOrder = async (orderData) => {
       status: 'pending'
     };
     await set(newOrderRef, newOrder);
+
+    // Send email notification using EmailJS
+    try {
+      await sendOrderEmail(newOrder);
+      console.log('Email notification sent successfully');
+    } catch (emailError) {
+      console.error("Error sending order notification email:", emailError);
+      // Don't throw the error here to prevent order creation from failing
+      // if email sending fails
+    }
+
     return { id: newOrderRef.key, ...newOrder };
   } catch (error) {
     console.error("Error creating order:", error);

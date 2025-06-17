@@ -58,7 +58,7 @@ function ClientsPage() {
   }
 
   return (
-    <div className="pt-8 mt-10">
+    <div className="pt-8 mt-20">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Clients Management</h1>
         <div className="relative w-1/2">

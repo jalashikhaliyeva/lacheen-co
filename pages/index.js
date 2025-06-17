@@ -49,7 +49,7 @@ export async function getServerSideProps({ locale }) {
       fetchCategories(),
       fetchProducts(),
       fetchSectionData('hero'),
-      fetchSectionData('categories'), // Add this line
+      fetchSectionData('categories'), 
       fetchSectionData('attitude'),
     ]);
 
@@ -64,8 +64,8 @@ export async function getServerSideProps({ locale }) {
         newProducts,
         modalNewProducts,
         heroSettings: heroSettings || null,
-        categoriesSettings: categoriesSettings || null, // Add this line
-        attitudeSettings: attitudeSettings || null, // Add this line
+        categoriesSettings: categoriesSettings || null, 
+        attitudeSettings: attitudeSettings || null, 
       },
     };
   } catch (error) {
@@ -77,8 +77,8 @@ export async function getServerSideProps({ locale }) {
         newProducts: [],
         modalNewProducts: [],
         heroSettings: null,
-        categoriesSettings: null, // Add this line
-        attitudeSettings: null, // Add this line
+        categoriesSettings: null, 
+        attitudeSettings: null, 
       },
     };
   }

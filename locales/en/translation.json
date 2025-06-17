@@ -289,5 +289,6 @@
   "found_sizes": "Found sizes",
   "found_colors": "Found colors",
   "no_results_found": "No results found",
-  "quantity_updated": "Quantity updated"
+  "quantity_updated": "Quantity updated",
+  "no_products_found_in_this_category": "No products found in this category"
 }

@@ -34,7 +34,7 @@ function Settings() {
   return (
     <ProtectedRoute>
       <AdminLayout>
-        <div className="bg-bodyGray h-full pb-20 pt-20">
+        <div className="bg-bodyGray h-full pb-20 pt-30">
           <Container>
             <div className="bg-white rounded-lg shadow">
               <div className="border-b border-gray-200">

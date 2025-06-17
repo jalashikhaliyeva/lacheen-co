@@ -6,6 +6,7 @@ import Image from "next/image";
 import { FiChevronDown, FiX } from "react-icons/fi";
 import { fetchSizes } from "@/firebase/services/sizeService";
 import { useTranslation } from "react-i18next";
+import { sendStatusUpdateEmail } from "@/firebase/services/emailService";
 const cancelReasons = [
   "The sizes are out of stock",
   "We currently do not have this model in this size",
@@ -187,6 +188,8 @@ function OrdersPage() {
         status: "confirmed",
         confirmedAt: new Date().toISOString(),
       });
+      const updatedOrder = (await get(orderRef)).val();
+      await sendStatusUpdateEmail({ id: orderId, ...updatedOrder });
       fetchOrders();
     } catch (error) {
       console.error("Error confirming order:", error);
@@ -201,6 +204,8 @@ function OrdersPage() {
         status: "delivered",
         deliveredAt: new Date().toISOString(),
       });
+      const updatedOrder = (await get(orderRef)).val();
+      await sendStatusUpdateEmail({ id: orderId, ...updatedOrder });
       fetchOrders();
     } catch (error) {
       console.error("Error marking order as delivered:", error);
@@ -221,6 +226,8 @@ function OrdersPage() {
         cancelledAt: new Date().toISOString(),
         cancellationReason: finalReason,
       });
+      const updatedOrder = (await get(orderRef)).val();
+      await sendStatusUpdateEmail({ id: selectedOrder.id, ...updatedOrder });
 
       setShowCancelModal(false);
       setSelectedOrder(null);
@@ -267,7 +274,7 @@ function OrdersPage() {
   }
 
   return (
-    <div className="pt-8 mt-10">
+    <div className="pt-8 mt-20">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Orders Management</h1>
         <div className="relative w-1/2">

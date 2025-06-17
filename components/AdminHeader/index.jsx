@@ -2,7 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import Container from "../Container";
 import { RiMenuUnfoldLine, RiMenuUnfold2Line } from "react-icons/ri";
 import { IoNotificationsOutline } from "react-icons/io5";
-import { FiMenu, FiX, FiHome, FiBox, FiList, FiShoppingCart, FiGrid } from "react-icons/fi";
+import {
+  FiMenu,
+  FiX,
+  FiHome,
+  FiBox,
+  FiList,
+  FiShoppingCart,
+  FiGrid,
+} from "react-icons/fi";
 import { HiOutlineColorSwatch } from "react-icons/hi";
 import { PiUsersThree } from "react-icons/pi";
 import { getDatabase, ref, onValue } from "firebase/database";
@@ -12,6 +20,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import { fetchSizes } from "@/firebase/services/sizeService";
 import Image from "next/image";
+import LanguageSwitcher from "../LanguageSwitcher";
 
 function AdminHeader({ toggleSidebar, sidebarOpen }) {
   const [pendingOrders, setPendingOrders] = useState([]);
@@ -47,14 +56,14 @@ function AdminHeader({ toggleSidebar, sidebarOpen }) {
       if (snapshot.exists()) {
         const ordersData = snapshot.val();
         const pendingOrdersList = Object.entries(ordersData)
-          .filter(([_, order]) => order.status === 'pending')
+          .filter(([_, order]) => order.status === "pending")
           .map(([id, data]) => ({
             id,
             ...data,
-            items: data.items?.map(item => ({
+            items: data.items?.map((item) => ({
               ...item,
-              orderId: id
-            }))
+              orderId: id,
+            })),
           }));
         setPendingOrders(pendingOrdersList);
       } else {
@@ -66,9 +75,9 @@ function AdminHeader({ toggleSidebar, sidebarOpen }) {
   }, []);
 
   const handleOrderClick = (orderId, itemId) => {
-    localStorage.setItem('selectedOrderId', orderId);
-    localStorage.setItem('selectedItemId', itemId);
-    router.push('/admin/orders');
+    localStorage.setItem("selectedOrderId", orderId);
+    localStorage.setItem("selectedItemId", itemId);
+    router.push("/admin/orders");
   };
 
   const menuItems = [
@@ -155,69 +164,90 @@ function AdminHeader({ toggleSidebar, sidebarOpen }) {
               />
             </div>
 
-            <div 
-              className="relative"
-              onMouseEnter={() => setIsDropdownOpen(true)}
-              onMouseLeave={() => setIsDropdownOpen(false)}
-              ref={dropdownRef}
-            >
-              <div className="relative border border-neutral-300 rounded-md p-1.5 cursor-pointer hover:bg-neutral-50">
-                <IoNotificationsOutline className="text-2xl bell-swing" />
-                {pendingOrders.length > 0 && (
-                  <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1 text-[10px] font-bold text-white bg-red-400 rounded-full transform translate-x-1/2 -translate-y-1/2">
-                    {pendingOrders.length}
-                  </span>
-                )}
-              </div>
-
-              {/* Dropdown for pending orders */}
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
               <div
-                className={`
-                  absolute right-0 w-80 bg-white rounded-lg shadow-lg border border-neutral-200 z-50
-                  transition-all duration-300 ease-in-out
-                  ${isDropdownOpen
-                    ? "opacity-100 translate-y-0 visible mt-2"
-                    : "opacity-0 -translate-y-4 invisible mt-0"}
-                `}
+                className="relative"
+                onMouseEnter={() => setIsDropdownOpen(true)}
+                onMouseLeave={() => setIsDropdownOpen(false)}
+                ref={dropdownRef}
               >
-                <div className="p-3 border-b border-neutral-200">
-                  <h3 className="font-semibold text-gray-900">Pending Orders</h3>
+                <div className="relative border border-neutral-300 rounded-md p-1.5 cursor-pointer hover:bg-neutral-50">
+                  <IoNotificationsOutline className="text-2xl bell-swing" />
+                  {pendingOrders.length > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1 text-[10px] font-bold text-white bg-red-400 rounded-full transform translate-x-1/2 -translate-y-1/2">
+                      {pendingOrders.length}
+                    </span>
+                  )}
                 </div>
-                <div className="max-h-96 overflow-y-auto">
-                  {pendingOrders.map((order) => (
-                    order.items?.map((item) => (
-                      <div 
-                        key={`${order.id}-${item.id}`}
-                        className="p-3 border-b border-neutral-200 hover:bg-neutral-50 cursor-pointer transition-colors duration-200"
-                        onClick={() => handleOrderClick(order.id, item.id)}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">Item #{item.id}</p>
-                            <p className="text-xs text-gray-500">
-                              {format(new Date(order.createdAt), 'MMM dd, yyyy HH:mm')}
-                            </p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              {t('customer')} : {order.userInfo?.name || 'Customer'}
+
+                {/* Dropdown for pending orders */}
+                <div
+                  className={`
+                  absolute right-0 top-full w-80 bg-white rounded-lg shadow-lg border border-neutral-200 z-50
+                  transition-all duration-300 ease-in-out
+                  ${
+                    isDropdownOpen
+                      ? "opacity-100 translate-y-0 visible mt-2"
+                      : "opacity-0 -translate-y-4 invisible mt-0"
+                  }
+                `}
+                >
+                  <div className="p-3 border-b border-neutral-200">
+                    <h3 className="font-semibold text-gray-900">
+                      Pending Orders
+                    </h3>
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {pendingOrders.map((order) =>
+                      order.items?.map((item) => (
+                        <div
+                          key={`${order.id}-${item.id}`}
+                          className="p-3 border-b border-neutral-200 hover:bg-neutral-50 cursor-pointer transition-colors duration-200"
+                          onClick={() => handleOrderClick(order.id, item.id)}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                Item #{item.id}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {format(
+                                  new Date(order.createdAt),
+                                  "MMM dd, yyyy HH:mm"
+                                )}
+                              </p>
+                              <p className="text-xs text-gray-600 mt-1">
+                                {t("customer")} :{" "}
+                                {order.userInfo?.name || "Customer"}
+                              </p>
+                            </div>
+                            <span className="text-sm font-medium text-gray-900">
+                              {item.price} ₼
+                            </span>
+                          </div>
+                          <div className="mt-2">
+                            <p className="text-xs text-gray-600">
+                              {item.name} • Sizes:{" "}
+                              {order.deliveryDetails?.selectedSizes?.map(
+                                (sizeId, index) => (
+                                  <span key={sizeId}>
+                                    {sizes[sizeId] || sizeId}
+                                    {index <
+                                    order.deliveryDetails.selectedSizes.length -
+                                      1
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                )
+                              )}{" "}
+                              • Color: {item.color}
                             </p>
                           </div>
-                          <span className="text-sm font-medium text-gray-900">
-                            {item.price} ₼
-                          </span>
                         </div>
-                        <div className="mt-2">
-                          <p className="text-xs text-gray-600">
-                            {item.name} • Sizes: {order.deliveryDetails?.selectedSizes?.map((sizeId, index) => (
-                              <span key={sizeId}>
-                                {sizes[sizeId] || sizeId}
-                                {index < order.deliveryDetails.selectedSizes.length - 1 ? ', ' : ''}
-                              </span>
-                            ))} • Color: {item.color}
-                          </p>
-                        </div>
-                      </div>
-                    ))
-                  ))}
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -226,17 +256,17 @@ function AdminHeader({ toggleSidebar, sidebarOpen }) {
       </div>
 
       {/* Mobile Menu Overlay */}
-      <div 
+      <div
         className={`fixed inset-0 bg-black transition-opacity duration-300 z-50 md:hidden ${
-          isMobileMenuOpen ? 'opacity-50' : 'opacity-0 pointer-events-none'
+          isMobileMenuOpen ? "opacity-50" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsMobileMenuOpen(false)}
       />
-      
+
       {/* Mobile Menu */}
-      <div 
+      <div
         className={`fixed inset-y-0 left-0 w-full bg-white z-50 md:hidden transform transition-transform duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">

@@ -79,7 +79,18 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
     const loadSizes = async () => {
       try {
         const sizesList = await fetchSizes();
-        setSizes(sizesList.filter((size) => size.is_active));
+        const activeSizes = sizesList.filter((size) => size.is_active);
+        setSizes(activeSizes);
+
+        const basketSizes = basketItems
+          .map((item) => {
+            const matchingSize = activeSizes.find(
+              (size) => size.value === item.size
+            );
+            return matchingSize?.id;
+          })
+          .filter(Boolean);
+        setSelectedSizes(basketSizes);
       } catch (error) {
         console.error("Error loading sizes:", error);
         setToastMessage(t("error_loading_sizes"));
@@ -92,7 +103,9 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
         try {
           const userData = await getUserProfile(user.uid);
           if (userData?.phoneNumber) {
-            setPhoneNumber(userData.phoneNumber);
+            // strip +994 if present:
+            const local = userData.phoneNumber.replace(/^\+994/, "");
+            setPhoneNumber(local);
             setShowPhoneInput(false);
           }
         } catch (error) {
@@ -106,7 +119,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
     fetchAddresses();
     loadSizes();
     loadUserProfile();
-  }, [user, t]);
+  }, [user, t, basketItems]);
 
   const handleAddressSuccess = (newAddress) => {
     setAddresses((prev) => [...prev, newAddress]);
@@ -117,15 +130,18 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
 
   const handleSizeSelection = (sizeId) => {
     setSelectedSizes((prev) => {
-      const newSizes = prev.includes(sizeId)
-        ? prev.filter((id) => id !== sizeId)
-        : prev.length < 2
-        ? [...prev, sizeId]
-        : prev;
+      let newSizes;
 
-      // Clear the sizes error if we have a valid selection
+      if (prev.includes(sizeId)) {
+        newSizes = prev.filter((id) => id !== sizeId);
+      } else if (prev.length < 2) {
+        newSizes = [...prev, sizeId];
+      } else {
+        newSizes = [...prev.slice(0, -1), sizeId];
+      }
+
       if (newSizes.length > 0 && errors.sizes) {
-        setErrors((prev) => ({ ...prev, sizes: undefined }));
+        setErrors((e) => ({ ...e, sizes: undefined }));
       }
 
       return newSizes;
@@ -169,14 +185,25 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
     // Limit to 9 digits (excluding +994)
     const limited = cleaned.slice(0, 9);
     setPhoneNumber(limited);
+
+    // If we have a valid phone number (9 digits), confirm it
+    if (limited.length === 9) {
+      setPhoneNumberConfirmed(true);
+      setUseExistingPhone(false);
+      // Clear any phone-related errors
+      setErrors((prev) => ({
+        ...prev,
+        phoneNumber: undefined,
+      }));
+    }
   };
 
   const handleUseExistingPhone = () => {
     setUseExistingPhone(true);
     setPhoneNumberConfirmed(true);
-    // Keep the existing phone number
-    setPhoneNumber(phoneNumber);
-    // Clear any phone-related errors
+    setShowPhoneInput(true);
+    const local = phoneNumber.replace(/^\+994/, "");
+    setPhoneNumber(local);
     setErrors((prev) => ({
       ...prev,
       phoneSelection: undefined,
@@ -185,67 +212,49 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
   };
 
   const handleEnterNewPhone = () => {
-    console.log('Before state update:', { showPhoneInput, useExistingPhone, phoneNumberConfirmed });
-    
-    // Clear the phone number when entering a new one
-    setPhoneNumber('');
+    console.log("Before state update:", {
+      showPhoneInput,
+      useExistingPhone,
+      phoneNumberConfirmed,
+    });
+
+    setPhoneNumber("");
     setPhoneNumberConfirmed(false);
     setUseExistingPhone(false);
     setShowPhoneInput(true);
-    
-    // Clear any phone-related errors
+
     setErrors((prev) => ({
       ...prev,
       phoneSelection: undefined,
       phoneNumber: undefined,
     }));
 
-    // Force a re-render after state updates
     setTimeout(() => {
-      console.log('After state update:', { showPhoneInput, useExistingPhone, phoneNumberConfirmed });
+      console.log("After state update:", {
+        showPhoneInput,
+        useExistingPhone,
+        phoneNumberConfirmed,
+      });
     }, 0);
   };
 
-  // Add useEffect to monitor state changes
   useEffect(() => {
-    console.log('State changed:', { showPhoneInput, useExistingPhone, phoneNumberConfirmed });
+    console.log("State changed:", {
+      showPhoneInput,
+      useExistingPhone,
+      phoneNumberConfirmed,
+    });
   }, [showPhoneInput, useExistingPhone, phoneNumberConfirmed]);
 
-  // Modify the phone number input section rendering
   const renderPhoneInput = () => {
-    console.log('Rendering phone input with states:', { showPhoneInput, useExistingPhone, phoneNumberConfirmed });
-    
-    // If we have a phone number and haven't confirmed it yet, show the selection UI
-    if (phoneNumber && !phoneNumberConfirmed) {
-      return (
-        <div className="space-y-4">
-          <div className={`p-4 border ${errors.phoneSelection ? "border-red-500" : "border-neutral-200"} bg-neutral-50`}>
-            <p className="text-neutral-700 mb-2">{t("existing_phone_number")}</p>
-            <p className="text-neutral-900 font-medium mb-4">{formatPhoneNumber(phoneNumber)}</p>
-            <div className="flex gap-3">
-              <button
-                onClick={handleUseExistingPhone}
-                className="px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
-              >
-                {t("use_this_number")}
-              </button>
-              <button
-                onClick={handleEnterNewPhone}
-                className="px-4 py-2 border border-neutral-200 hover:border-neutral-400 transition-colors"
-              >
-                {t("enter_new_number")}
-              </button>
-            </div>
-            {errors.phoneSelection && (
-              <p className="text-red-500 text-sm mt-2">{errors.phoneSelection}</p>
-            )}
-          </div>
-        </div>
-      );
-    }
-    
-    // If showPhoneInput is true or we're entering a new number, show the input
-    if (showPhoneInput || (!useExistingPhone && !phoneNumberConfirmed)) {
+    console.log("Rendering phone input with states:", {
+      showPhoneInput,
+      useExistingPhone,
+      phoneNumberConfirmed,
+      phoneNumber,
+    });
+
+    if (showPhoneInput || phoneNumberConfirmed) {
       return (
         <div className="mb-4">
           <label className="block text-sm text-neutral-700 mb-1">
@@ -271,7 +280,45 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
         </div>
       );
     }
-    
+
+    if (phoneNumber && !phoneNumberConfirmed) {
+      return (
+        <div className="space-y-4">
+          <div
+            className={`p-4 border ${
+              errors.phoneSelection ? "border-red-500" : "border-neutral-200"
+            } bg-neutral-50`}
+          >
+            <p className="text-neutral-700 mb-2">
+              {t("existing_phone_number")}
+            </p>
+            <p className="text-neutral-900 font-medium mb-4">
+              {formatPhoneNumber(phoneNumber)}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleUseExistingPhone}
+                className="px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
+              >
+                {t("use_this_number")}
+              </button>
+              <button
+                onClick={handleEnterNewPhone}
+                className="px-4 py-2 border border-neutral-200 hover:border-neutral-400 transition-colors"
+              >
+                {t("enter_new_number")}
+              </button>
+            </div>
+            {errors.phoneSelection && (
+              <p className="text-red-500 text-sm mt-2">
+                {errors.phoneSelection}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     return null;
   };
 
@@ -290,11 +337,12 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
     if (paymentMethod === "cash" && !cashAmount) {
       newErrors.cashAmount = t("cash_amount_required");
     }
-    if (phoneNumber && !useExistingPhone && !phoneNumberConfirmed) {
-      newErrors.phoneSelection = t("select_phone_option_required");
-    }
-    if (!phoneNumberConfirmed && showPhoneInput && !phoneNumber) {
+
+    if (!phoneNumber || phoneNumber.length !== 9) {
       newErrors.phoneNumber = t("phone_number_required");
+    }
+    if (phoneNumber && !phoneNumberConfirmed) {
+      newErrors.phoneSelection = t("select_phone_option_required");
     }
 
     setErrors(newErrors);
@@ -314,9 +362,10 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
 
     setIsSubmitting(true);
     try {
-      // Update user's phone number if it was missing or changed
       if (phoneNumber) {
-        await createOrUpdateUserProfile(user.uid, { phoneNumber });
+        await createOrUpdateUserProfile(user.uid, {
+          phoneNumber: formatPhoneNumber(phoneNumber),
+        });
       }
 
       const orderData = {
@@ -354,15 +403,12 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
 
       await createOrder(orderData);
 
-      // Clear the basket after successful order placement
       await clearBasket(user.uid);
-      // Update the basket context state to reflect the cleared basket
       updateBasketItems([]);
 
       setToastMessage(t("order_placed_successfully"));
       setShowToast(true);
 
-      // Reset all form inputs
       setDescription("");
       setDeliveryTimeRange("");
       setSelectedSizes([]);
@@ -370,7 +416,6 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
       setCashAmount("");
       setErrors({});
 
-      // Navigate to profile page after a short delay to show the success message
       setTimeout(() => {
         router.push("/profile?tab=orders");
       }, 1500);
@@ -399,7 +444,6 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
 
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 font-gilroy">
-          {/* Left Column - Delivery Address */}
           <div className="lg:col-span-2">
             <div className="bg-white p-6">
               <h2 className="text-xl mb-4">{t("delivery_address")}</h2>
@@ -477,13 +521,11 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                 </div>
               )}
 
-              {/* Add phone number input if needed */}
               <div className="my-6">
                 <h2 className="text-xl mb-4">{t("contact_information")}</h2>
                 {renderPhoneInput()}
               </div>
 
-              {/* Description Input */}
               <div className="mt-8" ref={orderDetailsRef}>
                 <h2 className="text-xl mb-5">{t("order_details")}</h2>
                 <div className="mb-4">
@@ -499,7 +541,6 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                   />
                 </div>
 
-                {/* Delivery Time Range */}
                 <div className="mb-4">
                   <label className="block text-sm text-neutral-700 mb-1">
                     {t("delivery_time_range")}
@@ -558,7 +599,6 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                   </div>
                 </div>
 
-                {/* Size Selection */}
                 <div className="mb-4">
                   <label className="block text-sm text-neutral-700 mb-1">
                     {t("select_sizes")}
@@ -583,7 +623,6 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                   )}
                 </div>
 
-                {/* Payment Method */}
                 <div className="mb-4">
                   <label className="block text-sm text-neutral-700 mb-1">
                     {t("payment_method")}
@@ -610,7 +649,6 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                   </div>
                 </div>
 
-                {/* Cash Amount Input */}
                 {paymentMethod === "cash" && (
                   <div className="mb-4">
                     <label className="block text-sm text-neutral-700 mb-1">
@@ -638,7 +676,6 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
             </div>
           </div>
 
-          {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white p-6 sticky top-8">
               <h2 className="text-xl font-semibold mb-4">

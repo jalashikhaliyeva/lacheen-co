@@ -28,7 +28,7 @@ export const addToBasket = async (userId, product) => {
         (parseFloat(product.sellingPrice) - parseFloat(product.sale)).toFixed(2) : 
         product.sellingPrice,
       image: product.images?.[0]?.url || product.images?.[0],
-      size: product.selectedSize,
+      size: product.selectedSize?.value || product.selectedSize,
       color: product.color?.name || product.baseColor,
       quantity: 1,
       createdAt: new Date().toISOString()

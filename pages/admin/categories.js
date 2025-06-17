@@ -186,11 +186,11 @@ export default function Categories() {
   return (
     <ProtectedRoute>
       <AdminLayout>
-        <div className="bg-bodyGray h-full pb-20 ">
+        <div className="bg-bodyGray h-full pb-20 mt-20 ">
           <Container>
             <div className="pt-7">
               <Breadcrumbs />
-              {/* Your page content goes here */}
+      
             </div>
 
             <div className="flex flex-col gap-6">
