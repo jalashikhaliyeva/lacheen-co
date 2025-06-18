@@ -7,11 +7,11 @@ import { useRouter } from "next/router";
 
 function NavList() {
   const { categories, loading, error } = useCategories();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const currentCategory = router.query.category || null;
+  const currentLang = i18n.language;
 
-  // Determine if the current path is the products page
   const isProductsPage = router.pathname === "/products";
 
   const staticMenuItems = [
@@ -24,13 +24,14 @@ function NavList() {
     },
     { id: "viewAll", label: t("nav.view_all"), is_active: true },
   ];
+  
   const menuItems = [
     ...staticMenuItems,
     ...categories
       .filter((category) => category.is_active)
       .map((category) => ({
-        id: category.slug || category.id,
-        label: category.name,
+        id: category.slug?.[currentLang] || category.slug?.az || category.slug || category.id,
+        label: category.name?.[currentLang] || category.name?.az || category.name,
         is_active: category.is_active,
       })),
   ];
@@ -43,7 +44,6 @@ function NavList() {
   };
 
   const isActive = (itemId) => {
-    // Only apply active state logic if we are on the /products page
     if (!isProductsPage) {
       return false;
     }

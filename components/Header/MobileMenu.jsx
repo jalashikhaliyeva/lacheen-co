@@ -18,8 +18,9 @@ import { SlLocationPin } from "react-icons/sl";
 const MobileMenu = ({ isOpen, onClose, user, onLogout }) => {
   const router = useRouter();
   const { categories, loading, error } = useCategories();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const currentCategory = router.query.category || null;
+  const currentLang = i18n.language;
 
   const isProductsPage = router.pathname === "/products";
 
@@ -68,8 +69,8 @@ const MobileMenu = ({ isOpen, onClose, user, onLogout }) => {
   const categoryItems = categories
     .filter((category) => category.is_active)
     .map((category) => ({
-      id: category.slug || category.id,
-      label: category.name,
+      id: category.slug?.[currentLang] || category.slug?.az || category.slug || category.id,
+      label: category.name?.[currentLang] || category.name?.az || category.name,
       is_active: category.is_active,
     }));
 

@@ -7,6 +7,7 @@ import { TfiLayoutWidthFull } from "react-icons/tfi";
 import Container from "../Container";
 import FilterComponent from "../FilterComponent";
 import { useTranslation } from "react-i18next";
+import { useCategories } from "@/shared/context/CategoriesContext";
 
 function ProductsListHeader({
   layout,
@@ -15,20 +16,35 @@ function ProductsListHeader({
   onFilterChange,
   activeFilters,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language;
+  const { categories } = useCategories();
   const [showFilter, setShowFilter] = useState(false);
 
-  const getCategoryDisplayName = (category) => {
-    if (!category || category === "viewAll")
+  const getCategoryDisplayName = (categorySlug) => {
+    if (!categorySlug || categorySlug === "viewAll")
       return t("nav.view_all") || "All Products";
 
-    switch (category) {
+    switch (categorySlug) {
       case "new":
         return t("nav.new") || "New Products";
       case "special":
         return t("nav.special_prices") || "Special Offers";
       default:
-        return category.charAt(0).toUpperCase() + category.slice(1);
+        // Find the category by slug and return the appropriate name
+        const category = categories.find(cat => 
+          (cat.slug?.[currentLang] === categorySlug) ||
+          (cat.slug?.az === categorySlug) ||
+          (cat.slug?.en === categorySlug) ||
+          (cat.slug === categorySlug)
+        );
+        
+        if (category) {
+          return category.name?.[currentLang] || category.name?.az || category.name || categorySlug;
+        }
+        
+        // Fallback: convert slug to readable name
+        return categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1).replace(/-/g, " ");
     }
   };
 

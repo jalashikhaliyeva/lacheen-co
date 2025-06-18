@@ -127,7 +127,7 @@ function AdminSidebar({ toggleSidebar }) {
         // Add dynamic categories here
         ...categories.map((category) => ({
           id: `category-${category.id}`,
-          label: category.name,
+          label: category.name?.az || category.name,
           route: `/admin/products?category=${category.id}`,
         })),
       ],

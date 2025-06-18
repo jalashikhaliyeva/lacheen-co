@@ -9,6 +9,7 @@ import { ProductContext } from "@/shared/context/ProductContext";
 import CustomDropdown from "../CustomDropdown";
 import { fetchCategories } from "@/firebase/services/categoriesService";
 import { fetchColors } from "@/firebase/services/colorService";
+import { useTranslation } from "react-i18next";
 
 import {
   getStorage,
@@ -21,6 +22,8 @@ import { useSizes } from "@/shared/hooks/useSizes";
 
 function Information() {
   const { informationData, setInformationData } = useContext(ProductContext);
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language;
   const [discountEnabled, setDiscountEnabled] = useState(informationData.sale && informationData.sale !== "");
 
   const {
@@ -62,7 +65,19 @@ function Information() {
     loadCategories();
   }, []);
 
-  const availableCategories = categories.map((c) => c.name);
+  // Get available categories based on current language
+  const availableCategories = categories
+    .filter((c) => c.is_active)
+    .map((c) => {
+      const name = c.name?.[currentLang] || c.name?.az || c.name;
+      const slug = c.slug?.[currentLang] || c.slug?.az || c.slug;
+      return {
+        id: c.id,
+        name,
+        slug,
+        originalCategory: c
+      };
+    });
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -203,7 +218,9 @@ function Information() {
             onClick={() => setCategoryOpen((prev) => !prev)}
           >
             {category ? (
-              <span className="text-black">{category}</span>
+              <span className="text-black">
+                {category.name?.[currentLang] || category.name?.az || category.name || category}
+              </span>
             ) : (
               <span className="text-gray-500">
                 {loadingCategories
@@ -231,14 +248,14 @@ function Information() {
               ) : availableCategories.length > 0 ? (
                 availableCategories.map((cat) => (
                   <div
-                    key={cat}
+                    key={cat.id}
                     className="py-2 px-4 hover:bg-gray-200 cursor-pointer flex justify-between items-center"
                     onClick={() => {
-                      handleSelectCategory(cat);
+                      handleSelectCategory(cat.originalCategory);
                       setCategoryOpen(false);
                     }}
                   >
-                    <span>{cat}</span>
+                    <span>{cat.name}</span>
                   </div>
                 ))
               ) : (

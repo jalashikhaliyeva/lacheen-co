@@ -13,6 +13,7 @@ import {
   isInWishlist,
 } from "@/firebase/services/firebaseWishlistService";
 import { useAuthClient } from "@/shared/context/AuthContext";
+import { useCategories } from "@/shared/context/CategoriesContext";
 import CustomToast from "../CustomToast/CustomToast";
 
 function ProductList({
@@ -21,8 +22,10 @@ function ProductList({
   onFilterChange,
   activeFilters,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language;
   const { user } = useAuthClient(); // Get the current user
+  const { categories } = useCategories(); // Get categories for name resolution
   const [wishlist, setWishlist] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState([]);
@@ -37,6 +40,35 @@ function ProductList({
   const [toastMessage, setToastMessage] = useState("");
 
   const closeToast = () => setShowToast(false);
+
+  // Function to get category display name based on current language
+  const getCategoryDisplayName = (categorySlug) => {
+    if (!categorySlug || categorySlug === "viewAll") {
+      return t("nav.view_all") || "All Products";
+    }
+
+    switch (categorySlug) {
+      case "new":
+        return t("nav.new") || "New Products";
+      case "special":
+        return t("nav.special_prices") || "Special Offers";
+      default:
+        // Find the category by slug and return the appropriate name
+        const category = categories.find(cat => 
+          (cat.slug?.[currentLang] === categorySlug) ||
+          (cat.slug?.az === categorySlug) ||
+          (cat.slug?.en === categorySlug) ||
+          (cat.slug === categorySlug)
+        );
+        
+        if (category) {
+          return category.name?.[currentLang] || category.name?.az || category.name || categorySlug;
+        }
+        
+        // Fallback: convert slug to readable name
+        return categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1).replace(/-/g, " ");
+    }
+  };
 
   // Load wishlist when user changes
   useEffect(() => {
@@ -160,10 +192,21 @@ const filteredProducts = useMemo(() => {
         return false;
       });
 
-    // Category filter
+    // Category filter - handle both string and object categories
     const categoryMatch =
       activeFilters.category.length === 0 ||
-      (product.category && activeFilters.category.includes(product.category));
+      activeFilters.category.some(filterCategory => {
+        if (product.category && typeof product.category === "object") {
+          // Handle multilingual category objects
+          const categoryNameAz = product.category.name?.az || product.category.name;
+          const categoryNameEn = product.category.name?.en;
+          return filterCategory === categoryNameAz || filterCategory === categoryNameEn;
+        } else if (product.category && typeof product.category === "string") {
+          // Handle legacy string categories
+          return filterCategory === product.category;
+        }
+        return false;
+      });
 
     return colorMatch && sizeMatch && priceMatch && categoryMatch;
   });
@@ -352,8 +395,8 @@ const filteredProducts = useMemo(() => {
           </h3>
           <p className="text-gray-600 mb-6">
             {selectedCategory && selectedCategory !== "viewAll"
-              ? `${t("no_products_found_for")} "${selectedCategory}"`
-              : t("no_results_found")}
+              ? `${t("no_products_found_in_this_category")} "${getCategoryDisplayName(selectedCategory)}"`
+              : t("no_products_found")}
           </p>
           {selectedCategory && selectedCategory !== "viewAll" && (
             <a

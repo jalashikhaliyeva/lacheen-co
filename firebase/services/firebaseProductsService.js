@@ -187,44 +187,80 @@ export const deleteMultipleProducts = async (ids) => {
 export const fetchProductsByCategory = async (categorySlug) => {
   const db = getDatabase(app);
   const productsRef = ref(db, "products");
+  const categoriesRef = ref(db, "categories");
 
   try {
-    const snapshot = await get(productsRef);
-    if (!snapshot.exists()) {
-      // console.log("🚫 Heç bir məhsul yoxdur.");
+    const [productsSnapshot, categoriesSnapshot] = await Promise.all([
+      get(productsRef),
+      get(categoriesRef),
+    ]);
+
+    if (!productsSnapshot.exists()) {
       return [];
     }
 
-    const allProductsObj = snapshot.val();
+    const allProductsObj = productsSnapshot.val();
     const allProducts = Object.values(allProductsObj);
+    
+    // Get categories to help with matching
+    const categories = categoriesSnapshot.exists() 
+      ? Object.values(categoriesSnapshot.val()) 
+      : [];
 
+    // Find category names that match this slug (for all languages)
+    const matchingCategoryNames = new Set();
+    
+    categories.forEach(category => {
+      if (category.is_active) {
+        // Check if slug matches (in any language)
+        const slugAz = category.slug?.az || category.slug;
+        const slugEn = category.slug?.en;
+        
+        if (slugAz === categorySlug || slugEn === categorySlug) {
+          // Add names in all languages
+          const nameAz = category.name?.az || category.name;
+          const nameEn = category.name?.en;
+          
+          if (nameAz) matchingCategoryNames.add(nameAz.toLowerCase().trim());
+          if (nameEn) matchingCategoryNames.add(nameEn.toLowerCase().trim());
+        }
+      }
+    });
+
+    // Also handle direct slug-to-name conversion (for legacy support)
     const slugToNameNormalized = categorySlug
       .replace(/-/g, " ")
       .trim()
       .toLowerCase();
+    matchingCategoryNames.add(slugToNameNormalized);
 
     const filteredProducts = allProducts.filter((product) => {
-      if (!product.category || typeof product.category !== "string") {
-        return false;
+      // Handle multilingual category objects
+      if (product.category && typeof product.category === "object") {
+        const categoryNameAz = product.category.name?.az || product.category.name;
+        const categoryNameEn = product.category.name?.en;
+        
+        const normalizedAz = categoryNameAz ? categoryNameAz.toLowerCase().trim() : "";
+        const normalizedEn = categoryNameEn ? categoryNameEn.toLowerCase().trim() : "";
+        
+        const matchesCategory = matchingCategoryNames.has(normalizedAz) || 
+                              matchingCategoryNames.has(normalizedEn);
+                              
+        const isActive = product.is_active !== false && product.is_active !== "false";
+        return matchesCategory && isActive;
+      }
+      
+      // Handle legacy string categories
+      if (product.category && typeof product.category === "string") {
+        const productCategoryNormalized = product.category.trim().toLowerCase();
+        const matchesCategory = matchingCategoryNames.has(productCategoryNormalized);
+        const isActive = product.is_active !== false && product.is_active !== "false";
+        return matchesCategory && isActive;
       }
 
-      const productCategoryNormalized = product.category.trim().toLowerCase();
-
-      const matchesCategory =
-        productCategoryNormalized === slugToNameNormalized;
-
-      const isActive =
-        product.is_active === false || product.is_active === "false"
-          ? false
-          : true;
-
-      return matchesCategory && isActive;
+      return false;
     });
 
-    // console.log(
-    //   `🛒 Category slug="${categorySlug}" üçün tapılan filtrlənmiş məhsullar:`,
-    //   filteredProducts
-    // );
     return filteredProducts;
   } catch (error) {
     console.error(

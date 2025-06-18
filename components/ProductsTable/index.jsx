@@ -15,10 +15,10 @@ import {
 } from "@/firebase/services/firebaseProductsService";
 import { toast } from "react-toastify";
 import DeleteModal from "../DeleteModal";
+import { useTranslation } from "react-i18next";
 
 function ImageCell({ images, name }) {
   if (!images) return null;
-
 
   const imgsArray = Array.isArray(images) ? images : Object.values(images);
   const firstImg = imgsArray[0];
@@ -61,8 +61,9 @@ function useDebounce(value, delay) {
 }
 
 function WomenShoesTable({ mockProducts }) {
-
   const router = useRouter();
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language;
 
   const formattedProducts = useMemo(() => {
     return mockProducts.map((product) => ({
@@ -71,10 +72,15 @@ function WomenShoesTable({ mockProducts }) {
       status: product.is_active ? "active" : "deactive",
       sellingPrice: Number(product["sellingPrice"]),
       stock: product.quantity ? Number(product.quantity) : 0,
-      category: product.category || "N/A",
+      category:
+        product.category?.name?.[currentLang] ||
+        product.category?.name?.az ||
+        product.category?.name ||
+        product.category ||
+        "N/A",
       color: product.color || product.selectedColor,
     }));
-  }, [mockProducts]);
+  }, [mockProducts, currentLang]);
 
   const [products, setProducts] = useState(formattedProducts);
   useEffect(() => {
@@ -229,19 +235,16 @@ function WomenShoesTable({ mockProducts }) {
       selectedRowKeys.includes(key)
     );
     if (allSelected) {
-
       setSelectedRowKeys((prev) =>
         prev.filter((key) => !paginatedRowKeys.includes(key))
       );
     } else {
-
       setSelectedRowKeys((prev) => [
         ...prev,
         ...paginatedRowKeys.filter((key) => !prev.includes(key)),
       ]);
     }
   };
-
 
   const getRowByKey = (rowKey) =>
     displayProducts.find((row) => row.rowKey === rowKey);
@@ -311,12 +314,10 @@ function WomenShoesTable({ mockProducts }) {
     }
   };
 
-
   const confirmSingleDelete = (row) => {
     setDeleteTarget({ type: "single", row });
     setShowDeleteModal(true);
   };
-
 
   const confirmDeleteSelected = () => {
     setDeleteTarget({ type: "multiple" });
@@ -339,7 +340,6 @@ function WomenShoesTable({ mockProducts }) {
       return "N/A";
     }
     if (typeof value === "object") {
-
       return value.name || value.code || value.value || JSON.stringify(value);
     }
     return value.toString();
@@ -347,7 +347,6 @@ function WomenShoesTable({ mockProducts }) {
 
   return (
     <div className="pt-2">
-
       <ActionsProductTable
         products={products}
         selectedCount={selectedRowKeys.length}
@@ -355,7 +354,6 @@ function WomenShoesTable({ mockProducts }) {
       />
 
       <div className="p-4 my-5 border border-neutral-300 font-gilroy rounded-lg bg-white relative">
-
         <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-4 gap-2">
           <div className="relative w-full sm:w-1/3">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -381,12 +379,10 @@ function WomenShoesTable({ mockProducts }) {
           </button>
         </div>
 
-
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead className="bg-gray-100">
               <tr>
-
                 <th className="px-4 py-2 text-left">
                   <input
                     type="checkbox"
@@ -400,7 +396,6 @@ function WomenShoesTable({ mockProducts }) {
                   />
                 </th>
 
-
                 <th className="px-4 py-2 text-left">Şəkil</th>
                 <th className="px-4 py-2 text-left relative">
                   <div
@@ -411,25 +406,8 @@ function WomenShoesTable({ mockProducts }) {
                       )
                     }
                   >
-                    Barcode <IoFunnelOutline className="text-sm" />
+                    Barcode
                   </div>
-                  {openFilter === "productId" && (
-                    <div
-                      ref={dropdownRefs.productId}
-                      className="absolute z-50 mt-2 p-2 bg-white rounded shadow-lg"
-                    >
-                      <input
-                        type="text"
-                        placeholder="Filter by ID"
-                        value={productIdFilter}
-                        onChange={(e) => {
-                          setProductIdFilter(e.target.value);
-                          setCurrentPage(0);
-                        }}
-                        className="px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      />
-                    </div>
-                  )}
                 </th>
                 <th className="px-4 py-2 text-left">Məhsul Adı</th>
                 <th className="px-4 py-2 text-left relative">
@@ -441,43 +419,8 @@ function WomenShoesTable({ mockProducts }) {
                       )
                     }
                   >
-                    Kategoriya <IoFunnelOutline className="text-sm" />
+                    Kategoriya
                   </div>
-                  {openFilter === "category" && (
-                    <div
-                      ref={dropdownRefs.category}
-                      className="absolute z-50 mt-2 p-2 bg-white rounded shadow-lg w-56"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <input
-                        type="text"
-                        placeholder="Axtar..."
-                        className="w-full px-2 py-1 mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      />
-                      {categoryOptions.map((cat) => (
-                        <label
-                          key={cat}
-                          className="flex items-center gap-2 px-2 py-1 hover:bg-gray-200 rounded cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={categoryFilter.includes(cat)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setCategoryFilter((prev) => [...prev, cat]);
-                              } else {
-                                setCategoryFilter((prev) =>
-                                  prev.filter((c) => c !== cat)
-                                );
-                              }
-                              setCurrentPage(0);
-                            }}
-                          />
-                          {cat}
-                        </label>
-                      ))}
-                    </div>
-                  )}
                 </th>
                 <th className="px-4 py-2 text-left relative">
                   <div
@@ -486,43 +429,8 @@ function WomenShoesTable({ mockProducts }) {
                       setOpenFilter(openFilter === "price" ? null : "price")
                     }
                   >
-                    Qiymət <IoFunnelOutline className="text-sm" />
+                    Qiymət
                   </div>
-                  {openFilter === "price" && (
-                    <div
-                      ref={dropdownRefs.price}
-                      className="absolute z-50 mt-2 p-2 bg-white rounded shadow-lg"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          placeholder="Min"
-                          value={priceFilter.min}
-                          onChange={(e) =>
-                            setPriceFilter((prev) => ({
-                              ...prev,
-                              min: e.target.value,
-                            }))
-                          }
-                          className="w-20 px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
-                        <span>-</span>
-                        <input
-                          type="number"
-                          placeholder="Max"
-                          value={priceFilter.max}
-                          onChange={(e) =>
-                            setPriceFilter((prev) => ({
-                              ...prev,
-                              max: e.target.value,
-                            }))
-                          }
-                          className="w-20 px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
-                      </div>
-                    </div>
-                  )}
                 </th>
                 <th className="px-4 py-2 text-left">Satış Qiyməti</th>
                 <th className="px-4 py-2 text-left">Stok</th>
@@ -535,43 +443,8 @@ function WomenShoesTable({ mockProducts }) {
                       setOpenFilter(openFilter === "color" ? null : "color")
                     }
                   >
-                    Rəng <IoFunnelOutline className="text-sm" />
+                    Rəng
                   </div>
-
-                  {openFilter === "color" && (
-                    <div
-                      ref={dropdownRefs.color}
-                      className="absolute z-50 mt-2 p-2 bg-white rounded shadow-lg w-56"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {colorOptions.map((color) => (
-                        <label
-                          key={color}
-                          className="flex items-center gap-2 px-2 py-1 hover:bg-gray-200 rounded cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={colorFilter.includes(color)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setColorFilter((prev) => [...prev, color]);
-                              } else {
-                                setColorFilter((prev) =>
-                                  prev.filter((c) => c !== color)
-                                );
-                              }
-                              setCurrentPage(0);
-                            }}
-                          />
-                          <span
-                            className="w-3 h-3 rounded-full border"
-                            style={{ backgroundColor: color }}
-                          ></span>
-                          {color}
-                        </label>
-                      ))}
-                    </div>
-                  )}
                 </th>
 
                 <th className="px-4 py-2 text-left">Əməliyyatlar</th>
@@ -582,38 +455,8 @@ function WomenShoesTable({ mockProducts }) {
                       setOpenFilter(openFilter === "status" ? null : "status")
                     }
                   >
-                    Status <IoFunnelOutline className="text-sm" />
+                    Status
                   </div>
-                  {openFilter === "status" && (
-                    <div
-                      ref={dropdownRefs.status}
-                      className="absolute z-50 mt-2 p-2 bg-white rounded shadow-lg"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {statusOptions.map((status) => (
-                        <label
-                          key={status}
-                          className="flex items-center gap-2 px-2 py-1 hover:bg-neutral-200 rounded cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={statusFilter.includes(status)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setStatusFilter((prev) => [...prev, status]);
-                              } else {
-                                setStatusFilter((prev) =>
-                                  prev.filter((s) => s !== status)
-                                );
-                              }
-                              setCurrentPage(0);
-                            }}
-                          />
-                          {status}
-                        </label>
-                      ))}
-                    </div>
-                  )}
                 </th>
                 {/* <th className="px-4 py-2 text-left">Bax</th> */}
               </tr>
@@ -663,7 +506,6 @@ function WomenShoesTable({ mockProducts }) {
                               className="w-4 h-4 rounded-full border"
                               style={{ backgroundColor: hex }}
                             />
-
                           </div>
                         );
                       })()}
@@ -680,7 +522,6 @@ function WomenShoesTable({ mockProducts }) {
                             }}
                             className="cursor-pointer "
                           />
-
                         </div>
                         <div className="px-2 py-2 flex items-center justify-center gap-2 bg-neutral-300 text-neutral-600 rounded-md text-base">
                           <BsTrash3
@@ -697,7 +538,6 @@ function WomenShoesTable({ mockProducts }) {
                           className="sr-only peer"
                           checked={row.status === "active"}
                           onChange={async () => {
-
                             const newIsActive = row.status !== "active";
                             try {
                               await updateProduct(row.id, {
@@ -773,7 +613,6 @@ function WomenShoesTable({ mockProducts }) {
             </tbody>
           </table>
         </div>
-
 
         <div className="flex flex-col sm:flex-row justify-between items-center mt-4">
           <div className="flex items-center gap-2">

@@ -10,7 +10,8 @@ const FilterComponent = ({ onClose, onFilterChange, initialFilters }) => {
   const [openSection, setOpenSection] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isMounted, setIsMounted] = useState(true);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language;
   const [selectedFilters, setSelectedFilters] = useState({
     color: [],
     size: [],
@@ -36,7 +37,7 @@ const FilterComponent = ({ onClose, onFilterChange, initialFilters }) => {
 
         const activeCategories = fetchedCategories
           .filter((category) => category.is_active)
-          .map((category) => category.name);
+          .map((category) => category.name?.[currentLang] || category.name?.az || category.name);
         setCategories(activeCategories);
       } catch (error) {
         console.error("Failed to load categories:", error);
@@ -45,7 +46,7 @@ const FilterComponent = ({ onClose, onFilterChange, initialFilters }) => {
       }
     };
     loadCategories();
-  }, []);
+  }, [currentLang]);
 
   useEffect(() => {
     requestAnimationFrame(() => {
