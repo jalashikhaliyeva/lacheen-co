@@ -286,9 +286,9 @@
   "afternoon": "Günorta",
   "evening": "Gecə",
   "search_results": "Axtarış nəticələri",
-  "found_categories": "Tapılmış kateqoriyalar",
-  "found_sizes": "Tapılmış ölçülər",
-  "found_colors": "Tapılmış rənglər",
+  "found_categories": "Kateqoriyalar",
+  "found_sizes": "Ölçülər",
+  "found_colors": "Rənglər",
   "quantity_updated": "Miqdar uğurla yeniləndi",
   "no_products_found_in_this_category": "Bu kateqoriya üzrə məhsul tapılmadı"
   

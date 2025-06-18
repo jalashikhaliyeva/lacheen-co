@@ -14,7 +14,6 @@ import { useTranslation } from "react-i18next";
 import { useAuthClient } from "@/shared/context/AuthContext";
 
 function Header({ modalNewProducts, categories }) {
-  console.log(categories, "categories");
 
   const { user, loading, logout } = useAuthClient();
   const { t } = useTranslation();

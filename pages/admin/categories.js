@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useTranslation } from "react-i18next";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminLayout from "@/components/AdminLayout";
 import Container from "@/components/Container";
@@ -17,6 +18,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function Categories() {
   const router = useRouter();
+  const { i18n } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -80,10 +82,13 @@ export default function Categories() {
   };
 
   const handleDeleteClick = (category) => {
+    const currentLang = i18n.language;
+    const categoryName = category.name?.[currentLang] || category.name?.az || category.name;
+    
     setDeleteModal({
       isOpen: true,
       categoryId: category.id,
-      categoryName: category.name,
+      categoryName,
     });
   };
 

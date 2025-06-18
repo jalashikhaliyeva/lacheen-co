@@ -2,6 +2,7 @@ import React from "react";
 import { FiEdit2 } from "react-icons/fi";
 import { GoTrash } from "react-icons/go";
 import { Switch } from '@headlessui/react';
+import { useTranslation } from 'react-i18next';
 
 export default function CategoryTable({
   categories,
@@ -10,6 +11,9 @@ export default function CategoryTable({
   onToggleActive,
   isLoading,
 }) {
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language;
+
   return (
     <div className="bg-white font-gilroy rounded-lg shadow overflow-hidden">
       <div className="overflow-x-auto">
@@ -36,9 +40,11 @@ export default function CategoryTable({
                 <tr key={category.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {category.name}
+                      {category.name?.[currentLang] || category.name?.az || category.name}
                     </div>
-                    <div className="text-sm text-gray-500">{category.slug}</div>
+                    <div className="text-sm text-gray-500">
+                      {category.slug?.[currentLang] || category.slug?.az || category.slug}
+                    </div>
                   </td>
              
                   <td className="px-6 py-4 whitespace-nowrap">
