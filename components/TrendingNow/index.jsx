@@ -41,7 +41,7 @@ function TrendingNow({ products = [] }) {
         linkHref="/wishlist"
       />
 
-      <div className="flex flex-col items-center h-full pt-10 mb-14 relative z-0">
+      <div className="flex text-neutral-800 flex-col items-center h-full pt-10 mb-14 relative z-0">
         <p className="uppercase font-gilroy text-sm py-5">Women</p>
         <h2 className="font-gilroy text-2xl font-normal">
           {t("trending_now")}

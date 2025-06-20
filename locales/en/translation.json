@@ -255,7 +255,7 @@
   "pending": "Pending",
   "confirmed": "Confirmed",
   "cancelled": "Cancelled",
-    "please_login_to_view_basket": "Please login to view basket",
+  "please_login_to_view_basket": "Please login to view basket",
   "your_items_will_be_safe_until_you_return": "Your items will be safe until you return",
   "my_account": "My account",
   "products_in_size": "Products in size",
@@ -290,5 +290,6 @@
   "found_colors": "Found colors",
   "no_results_found": "No results found",
   "quantity_updated": "Quantity updated",
-  "no_products_found_in_this_category": "No products found in this category"
+  "no_products_found_in_this_category": "No products found in this category",
+  "search_placeholder": "Search for items, categories, products or product colors"
 }

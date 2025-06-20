@@ -67,7 +67,7 @@ const SliderEmbla = ({ products }) => {
   }
 
   return (
-    <div className={`mt-4 md:mt-10 ${styles.embla}`}>
+    <div className={`mt-4 text-neutral-700 md:mt-10 ${styles.embla}`}>
       <Container>
         <div className="flex justify-between w-full">
           <h1 className="pb-3 font-gilroy text-xl md:text-2xl">

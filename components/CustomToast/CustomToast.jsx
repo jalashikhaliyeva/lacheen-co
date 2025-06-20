@@ -15,7 +15,7 @@ function CustomToast({ show, onClose, product, message, linkText, linkHref }) {
   return (
     <div
       className={[
-        "fixed top-4 left-1/2 -translate-x-1/2 z-[150] max-w-sm w-full",
+        "fixed top-4 left-1/2 -translate-x-1/2 z-[150] max-w-sm w-full text-neutral-800",
         "transform transition-all duration-500 ease-in-out",
         show
           ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"

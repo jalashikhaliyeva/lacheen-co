@@ -1,10 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { FiHeart } from "react-icons/fi";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-import { FaHeart } from "react-icons/fa";
-import { IoClose } from "react-icons/io5";
-import { PiHeartLight } from "react-icons/pi";
 import { PiHeart } from "react-icons/pi";
 import { PiHeartFill } from "react-icons/pi";
 import style from "./ProductCard.module.css";
@@ -152,7 +148,7 @@ function ProductCard({
           aria-label="Add to favorites"
           onClick={(e) => {
             e.stopPropagation();
-            onToggleWishlist();
+            onToggleWishlist(e);
           }}
         >
           {isInWishlist ? (

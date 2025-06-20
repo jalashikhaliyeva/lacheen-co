@@ -10,7 +10,7 @@ function Citate() {
   const { t } = useTranslation();
   return (
     <Container>
-      <div className="bg-neutral-100 p-9 h-[300px] flex flex-col gap-4 items-center justify-center relative">
+      <div className="bg-neutral-100 text-neutral-800 p-9 h-[300px] flex flex-col gap-4 items-center justify-center relative">
         <span
           className={`${playfair.className} absolute left-12 top-16 text-9xl opacity-20`}
           style={{ transform: "translateY(-50%)" }}

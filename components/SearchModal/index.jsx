@@ -163,7 +163,7 @@ export default function SearchModal({
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="font-gilroy">
+        <div className="font-gilroy text-neutral-800">
           <motion.div
             className="fixed inset-0 bg-black/40 z-[100]"
             onClick={onClose}
@@ -213,7 +213,7 @@ export default function SearchModal({
                 <div className="w-full relative max-w-4xl">
                   <input
                     type="text"
-                    placeholder="Search products, categories, sizes, colors..."
+                    placeholder={t("search_placeholder")}
                     className="w-full font-gilroy border rounded-full border-black py-3 px-4 text-lg focus:outline-none transition"
                     autoFocus
                     value={searchQuery}

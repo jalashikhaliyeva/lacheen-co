@@ -25,7 +25,7 @@ const Footer = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 text-neutral-800">
       {/* Top section: stacks on mobile, row on md+ */}
       <div className="border-t border-b py-10">
         <Container>
