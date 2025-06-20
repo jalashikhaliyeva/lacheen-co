@@ -17,9 +17,12 @@ import {
 import { app } from "@/firebase/backendConfig";
 // In Information.js
 import { useSizes } from "@/shared/hooks/useSizes";
+import { useTranslation } from "react-i18next";
 function Information() {
   const { sizes: availableSizes, loading: sizesLoading } = useSizes();
   const { informationData, setInformationData } = useContext(ProductContext);
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language;
 
   const {
     name,
@@ -172,7 +175,9 @@ function Information() {
               onClick={() => setCategoryOpen(!categoryOpen)}
             >
               {category ? (
-                <span className="text-black">{category}</span>
+                <span className="text-black">
+                  {category.name?.[currentLang] || category.name?.az || category.name || category}
+                </span>
               ) : (
                 <span className="text-gray-500">Select a category</span>
               )}

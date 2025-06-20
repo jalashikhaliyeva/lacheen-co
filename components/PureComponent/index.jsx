@@ -21,11 +21,30 @@ export default class PieMostSells extends PureComponent {
         .slice(0, 4);
 
       // If no sales data, use mock data for visualization
-      let chartData = sortedProducts.map(product => ({
-        name: product.name,
-        category: product.category || 'Uncategorized', // Include category
-        value: product.salesCount || 0
-      }));
+      let chartData = sortedProducts.map(product => {
+        let categoryName = 'Uncategorized';
+        
+        if (product.category && typeof product.category === 'object') {
+          if (product.category.name && typeof product.category.name === 'object') {
+            // Category name is a translation object {az, en}
+            categoryName = product.category.name.en || product.category.name.az || 'Uncategorized';
+          } else if (typeof product.category.name === 'string') {
+            // Category name is a string
+            categoryName = product.category.name;
+          } else if (typeof product.category === 'string') {
+            // Category itself is a string
+            categoryName = product.category;
+          }
+        } else if (typeof product.category === 'string') {
+          categoryName = product.category;
+        }
+
+        return {
+          name: product.name,
+          category: categoryName,
+          value: product.salesCount || 0
+        };
+      });
 
       // If all values are 0 or no data, create mock data
       const totalValue = chartData.reduce((sum, item) => sum + item.value, 0);
