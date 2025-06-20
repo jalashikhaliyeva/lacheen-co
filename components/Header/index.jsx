@@ -43,7 +43,7 @@ function Header({ modalNewProducts, categories }) {
           <div className="flex items-center gap-7 font-gilroy">
             <div
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="flex items-center gap-2 cursor-pointer hover:text-neutral-600 transition-colors"
+              className="flex items-center gap-2 cursor-pointer text-neutral-800 hover:text-neutral-600 transition-colors"
               aria-label={t("nav.search")}
             >
               <TfiSearch className="text-lg" />

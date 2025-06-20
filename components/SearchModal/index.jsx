@@ -15,7 +15,7 @@ export default function SearchModal({
   newProducts,
   categories,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState({
@@ -26,6 +26,30 @@ export default function SearchModal({
   });
   const [isSearching, setIsSearching] = useState(false);
   const router = useRouter();
+
+  // Helper function to get text from multilingual objects
+  const getMultilingualText = (textObj, fallback = "") => {
+    if (!textObj) return fallback;
+    
+    // If it's already a string, return it
+    if (typeof textObj === "string") return textObj;
+    
+    // If it's an object with language keys, get the current language
+    if (typeof textObj === "object" && textObj !== null) {
+      const currentLanguage = i18n.language || "az";
+      
+      // Try current language first, then available languages, then fallback
+      return (
+        textObj[currentLanguage] ||
+        textObj["az"] ||
+        textObj["en"] ||
+        Object.values(textObj)[0] ||
+        fallback
+      );
+    }
+    
+    return fallback;
+  };
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
@@ -105,14 +129,14 @@ export default function SearchModal({
       case 'categories':
         return searchResults.products.filter((product) =>
           searchResults.categories.some(
-            (cat) => product.category?.toLowerCase() === cat.name.toLowerCase()
+            (cat) => product.category?.toLowerCase() === getMultilingualText(cat.name).toLowerCase()
           )
         );
       case 'sizes':
         return searchResults.products.filter((product) =>
           searchResults.sizes.some((size) =>
             product.sizes?.some(
-              (s) => (s || '').toLowerCase() === (size.value || '').toLowerCase()
+              (s) => (s || '').toLowerCase() === (getMultilingualText(size.value) || '').toLowerCase()
             )
           )
         );
@@ -121,7 +145,7 @@ export default function SearchModal({
           searchResults.colors.some((color) =>
             product.colors?.some(
               (productColor) => 
-                (productColor || '').toLowerCase() === (color.name || '').toLowerCase()
+                (productColor || '').toLowerCase() === (getMultilingualText(color.name) || '').toLowerCase()
             )
           )
         );
@@ -234,13 +258,13 @@ export default function SearchModal({
                                         product.images?.[0] ||
                                         "/images/placeholder.png"
                                       }
-                                      alt={product.name}
+                                      alt={getMultilingualText(product.name) || "Product"}
                                       fill
                                       className="object-cover rounded-lg"
                                     />
                                   </div>
                                   <h4 className="mt-2 text-sm font-medium">
-                                    {product.name}
+                                    {getMultilingualText(product.name)}
                                   </h4>
                                   <p className="text-gray-600">
                                     {product.price} AZN
@@ -256,7 +280,7 @@ export default function SearchModal({
                           <div className="mb-4">
                             <h3 className="text-lg mb-2">
                               {t("found_categories")}:{" "}
-                              {searchResults.categories.map((c) => c.name).join(", ")}
+                              {searchResults.categories.map((c) => getMultilingualText(c.name)).join(", ")}
                             </h3>
                           </div>
                         )}
@@ -266,7 +290,7 @@ export default function SearchModal({
                           <div className="mb-4">
                             <h3 className="text-lg mb-2">
                               {t("found_sizes")}:{" "}
-                              {searchResults.sizes.map((s) => s.value).join(", ")}
+                              {searchResults.sizes.map((s) => getMultilingualText(s.value)).join(", ")}
                             </h3>
                           </div>
                         )}
@@ -276,7 +300,7 @@ export default function SearchModal({
                           <div className="mb-4">
                             <h3 className="text-lg mb-2">
                               {t("found_colors")}:{" "}
-                              {searchResults.colors.map((c) => c.name).join(", ")}
+                              {searchResults.colors.map((c) => getMultilingualText(c.name)).join(", ")}
                             </h3>
                           </div>
                         )}
@@ -302,10 +326,10 @@ export default function SearchModal({
                       {trendingCats.map((cat) => (
                         <button
                           key={cat.id}
-                          onClick={() => setSearchQuery(cat.name)}
+                          onClick={() => setSearchQuery(getMultilingualText(cat.name))}
                           className="lowercase cursor-pointer text-neutral-600 hover:text-neutral-800 transition"
                         >
-                          {cat.name}
+                          {getMultilingualText(cat.name)}
                         </button>
                       ))}
                     </div>

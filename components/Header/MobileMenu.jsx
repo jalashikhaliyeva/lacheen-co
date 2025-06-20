@@ -116,7 +116,7 @@ const MobileMenu = ({ isOpen, onClose, user, onLogout }) => {
 
   return (
     <nav
-      className={`fixed inset-0 bg-white z-[100] transform ${
+      className={`fixed inset-0 text-neutral-800 bg-white z-[100] transform ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       } transition-transform duration-300 ease-in-out overflow-y-auto w-full min-w-[280px]`}
       aria-label="Mobile navigation menu"

@@ -1,6 +1,27 @@
 import { getDatabase, ref, get } from "firebase/database";
 import { app } from "@/firebase/backendConfig";
 
+// Helper function to get text from multilingual objects
+const getMultilingualText = (textObj, fallback = "") => {
+  if (!textObj) return fallback;
+  
+  // If it's already a string, return it
+  if (typeof textObj === "string") return textObj;
+  
+  // If it's an object with language keys, get the current language
+  if (typeof textObj === "object" && textObj !== null) {
+    // Try available languages, prioritizing Azerbaijani as default
+    return (
+      textObj["az"] ||
+      textObj["en"] ||
+      Object.values(textObj)[0] ||
+      fallback
+    );
+  }
+  
+  return fallback;
+};
+
 export const searchProducts = async (query) => {
   const db = getDatabase(app);
   const productsRef = ref(db, "products");
@@ -52,28 +73,28 @@ export const searchProducts = async (query) => {
     };
 
     // Search in categories
-    results.categories = categories.filter(
-      (category) =>
-        category.name &&
-        category.name.toLowerCase().includes(normalizedQuery) &&
-        category.is_active !== false
-    );
+    results.categories = categories.filter((category) => {
+      if (!category.name || category.is_active === false) return false;
+      
+      const categoryName = getMultilingualText(category.name);
+      return categoryName && categoryName.toLowerCase().includes(normalizedQuery);
+    });
 
     // Search in sizes
-    results.sizes = sizes.filter(
-      (size) =>
-        size.value &&
-        size.value.toLowerCase().includes(normalizedQuery) &&
-        size.is_active !== false
-    );
+    results.sizes = sizes.filter((size) => {
+      if (!size.value || size.is_active === false) return false;
+      
+      const sizeValue = getMultilingualText(size.value);
+      return sizeValue && sizeValue.toLowerCase().includes(normalizedQuery);
+    });
 
     // Search in colors
-    results.colors = colors.filter(
-      (color) =>
-        color.name &&
-        color.name.toLowerCase().includes(normalizedQuery) &&
-        color.is_active !== false
-    );
+    results.colors = colors.filter((color) => {
+      if (!color.name || color.is_active === false) return false;
+      
+      const colorName = getMultilingualText(color.name);
+      return colorName && colorName.toLowerCase().includes(normalizedQuery);
+    });
 
     // Helper function to normalize and extract colors from a product
     const getProductColors = (product) => {
@@ -84,7 +105,7 @@ export const searchProducts = async (query) => {
           .filter((color) => color != null)
           .map((color) => {
             if (typeof color === "object" && color.name) {
-              return color.name.toLowerCase().trim();
+              return getMultilingualText(color.name).toLowerCase().trim();
             }
             return color.toString().toLowerCase().trim();
           });
@@ -92,7 +113,7 @@ export const searchProducts = async (query) => {
         productColors = [product.colors.toLowerCase().trim()];
       } else if (product.color) {
         if (typeof product.color === "object" && product.color.name) {
-          productColors = [product.color.name.toLowerCase().trim()];
+          productColors = [getMultilingualText(product.color.name).toLowerCase().trim()];
         } else if (typeof product.color === "string") {
           productColors = [product.color.toLowerCase().trim()];
         }
@@ -124,8 +145,8 @@ export const searchProducts = async (query) => {
 
     // Search in products directly by name, category, size, and color
     const directMatchingProducts = activeProducts.filter((product) => {
-      const productName = (product.name || "").toLowerCase();
-      const productCategory = (product.category || "").toLowerCase();
+      const productName = getMultilingualText(product.name || "").toLowerCase();
+      const productCategory = getMultilingualText(product.category || "").toLowerCase();
       const productColors = getProductColors(product);
       const productSizes = getProductSizes(product);
 
@@ -150,10 +171,10 @@ export const searchProducts = async (query) => {
 
     if (results.categories.length > 0) {
       const categoryNames = results.categories.map((cat) =>
-        cat.name.toLowerCase()
+        getMultilingualText(cat.name).toLowerCase()
       );
       activeProducts.forEach((product) => {
-        const productCategory = (product.category || "").toLowerCase();
+        const productCategory = getMultilingualText(product.category || "").toLowerCase();
         if (categoryNames.includes(productCategory) && product.id) {
           uniqueProductIds.add(product.id);
         }
@@ -161,7 +182,9 @@ export const searchProducts = async (query) => {
     }
 
     if (results.sizes.length > 0) {
-      const sizeValues = results.sizes.map((size) => size.value.toLowerCase());
+      const sizeValues = results.sizes.map((size) => 
+        getMultilingualText(size.value).toLowerCase()
+      );
       activeProducts.forEach((product) => {
         const productSizes = getProductSizes(product);
         const hasMatchingSize = productSizes.some((size) =>
@@ -175,7 +198,7 @@ export const searchProducts = async (query) => {
 
     if (results.colors.length > 0) {
       const colorNames = results.colors.map((color) =>
-        color.name.toLowerCase()
+        getMultilingualText(color.name).toLowerCase()
       );
       activeProducts.forEach((product) => {
         const productColors = getProductColors(product);

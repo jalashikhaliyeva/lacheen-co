@@ -49,7 +49,7 @@ function LanguageSwitcher() {
     >
       <button
         id="dropdownLanguageButton"
-        className="px-2 flex items-center justify-center gap-2 py-1 text-base font-gilroy focus:outline-none"
+        className="px-2 text-neutral-800 flex items-center justify-center gap-2 py-1 text-base font-gilroy focus:outline-none"
         type="button"
       >
         {selectedLanguage}
@@ -64,6 +64,7 @@ function LanguageSwitcher() {
 
       <div
         className={`
+          text-neutral-800
           absolute z-[999] w-28 mt-2 font-gilroy bg-white 
           md:border md:border-gray-300 md:rounded-sm md:shadow-lg md:p-2
           transition-all duration-300 ease-in-out
@@ -79,7 +80,7 @@ function LanguageSwitcher() {
               key={lang}
               className={`
                 px-4 py-2 cursor-pointer rounded
-                hover:bg-gray-100 text-base transition-colors
+                hover:bg-gray-100 text-base transition-colors text-neutral-800
                 ${selectedLanguage === lang
                   ? "text-gray-700 font-semibold"
                   : "text-gray-700"}
