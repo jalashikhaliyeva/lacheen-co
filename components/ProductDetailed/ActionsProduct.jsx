@@ -1,14 +1,19 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   LiaCheckSolid,
   LiaChevronDownSolid,
   LiaChevronUpSolid,
 } from "react-icons/lia";
-import { PiChatsThin, PiHeart } from "react-icons/pi";
+import { PiChatsThin, PiHeart, PiHeartFill } from "react-icons/pi";
 import { useAuthClient } from "@/shared/context/AuthContext";
 import { addToBasket } from "@/firebase/services/basketService";
+import { 
+  addToWishlist, 
+  removeFromWishlist, 
+  isInWishlist 
+} from "@/firebase/services/firebaseWishlistService";
 import CustomToast from "../CustomToast/CustomToast";
 import { useBasket } from "@/shared/context/BasketContext";
 
@@ -20,6 +25,8 @@ function ActionsProduct({ product, allProducts }) {
   const [isAddingToBasket, setIsAddingToBasket] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [isInWishlistState, setIsInWishlistState] = useState(false);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const router = useRouter();
   const { user } = useAuthClient();
   const { loadBasketItems } = useBasket();
@@ -205,6 +212,53 @@ function ActionsProduct({ product, allProducts }) {
 
   const closeToast = () => setShowToast(false);
 
+  // Check if product is in wishlist on component mount
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      if (user && product.id) {
+        try {
+          const inWishlist = await isInWishlist(user.uid, product.id);
+          setIsInWishlistState(inWishlist);
+        } catch (error) {
+          console.error("Error checking wishlist status:", error);
+        }
+      }
+    };
+
+    checkWishlistStatus();
+  }, [user, product.id]);
+
+  const handleWishlistToggle = async () => {
+    if (!user) {
+      setToastMessage(t("please_login_first"));
+      setShowToast(true);
+      router.push("/login");
+      return;
+    }
+
+    try {
+      setIsWishlistLoading(true);
+      
+      if (isInWishlistState) {
+        await removeFromWishlist(user.uid, product.id);
+        setIsInWishlistState(false);
+        setToastMessage(t("removed_from_wishlist") || "Removed from wishlist");
+      } else {
+        await addToWishlist(user.uid, product);
+        setIsInWishlistState(true);
+        setToastMessage(t("added_to_wishlist") || "Added to wishlist");
+      }
+      
+      setShowToast(true);
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+      setToastMessage(t("error_updating_wishlist") || "Error updating wishlist");
+      setShowToast(true);
+    } finally {
+      setIsWishlistLoading(false);
+    }
+  };
+
   return (
     <>
       <CustomToast
@@ -214,10 +268,10 @@ function ActionsProduct({ product, allProducts }) {
       />
       <div className="flex flex-col gap-1 md:gap-4 w-full font-gilroy bg-white p-4 md:p-5 border-neutral-200">
         <div className="flex flex-row gap-2 items-center justify-between">
-          <h2 className=" uppercase block text-lg md:text-xl">
+          <h2 className=" uppercase block text-lg md:text-xl text-neutral-800">
             {product.name}
           </h2>
-          <h2 className=" uppercase block text-sm md:text-base">
+          <h2 className=" uppercase block text-sm md:text-base text-neutral-800">
             {product.barcode}
           </h2>
         </div>
@@ -226,7 +280,7 @@ function ActionsProduct({ product, allProducts }) {
           <div className="flex flex-row justify-between">
             {product.sale && parseFloat(product.sale) > 0 ? (
               <div className="flex flex-col gap-1">
-                <span className="text-base line-through text-neutral-500">
+                <span className="text-base line-through  text-neutral-800">
                   {product.sellingPrice} ₼
                 </span>
                 <span className="text-base font-semibold text-rose-800">
@@ -237,7 +291,9 @@ function ActionsProduct({ product, allProducts }) {
                 </span>
               </div>
             ) : (
-              <span className="text-base">{product.sellingPrice} ₼</span>
+              <span className="text-base text-neutral-800">
+                {product.sellingPrice} ₼
+              </span>
             )}
           </div>
         </div>
@@ -280,7 +336,7 @@ function ActionsProduct({ product, allProducts }) {
             })}
           </div>
           <div>
-            <p className="text-base font-gilroy">
+            <p className="text-base font-gilroy text-neutral-800">
               - {product.color?.name || product.baseColor}
             </p>
           </div>
@@ -347,12 +403,24 @@ function ActionsProduct({ product, allProducts }) {
                 : t("select_size_before_adding_to_basket") || "Select Size"}
             </button>
           </div>
-          <div className="cursor-pointer py-2 px-2 border border-black bg-black text-center">
-            <PiHeart className="text-2xl text-white" />
-          </div>
+          <button 
+            className={`cursor-pointer py-2 px-2 border transition-all duration-200 ${
+              isInWishlistState 
+                ? "border-black bg-black" 
+                : "border-black bg-black hover:border-neutral-500 hover:bg-neutral-500"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+            onClick={handleWishlistToggle}
+            disabled={isWishlistLoading}
+          >
+            {isInWishlistState ? (
+              <PiHeartFill className="text-2xl text-white" />
+            ) : (
+              <PiHeart className="text-2xl text-white" />
+            )}
+          </button>
         </div>
 
-        <div className="hidden md:flex mt-4 md:mt-5 flex-col gap-2 text-sm md:text-base">
+        <div className="hidden text-neutral-800 md:flex mt-4 md:mt-5 flex-col gap-2 text-sm md:text-base">
           <a
             href={waLink}
             target="_blank"

@@ -292,5 +292,8 @@
   "quantity_updated": "Quantity updated",
   "no_products_found_in_this_category": "No products found in this category",
   "search_placeholder": "Search for items, categories, products or product colors",
-  "save": "Save"
+  "save": "Save",
+  "added_to_wishlist": "Added to wishlist",
+  "remove_from_wishlist": "Remove from wishlist",
+  "removed_from_wishlist": "Removed from wishlist"
 }
