@@ -13,7 +13,6 @@ function ProductCardSingle({
   allProducts = [],
 }) {
   const router = useRouter();
-
   const images =
     Array.isArray(product.images) && product.images.length > 0
       ? product.images.map((img) => img.url || img)
@@ -235,7 +234,7 @@ function ProductCardSingle({
       </div>
 
       <div className="mt-4 text-start font-gilroy">
-        <h3 className="text-sm md:text-lg">{product.name}</h3>
+        <h3 className="text-sm md:text-lg text-neutral-800">{product.name}</h3>
 
         <div className="flex items-center gap-2">
           {product.sale ? (

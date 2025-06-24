@@ -22,7 +22,7 @@ function WishlistSection({ wishlistItems }) {
   const shareToWhatsApp = () => {
     const text = `Check out my wishlist on Lacheen! ${window.location.href}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(whatsappUrl, '_blank');
+    window.open(whatsappUrl, "_blank");
   };
 
   const shareToInstagram = () => {
@@ -89,9 +89,11 @@ function WishlistSection({ wishlistItems }) {
         message={toastMessage}
       />
       <div className="flex flex-col gap-4 justify-center pt-[40px] items-center relative">
-        <h1 className="font-gilroy text-3xl font-normal">
-     { t("create_your_own_wishlist")}{" "}
-          <span className="italic lowercase text-rose-800">{t("wishlist-title")}</span>
+        <h1 className="font-gilroy text-3xl font-normal text-neutral-800">
+          {t("create_your_own_wishlist")}{" "}
+          <span className="italic lowercase text-rose-800">
+            {t("wishlist-title")}
+          </span>
         </h1>
 
         <div className="relative" ref={shareRef}>
@@ -120,19 +122,19 @@ function WishlistSection({ wishlistItems }) {
                 exit="exit"
                 variants={shareVariants}
               >
-                <button 
+                <button
                   onClick={shareToWhatsApp}
                   className="text-green-600 hover:text-green-700 transition-colors"
                 >
                   <FaWhatsapp size={20} />
                 </button>
-                <button 
+                <button
                   onClick={shareToInstagram}
                   className="text-pink-600 hover:text-pink-700 transition-colors"
                 >
                   <FaInstagram size={20} />
                 </button>
-                <button 
+                <button
                   onClick={copyLink}
                   className="text-neutral-600 hover:text-neutral-800 transition-colors"
                 >

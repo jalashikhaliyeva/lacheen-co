@@ -17,9 +17,11 @@ function BasketSectionTotal() {
   const router = useRouter();
 
   const calculateSubtotal = () => {
-    return basketItems.reduce((total, item) => {
-      return total + (parseFloat(item.price) * item.quantity);
-    }, 0).toFixed(2);
+    return basketItems
+      .reduce((total, item) => {
+        return total + parseFloat(item.price) * item.quantity;
+      }, 0)
+      .toFixed(2);
   };
 
   const calculateDelivery = () => {
@@ -43,31 +45,41 @@ function BasketSectionTotal() {
 
   return (
     <div className="flex flex-col gap-1 md:gap-4 w-full font-gilroy bg-white p-4 md:p-5 border-neutral-200">
-      <h2 className="hidden md:block text-lg md:text-xl font-semibold">
+      <h2 className="hidden md:block text-lg md:text-xl font-semibold text-neutral-800">
         {t("order_summary")}
       </h2>
 
       <div className="hidden md:block">
         <div className="flex flex-row justify-between">
-          <p className="text-base md:text-lg">{t("subtotal")}</p>
-          <span className="text-base">{calculateSubtotal()} ₼</span>
+          <p className="text-base md:text-lg text-neutral-800">
+            {t("subtotal")}
+          </p>
+          <span className="text-base text-neutral-800">
+            {calculateSubtotal()} ₼
+          </span>
         </div>
         <div className="flex flex-row justify-between">
-          <p className="text-base md:text-lg">{t("delivery")}</p>
-          <span className="text-base">
+          <p className="text-base md:text-lg text-neutral-800">
+            {t("delivery")}
+          </p>
+          <span className="text-base text-neutral-800">
             {calculateDelivery() === 0 ? t("free") : `${calculateDelivery()} ₼`}
           </span>
         </div>
       </div>
 
       <div className="flex flex-row justify-between md:border-t border-neutral-200 pt-3">
-        <p className="text-base md:text-lg uppercase font-medium">{t("total")}</p>
-        <span className="text-base font-semibold">{calculateTotal()} ₼</span>
+        <p className="text-base md:text-lg uppercase font-medium text-neutral-800">
+          {t("total")}
+        </p>
+        <span className="text-base font-semibold text-neutral-800">
+          {calculateTotal()} ₼
+        </span>
       </div>
 
       <div className="md:hidden">
         <div className="flex justify-between items-center mt-2">
-          <button onClick={toggleDetails} className="text-sm text-neutral-600">
+          <button onClick={toggleDetails} className="text-sm text-neutral-800">
             {showDetails ? t("hide_details") : t("show_details")}
           </button>
           <button onClick={toggleDetails}>
@@ -86,24 +98,30 @@ function BasketSectionTotal() {
         >
           <div className="mt-1">
             <div className="flex flex-row justify-between mb-2">
-              <p className="text-base">{t("subtotal")}</p>
-              <span className="text-base">{calculateSubtotal()} ₼</span>
+              <p className="text-base text-neutral-800">{t("subtotal")}</p>
+              <span className="text-base text-neutral-800">
+                {calculateSubtotal()} ₼
+              </span>
             </div>
             <div className="flex flex-row justify-between mb-3">
-              <p className="text-base">{t("delivery")}</p>
-              <span className="text-base">
-                {calculateDelivery() === 0 ? t("free") : `${calculateDelivery()} ₼`}
+              <p className="text-base text-neutral-800">{t("delivery")}</p>
+              <span className="text-base text-neutral-800">
+                {calculateDelivery() === 0
+                  ? t("free")
+                  : `${calculateDelivery()} ₼`}
               </span>
             </div>
 
             <div className="flex flex-col gap-2 text-sm pb-2">
               <div className="flex flex-row gap-2 items-center">
                 <LiaCheckSolid size={18} />
-                <p>{t("delivery_time")}</p>
+                <p className="text-neutral-800">{t("delivery_time")}</p>
               </div>
               <div className="flex flex-row gap-2 items-center">
                 <LiaCheckSolid size={18} />
-                <p>100 AZN{t("free_shipping_threshold")}</p>
+                <p className="text-neutral-800">
+                  100 AZN{t("free_shipping_threshold")}
+                </p>
               </div>
             </div>
           </div>
@@ -120,7 +138,7 @@ function BasketSectionTotal() {
             hover:border-neutral-900
             active:scale-95"
           disabled={basketItems.length === 0}
-          onClick={() => router.push('/checkout')}
+          onClick={() => router.push("/checkout")}
         >
           {t("buy_now")}
         </button>
@@ -129,11 +147,13 @@ function BasketSectionTotal() {
       <div className="hidden md:flex mt-4 md:mt-5 flex-col gap-2 text-sm md:text-base">
         <div className="flex flex-row gap-2 items-center">
           <LiaCheckSolid size={18} />
-          <p>{t("delivery_time")}</p>
+          <p className="text-neutral-800">{t("delivery_time")}</p>
         </div>
         <div className="flex flex-row gap-2 items-center">
           <LiaCheckSolid size={18} />
-          <p>100 AZN {t("free_shipping_threshold")}</p>
+          <p className="text-neutral-800">
+            100 AZN {t("free_shipping_threshold")}
+          </p>
         </div>
       </div>
     </div>

@@ -26,11 +26,9 @@ const Footer = () => {
 
   return (
     <div className="flex flex-col gap-4 text-neutral-800">
-      {/* Top section: stacks on mobile, row on md+ */}
       <div className="border-t border-b py-10">
         <Container>
           <div className="flex flex-col md:flex-row justify-between gap-8 w-full">
-            {/* Help */}
             <div className="flex flex-col gap-4 font-gilroy w-full md:w-1/3">
               <h6 className="text-base pb-5 uppercase font-normal text-neutral-500">
                 {t("help")}
@@ -62,7 +60,6 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Stores */}
             <div className="flex flex-col gap-4 font-gilroy w-full md:w-1/3">
               <h6 className="text-base pb-5 uppercase font-normal text-neutral-500">
                 {t("stores")}
@@ -88,7 +85,6 @@ const Footer = () => {
               </button>
             </div>
 
-            {/* Email Sign‑up */}
             <div
               onClick={handleEmailClick}
               className="flex flex-col gap-4 font-gilroy w-full md:w-1/3"

@@ -5,7 +5,10 @@ import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { useTranslation } from "react-i18next";
 import { useAuthClient } from "@/shared/context/AuthContext";
 import { IoClose } from "react-icons/io5";
-import { updateQuantity, removeFromBasket } from "@/firebase/services/basketService";
+import {
+  updateQuantity,
+  removeFromBasket,
+} from "@/firebase/services/basketService";
 import { useBasket } from "@/shared/context/BasketContext";
 
 function BasketSectionItems() {
@@ -26,7 +29,7 @@ function BasketSectionItems() {
   const handleQuantityChange = async (productId, newQuantity) => {
     try {
       await updateQuantity(user.uid, productId, newQuantity);
-      const updatedItems = basketItems.map(item =>
+      const updatedItems = basketItems.map((item) =>
         item.id === productId ? { ...item, quantity: newQuantity } : item
       );
       updateBasketItems(updatedItems);
@@ -40,7 +43,7 @@ function BasketSectionItems() {
   const handleRemoveItem = async (productId) => {
     try {
       await removeFromBasket(user.uid, productId);
-      const updatedItems = basketItems.filter(item => item.id !== productId);
+      const updatedItems = basketItems.filter((item) => item.id !== productId);
       updateBasketItems(updatedItems);
       showNotificationMessage(t("item_removed"));
     } catch (error) {
@@ -60,11 +63,12 @@ function BasketSectionItems() {
     document.body.style.overflow = "auto";
   };
 
-
   if (basketItems.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-lg font-normal font-gilroy">{t("your_basket_is_empty")}</p>
+        <p className="text-lg font-normal font-gilroy">
+          {t("your_basket_is_empty")}
+        </p>
       </div>
     );
   }
@@ -72,7 +76,7 @@ function BasketSectionItems() {
   return (
     <>
       {showNotification && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-white rounded-lg shadow-lg p-4 max-w-sm w-full transform transition-all duration-500 ease-in-out animate-slide-down">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-white text-neutral-800 rounded-lg shadow-lg p-4 max-w-sm w-full transform transition-all duration-500 ease-in-out animate-slide-down">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600">{notificationMessage}</p>
             <button
@@ -88,7 +92,7 @@ function BasketSectionItems() {
         {basketItems.map((item) => (
           <div
             key={item.id}
-            className="flex flex-col border border-neutral-300 p-3 md:p-4"
+            className="flex flex-col border border-neutral-300 p-3 md:p-4 text-neutral-800"
           >
             <div className="flex justify-end">
               <TfiClose
@@ -114,7 +118,7 @@ function BasketSectionItems() {
                 <span className="block text-base md:text-lg font-medium">
                   {item.name}
                 </span>
-                <span className="block text-xs md:text-sm text-gray-500 mt-1">
+                <span className="block text-xs md:text-sm text-neutral-500 mt-1">
                   Size: {item.size} | Color: {item.color}
                 </span>
 
@@ -126,7 +130,9 @@ function BasketSectionItems() {
               <div className="flex items-center justify-between w-full sm:w-auto gap-4">
                 <div className="flex items-center font-gilroy">
                   <button
-                    onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                    onClick={() =>
+                      handleQuantityChange(item.id, item.quantity - 1)
+                    }
                     disabled={item.quantity <= 1}
                     aria-label="Decrease quantity"
                     className="w-8 h-8 flex cursor-pointer items-center justify-center border border-neutral-300 hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
@@ -134,10 +140,14 @@ function BasketSectionItems() {
                     <AiOutlineMinus className="text-lg" />
                   </button>
 
-                  <span className="w-8 text-center text-base">{item.quantity}</span>
+                  <span className="w-8 text-center text-base">
+                    {item.quantity}
+                  </span>
 
                   <button
-                    onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                    onClick={() =>
+                      handleQuantityChange(item.id, item.quantity + 1)
+                    }
                     aria-label="Increase quantity"
                     className="w-8 h-8 flex items-center cursor-pointer justify-center border border-neutral-300 hover:bg-neutral-100 transition"
                   >

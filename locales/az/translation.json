@@ -291,6 +291,7 @@
   "found_colors": "Rənglər",
   "quantity_updated": "Miqdar uğurla yeniləndi",
   "no_products_found_in_this_category": "Bu kateqoriya üzrə məhsul tapılmadı",
-    "search_placeholder": "Kateqoriyalar, rəng və ya məhsul adları üzrə axtarış et..."
+    "search_placeholder": "Kateqoriyalar, rəng və ya məhsul adları üzrə axtarış et...",
+    "save": "Yadda saxla"
   
 }

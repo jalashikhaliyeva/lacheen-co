@@ -31,20 +31,27 @@ function ProductsListHeader({
       case "special":
         return t("nav.special_prices") || "Special Offers";
       default:
-        // Find the category by slug and return the appropriate name
-        const category = categories.find(cat => 
-          (cat.slug?.[currentLang] === categorySlug) ||
-          (cat.slug?.az === categorySlug) ||
-          (cat.slug?.en === categorySlug) ||
-          (cat.slug === categorySlug)
+        const category = categories.find(
+          (cat) =>
+            cat.slug?.[currentLang] === categorySlug ||
+            cat.slug?.az === categorySlug ||
+            cat.slug?.en === categorySlug ||
+            cat.slug === categorySlug
         );
-        
+
         if (category) {
-          return category.name?.[currentLang] || category.name?.az || category.name || categorySlug;
+          return (
+            category.name?.[currentLang] ||
+            category.name?.az ||
+            category.name ||
+            categorySlug
+          );
         }
-        
-        // Fallback: convert slug to readable name
-        return categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1).replace(/-/g, " ");
+
+        return (
+          categorySlug.charAt(0).toUpperCase() +
+          categorySlug.slice(1).replace(/-/g, " ")
+        );
     }
   };
 
@@ -59,10 +66,9 @@ function ProductsListHeader({
   return (
     <>
       <Container>
-        {/* Controls */}
         <div className="flex justify-between w-full">
           <button
-            className="py-1 border border-neutral-700 font-gilroy px-3 text-sm md:text-lg cursor-pointer hover:text-neutral-600 transition-colors"
+            className="py-1 border border-neutral-700 text-neutral-800 font-gilroy px-3 text-sm md:text-lg cursor-pointer hover:text-neutral-600 transition-colors"
             onClick={() => setShowFilter(true)}
           >
             Filter {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}

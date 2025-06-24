@@ -102,7 +102,7 @@ function OrdersUserSingle() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-gilroy font-normal">{t("my_orders")}</h2>
+        <h2 className="text-2xl font-gilroy text-neutral-800 font-normal">{t("my_orders")}</h2>
         <div
           className="relative"
           onMouseEnter={() => setIsFilterOpen(true)}
@@ -110,7 +110,7 @@ function OrdersUserSingle() {
           ref={filterRef}
         >
           <button
-            className="px-2 flex items-center justify-center gap-2 py-1 text-base font-gilroy focus:outline-none"
+            className="px-2 flex items-center text-neutral-800 justify-center gap-2 py-1 text-base font-gilroy focus:outline-none"
             type="button"
           >
             {t("filter")}
@@ -125,7 +125,7 @@ function OrdersUserSingle() {
 
           <div
             className={`
-              absolute z-[999] w-40 mt-2 font-gilroy bg-white 
+              absolute z-[999] w-40 mt-2 font-gilroy bg-white  text-neutral-800
               border border-gray-300 rounded-sm shadow-lg p-2
               transition-all duration-300 ease-in-out
               ${isFilterOpen
@@ -134,13 +134,13 @@ function OrdersUserSingle() {
               right-0
             `}
           >
-            <ul className="py-1">
+            <ul className="py-1 text-neutral-800">
               {filterOptions.map((option) => (
                 <li
                   key={option.value}
                   className={`
                     px-4 py-2 cursor-pointer rounded
-                    hover:bg-gray-100 text-base transition-colors
+                    hover:bg-gray-100 text-base transition-colors text-neutral-800
                     ${selectedFilter === option.value
                       ? "text-gray-700 font-semibold"
                       : "text-gray-700"}
@@ -160,7 +160,7 @@ function OrdersUserSingle() {
 
       <div className="grid gap-4">
         {[...filteredOrders].reverse().map((order) => (
-          <div key={order.id} className="border p-4 bg-white">
+          <div key={order.id} className="border p-4 bg-white text-neutral-800">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <p className="text-sm text-neutral-600">

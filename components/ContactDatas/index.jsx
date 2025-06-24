@@ -22,10 +22,10 @@ function ContactDatas() {
         <div className="flex flex-col lg:flex-row justify-between lg:gap-20 gap-12 items-start lg:divide-x font-gilroy mt-16">
           <div className="flex flex-col gap-10 lg:w-1/2 w-full">
             <div className="flex flex-col gap-4">
-              <h1 className="font-normal uppercase text-xl md:text-2xl">
+              <h1 className="font-normal uppercase text-xl md:text-2xl text-neutral-800">
                 {t("call_us")}
               </h1>
-              <p className="text-neutral-500 text-sm max-w-[450px]">
+              <p className="text-neutral-800 text-sm max-w-[450px]">
                 {t("experience_our_latest_shoe_collections_in_person_at_our_comfortable_retail_stores")}
               </p>
 
@@ -38,7 +38,7 @@ function ContactDatas() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <h1 className="font-normal uppercase text-xl md:text-2xl">
+              <h1 className="font-normal uppercase text-xl md:text-2xl text-neutral-800">
                 {t("visit_us")}
               </h1>
               <p className="text-neutral-500 text-sm max-w-[450px]">
@@ -67,7 +67,7 @@ function ContactDatas() {
           </div>
 
           <div className="lg:w-1/2 w-full lg:pl-8">
-            <h1 className="font-normal uppercase text-xl md:text-2xl mb-6">
+            <h1 className="font-normal uppercase text-xl md:text-2xl mb-6 text-neutral-800">
               {t("frequently_asked_questions")}
             </h1>
             <div className="space-y-0">

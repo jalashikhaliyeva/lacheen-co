@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
@@ -268,7 +267,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
               type="tel"
               value={phoneNumber}
               onChange={handlePhoneNumberChange}
-              className={`w-full pl-12 pr-3 py-2 border ${
+              className={`w-full pl-12 pr-3 py-2 border text-neutral-800 ${
                 errors.phoneNumber ? "border-red-500" : "border-neutral-300"
               } focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent`}
               placeholder="xx xxx xx xx"
@@ -285,7 +284,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
       return (
         <div className="space-y-4">
           <div
-            className={`p-4 border ${
+            className={`p-4 border text-neutral-800 ${
               errors.phoneSelection ? "border-red-500" : "border-neutral-200"
             } bg-neutral-50`}
           >
@@ -304,7 +303,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
               </button>
               <button
                 onClick={handleEnterNewPhone}
-                className="px-4 py-2 border border-neutral-200 hover:border-neutral-400 transition-colors"
+                className="px-4 py-2 border text-neutral-700 border-neutral-200 hover:border-neutral-400 transition-colors"
               >
                 {t("enter_new_number")}
               </button>
@@ -446,7 +445,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 font-gilroy">
           <div className="lg:col-span-2">
             <div className="bg-white p-6">
-              <h2 className="text-xl mb-4">{t("delivery_address")}</h2>
+              <h2 className="text-xl mb-4 text-neutral-800">{t("delivery_address")}</h2>
 
               {loading ? (
                 <div className="animate-pulse">
@@ -464,7 +463,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                       } ${errors.address ? "border-red-500" : ""}`}
                       onClick={() => setSelectedAddress(address)}
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-3 text-neutral-800">
                         <div className="mt-1">
                           <div
                             className={`w-4 h-4  border ${
@@ -475,7 +474,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                           ></div>
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 text-neutral-800" >
                             <p className="">{address.title}</p>
                             {address.isDefault && (
                               <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 ">
@@ -522,12 +521,12 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
               )}
 
               <div className="my-6">
-                <h2 className="text-xl mb-4">{t("contact_information")}</h2>
+                <h2 className="text-xl text-neutral-800 mb-4">{t("contact_information")}</h2>
                 {renderPhoneInput()}
               </div>
 
               <div className="mt-8" ref={orderDetailsRef}>
-                <h2 className="text-xl mb-5">{t("order_details")}</h2>
+                <h2 className="text-xl text-neutral-800 mb-5">{t("order_details")}</h2>
                 <div className="mb-4">
                   <label className="block text-sm text-neutral-700 mb-1">
                     {t("order_description")}
@@ -535,7 +534,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full p-2 border border-neutral-200"
+                    className="w-full p-2 border text-neutral-800 border-neutral-200"
                     rows="3"
                     placeholder={t("enter_order_description")}
                   />
@@ -580,7 +579,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                       </p>
                     )}
                     {isDropdownOpen && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-neutral-200 shadow-lg">
+                      <div className="absolute z-10  text-neutral-800 w-full mt-1 bg-white border border-neutral-200 shadow-lg">
                         {deliveryTimeOptions.map((option, index) => (
                           <button
                             key={index}
@@ -603,7 +602,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                   <label className="block text-sm text-neutral-700 mb-1">
                     {t("select_sizes")}
                   </label>
-                  <div className="grid grid-cols-6 gap-2">
+                  <div className="grid  text-neutral-800 grid-cols-6 gap-2">
                     {sizes.map((size) => (
                       <button
                         key={size.id}
@@ -626,8 +625,8 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                 <div className="mb-4">
                   <label className="block text-sm text-neutral-700 mb-1">
                     {t("payment_method")}
-                  </label>
-                  <div className="space-y-2">
+                  </label> 
+                  <div className="space-y-2 text-neutral-800">
                     <label className="flex items-center gap-2">
                       <input
                         type="radio"
@@ -637,7 +636,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                       />
                       {t("card_payment")}
                     </label>
-                    <label className="flex items-center gap-2">
+                    <label className="flex items-center gap-2 text-neutral-800">
                       <input
                         type="radio"
                         value="cash"
@@ -658,7 +657,7 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
                       type="number"
                       value={cashAmount}
                       onChange={(e) => setCashAmount(e.target.value)}
-                      className={`w-full p-2 border ${
+                      className={`w-full p-2 border text-neutral-800 ${
                         errors.cashAmount
                           ? "border-red-500"
                           : "border-neutral-200"
@@ -678,19 +677,19 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
 
           <div className="lg:col-span-1">
             <div className="bg-white p-6 sticky top-8">
-              <h2 className="text-xl font-semibold mb-4">
+              <h2 className="text-xl font-semibold mb-4 text-neutral-800">
                 {t("order_summary")}
               </h2>
 
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <p className="text-neutral-600">{t("subtotal")}</p>
-                  <span>{calculateSubtotal()} ₼</span>
+                  <span className="text-neutral-800">{calculateSubtotal()} ₼</span>
                 </div>
 
                 <div className="flex justify-between">
                   <p className="text-neutral-600">{t("delivery")}</p>
-                  <span>
+                  <span className="text-neutral-800">
                     {calculateDelivery() === 0
                       ? t("free")
                       : `${calculateDelivery()} ₼`}
@@ -699,8 +698,8 @@ export default function CheckoutPage({ categories, modalNewProducts }) {
 
                 <div className="border-t pt-4">
                   <div className="flex justify-between font-semibold">
-                    <p>{t("total")}</p>
-                    <span>{calculateTotal()} ₼</span>
+                    <p className="text-neutral-800">{t("total")}</p>
+                    <span className="text-neutral-800">{calculateTotal()} ₼</span>
                   </div>
                 </div>
 

@@ -2,21 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Container from "../Container";
 import {
-  PiHeartLight,
-  PiUserLight,
-  PiBasketLight,
   PiCalendarLight,
   PiGiftLight,
 } from "react-icons/pi";
-import { TfiSearch } from "react-icons/tfi";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { SlLocationPin } from "react-icons/sl";
 import { useTranslation } from "react-i18next";
-import { createOrUpdateUserProfile, getUserProfile } from "@/firebase/services/firebaseUserService";
+import {
+  createOrUpdateUserProfile,
+  getUserProfile,
+} from "@/firebase/services/firebaseUserService";
 import CustomToast from "../CustomToast/CustomToast";
 function PersonalInfo({ user }) {
-  
   const router = useRouter();
   const { t } = useTranslation();
   const [birthday, setBirthday] = useState(null);
@@ -34,7 +31,7 @@ function PersonalInfo({ user }) {
     if (!name) return "";
     return name
       .split(" ")
-      .map(word => word[0])
+      .map((word) => word[0])
       .join("")
       .toUpperCase()
       .slice(0, 2);
@@ -46,8 +43,8 @@ function PersonalInfo({ user }) {
         try {
           const userData = await getUserProfile(user.uid);
           // Prioritize Firebase Auth displayName if it exists
-          const displayName = user.displayName || (userData?.displayName || "");
-          
+          const displayName = user.displayName || userData?.displayName || "";
+
           setFormData({
             displayName: displayName,
             phoneNumber: userData?.phoneNumber || "",
@@ -81,9 +78,9 @@ function PersonalInfo({ user }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -125,14 +122,12 @@ function PersonalInfo({ user }) {
       <div className="flex flex-col space-y-6">
         {/* Profile Picture Section */}
         <div className="flex items-center space-x-4 mb-6">
-     
-  
-            <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center">
-              <span className="text-lg font-medium text-neutral-600 font-helvetica">
-                {getUserInitials(formData.displayName || user.displayName)}
-              </span>
-            </div>
-     
+          <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center">
+            <span className="text-lg font-medium text-neutral-600 font-helvetica">
+              {getUserInitials(formData.displayName || user.displayName)}
+            </span>
+          </div>
+
           {/* <div>
             <button className="text-sm text-blue-600 hover:text-blue-800">
               {t("change_photo")}
@@ -152,7 +147,7 @@ function PersonalInfo({ user }) {
               name="displayName"
               value={formData.displayName}
               onChange={handleInputChange}
-              className="w-full p-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 transition-colors"
+              className="w-full p-3 border text-neutral-800 border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 transition-colors"
               placeholder="John Doe"
             />
           </div>
@@ -162,7 +157,7 @@ function PersonalInfo({ user }) {
             <input
               type="email"
               value={user.email || ""}
-              className="w-full p-3 border cursor-not-allowed border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 transition-colors"
+              className="w-full p-3 border cursor-not-allowed text-neutral-800 border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 transition-colors"
               placeholder="john@example.com"
               disabled
             />
@@ -178,7 +173,9 @@ function PersonalInfo({ user }) {
               {t("auth.phone_number")}
             </label>
             <div className="flex">
-              <div className="p-3 bg-gray-100 border border-r-0">+994</div>
+              <div className="p-3 bg-gray-100 border border-r-0 text-neutral-800">
+                +994
+              </div>
               <input
                 type="text"
                 name="phoneNumber"
@@ -186,7 +183,7 @@ function PersonalInfo({ user }) {
                 onChange={handleInputChange}
                 maxLength={15}
                 placeholder="xx xxx xx xx"
-                className="border w-full p-3 focus:outline-none focus:shadow-outline"
+                className="border w-full p-3 focus:outline-none focus:shadow-outline text-neutral-800"
               />
             </div>
           </div>
@@ -203,11 +200,11 @@ function PersonalInfo({ user }) {
               selected={birthday}
               onChange={(date) => {
                 setBirthday(date);
-                setFormData(prev => ({ ...prev, birthday: date }));
+                setFormData((prev) => ({ ...prev, birthday: date }));
               }}
               dateFormat="MMMM d, yyyy"
               placeholderText="Select your birthday"
-              className="w-full p-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
+              className="w-full p-3 border border-gray-300 text-neutral-800 focus:outline-none focus:ring-1 focus:ring-gray-400"
               showYearDropdown
               dropdownMode="select"
               maxDate={new Date()}

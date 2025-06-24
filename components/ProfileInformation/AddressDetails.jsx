@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { GoTrash } from "react-icons/go";
-import { PiMinusSquareLight } from "react-icons/pi";
-import { RiDeleteBack2Line } from "react-icons/ri";
 import { SlLocationPin } from "react-icons/sl";
 import {
   getUserProfile,
