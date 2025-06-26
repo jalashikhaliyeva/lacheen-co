@@ -66,7 +66,7 @@ function BasketSectionItems() {
   if (basketItems.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-lg font-normal font-gilroy">
+        <p className="text-lg font-normal font-gilroy text-neutral-800">
           {t("your_basket_is_empty")}
         </p>
       </div>

@@ -61,8 +61,8 @@ function TrendingNow({ products = [] }) {
         </div>
 
         <button
-      onClick={() => router.push("/products")}
-      className="py-2 px-4 mt-7 border cursor-pointer font-gilroy border-neutral-900 text-neutral-800 
+          onClick={() => router.push("/products")}
+          className="py-2 px-4 mt-7 border cursor-pointer font-gilroy border-neutral-900 text-neutral-800 
                 relative overflow-hidden 
                 hover:text-white 
                 transition-all duration-300
@@ -71,9 +71,9 @@ function TrendingNow({ products = [] }) {
                 before:w-0 before:h-full before:bg-neutral-900 
                 before:-z-10 before:transition-all before:duration-300
                 hover:before:w-full"
-    >
-      {t("discover_more")}
-    </button>
+        >
+          {t("discover_more")}
+        </button>
       </div>
     </Container>
   );

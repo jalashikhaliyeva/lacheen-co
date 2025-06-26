@@ -1,4 +1,3 @@
-// pages/index.js
 import { useState } from "react";
 import Header from "@/components/Header";
 import NavList from "@/components/NavList";
@@ -17,7 +16,7 @@ import { fetchSectionData } from "@/firebase/services/settingsService";
 export default function Home({
   categories,
   products,
-  newProducts,       
+  newProducts,
   modalNewProducts,
   heroSettings,
   categoriesSettings,
@@ -29,10 +28,13 @@ export default function Home({
   return (
     <div className="relative">
       <main>
-        <Header modalNewProducts={modalNewProducts} categories={categories}  />
+        <Header modalNewProducts={modalNewProducts} categories={categories} />
         <NavList onMenuToggle={setIsMenuOpen} />
         <Hero heroSettings={heroSettings} />
-        <CategorySection categories={categories}     categoriesSettings={categoriesSettings}  />
+        <CategorySection
+          categories={categories}
+          categoriesSettings={categoriesSettings}
+        />
         <Citate />
         <SliderEmbla products={products} />
         <VideoandImage attitudeSettings={attitudeSettings} />
@@ -45,12 +47,18 @@ export default function Home({
 
 export async function getServerSideProps({ locale }) {
   try {
-    const [categories, allProducts, heroSettings, categoriesSettings , attitudeSettings] = await Promise.all([
+    const [
+      categories,
+      allProducts,
+      heroSettings,
+      categoriesSettings,
+      attitudeSettings,
+    ] = await Promise.all([
       fetchCategories(),
       fetchProducts(),
-      fetchSectionData('hero'),
-      fetchSectionData('categories'), 
-      fetchSectionData('attitude'),
+      fetchSectionData("hero"),
+      fetchSectionData("categories"),
+      fetchSectionData("attitude"),
     ]);
 
     const last10Products = allProducts.slice(0, 10);
@@ -64,8 +72,8 @@ export async function getServerSideProps({ locale }) {
         newProducts,
         modalNewProducts,
         heroSettings: heroSettings || null,
-        categoriesSettings: categoriesSettings || null, 
-        attitudeSettings: attitudeSettings || null, 
+        categoriesSettings: categoriesSettings || null,
+        attitudeSettings: attitudeSettings || null,
       },
     };
   } catch (error) {
@@ -77,8 +85,8 @@ export async function getServerSideProps({ locale }) {
         newProducts: [],
         modalNewProducts: [],
         heroSettings: null,
-        categoriesSettings: null, 
-        attitudeSettings: null, 
+        categoriesSettings: null,
+        attitudeSettings: null,
       },
     };
   }

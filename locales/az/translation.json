@@ -291,10 +291,10 @@
   "found_colors": "Rənglər",
   "quantity_updated": "Miqdar uğurla yeniləndi",
   "no_products_found_in_this_category": "Bu kateqoriya üzrə məhsul tapılmadı",
-    "search_placeholder": "Kateqoriyalar, rəng və ya məhsul adları üzrə axtarış et...",
-    "save": "Yadda saxla",
-    "added_to_wishlist": "İstək siyahısına əlavə edildi",
-    "remove_from_wishlist": "İstək siyahısından sil",
-    "removed_from_wishlist": "İstək siyahısından silindi"
+  "search_placeholder": "Kateqoriyalar, rəng və ya məhsul adları üzrə axtarış et...",
+  "save": "Yadda saxla",
+  "added_to_wishlist": "İstək siyahısına əlavə edildi",
+  "remove_from_wishlist": "İstək siyahısından sil",
+  "removed_from_wishlist": "İstək siyahısından silindi"
   
 }
