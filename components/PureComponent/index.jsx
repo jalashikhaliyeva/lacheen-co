@@ -14,25 +14,20 @@ export default class PieMostSells extends PureComponent {
     try {
       const products = await fetchProducts();
       
-      // Sort products by sales count
       const sortedProducts = products
         .filter(product => product.is_active !== false)
         .sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0))
         .slice(0, 4);
 
-      // If no sales data, use mock data for visualization
       let chartData = sortedProducts.map(product => {
         let categoryName = 'Uncategorized';
         
         if (product.category && typeof product.category === 'object') {
           if (product.category.name && typeof product.category.name === 'object') {
-            // Category name is a translation object {az, en}
             categoryName = product.category.name.en || product.category.name.az || 'Uncategorized';
           } else if (typeof product.category.name === 'string') {
-            // Category name is a string
             categoryName = product.category.name;
           } else if (typeof product.category === 'string') {
-            // Category itself is a string
             categoryName = product.category;
           }
         } else if (typeof product.category === 'string') {
@@ -46,7 +41,6 @@ export default class PieMostSells extends PureComponent {
         };
       });
 
-      // If all values are 0 or no data, create mock data
       const totalValue = chartData.reduce((sum, item) => sum + item.value, 0);
       if (totalValue === 0 && chartData.length > 0) {
         chartData = chartData.map((item, index) => ({
@@ -99,7 +93,6 @@ export default class PieMostSells extends PureComponent {
               'Z'
             ].join(' ');
             
-            // Calculate label position
             const labelAngle = currentAngle + angle / 2;
             const labelRadius = radius * 0.7;
             const labelX = center + labelRadius * Math.cos((labelAngle * Math.PI) / 180);
@@ -139,6 +132,7 @@ export default class PieMostSells extends PureComponent {
     
     return (
       <div
+      className="flex items-center justify-center text-neutral-800"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(2, auto)",

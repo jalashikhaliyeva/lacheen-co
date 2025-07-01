@@ -274,9 +274,11 @@ function OrdersPage() {
   }
 
   return (
-    <div className="pt-8 mt-20">
+    <div className="pt-8 mt-20 text-neutral-800">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Orders Management</h1>
+        <h1 className="text-2xl font-bold text-neutral-800">
+          Orders Management
+        </h1>
         <div className="relative w-1/2">
           <input
             type="text"
@@ -347,13 +349,13 @@ function OrdersPage() {
                       </span>
                     </div>
 
-                    <div className="space-y-1">
-                      <div>
+                    <div className="space-y-1 max-w-[260px] text-wrap">
+                      <div className="text-wrap">
                         Time: {order.deliveryDetails?.timeRange || "N/A"}
                       </div>
 
-                      <div>Address: {order.userInfo?.address || "N/A"}</div>
-                      <div className="text-amber-800 italic">
+                      <div className="text-wrap">Address: {order.userInfo?.address || "N/A"}</div>
+                      <div className="text-amber-800 italic text-wrap">
                         {order.deliveryDetails?.description || "No description"}
                       </div>
                     </div>

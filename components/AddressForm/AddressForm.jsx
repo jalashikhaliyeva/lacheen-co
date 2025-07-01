@@ -117,9 +117,11 @@ function AddressForm({ onClose, onSuccess }) {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border text-neutral-800 ${
-                  errors.title ? "border-red-500" : "border-neutral-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent`}
+                className={`w-full  px-3 py-2 border text-neutral-800 ${
+                  errors.title
+                    ? "border-red-500 text-neutral-800"
+                    : "border-neutral-300 text-neutral-800"
+                } rounded-lg focus:outline-none focus:ring-2 placeholder:text-neutral-800 focus:ring-neutral-900 focus:border-transparent`}
                 placeholder="e.g. Home, Work"
               />
               {errors.title && (
@@ -136,7 +138,7 @@ function AddressForm({ onClose, onSuccess }) {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 text-neutral-800 border ${
+                className={`w-full px-3 placeholder:text-neutral-800 py-2 text-neutral-800 border ${
                   errors.fullName
                     ? "border-red-500 text-neutral-800"
                     : "border-neutral-300 text-neutral-800"

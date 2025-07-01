@@ -58,7 +58,7 @@ function ClientsPage() {
   }
 
   return (
-    <div className="pt-8 mt-20">
+    <div className="pt-8 mt-20 text-neutral-800">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Clients Management</h1>
         <div className="relative w-1/2">
@@ -72,7 +72,7 @@ function ClientsPage() {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute inset-y-0 right-2 flex items-center justify-center p-1"
+              className="absolute inset-y-0  text-neutral-800 right-2 flex items-center justify-center p-1"
             >
               <FiX className="h-5 w-5 text-gray-500 hover:text-gray-700" />
             </button>

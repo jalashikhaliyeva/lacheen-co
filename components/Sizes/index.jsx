@@ -138,7 +138,7 @@ function SizesList() {
   }
 
   return (
-    <div className="p-5 font-sans">
+    <div className="p-5 font-sans  text-neutral-800">
       <div className="mt-5 flex justify-between items-center">
         <h1 className="text-2xl font-medium mb-4">Sizes Management</h1>
         <button
@@ -159,7 +159,7 @@ function SizesList() {
         </div>
       )}
 
-      <div className="bg-white mt-4 flex flex-col justify-between rounded-lg shadow overflow-hidden border border-gray-200">
+      <div className="bg-white  text-neutral-800 mt-4 flex flex-col justify-between rounded-lg shadow overflow-hidden border border-gray-200">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 ">
             <thead className="bg-gray-50">

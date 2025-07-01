@@ -16,7 +16,7 @@ function Colors() {
       <AdminLayout>
         <div className="bg-bodyGray h-full pb-20 pt-5">
           <Container>
-         <ColorsList />
+            <ColorsList />
           </Container>
         </div>
       </AdminLayout>

@@ -15,7 +15,7 @@ function ActionsProductTable({ products, selectedCount, onDeleteSelected }) {
   };
 
   return (
-    <div className="bg-white border flex flex-col md:flex-row justify-between gap-4 border-neutral-300 mb-5 rounded-lg p-5">
+    <div className="bg-white text-neutral-800 border flex flex-col md:flex-row justify-between gap-4 border-neutral-300 mb-5 rounded-lg p-5">
       <div>
         <button
           onClick={exportToExcel}

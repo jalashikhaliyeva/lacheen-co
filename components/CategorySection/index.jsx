@@ -5,15 +5,29 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 function CategorySection({ categories, categoriesSettings }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
   const [isVideoVisible, setIsVideoVisible] = useState(false);
   const [hasVideoError, setHasVideoError] = useState(false);
 
+  // Get current language
+  const currentLanguage = i18n.language || 'en';
+
   const handleCategoryClick = (categorySlug) => {
-    router.push(`/products?category=${categorySlug}`);
+    // Handle slug which might also be an object
+    const slugValue = typeof categorySlug === 'object' ? categorySlug[currentLanguage] : categorySlug;
+    router.push(`/products?category=${slugValue}`);
+  };
+
+  // Helper function to get localized text
+  const getLocalizedText = (textObj) => {
+    if (typeof textObj === 'string') return textObj;
+    if (typeof textObj === 'object' && textObj !== null) {
+      return textObj[currentLanguage] || textObj['en'] || textObj['az'] || '';
+    }
+    return '';
   };
 
   useEffect(() => {
@@ -69,6 +83,11 @@ function CategorySection({ categories, categoriesSettings }) {
     };
   }, [isVideoVisible]);
 
+  // Early return if categories is not available or empty
+  if (!categories || categories.length < 2) {
+    return null;
+  }
+
   return (
     <Container>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 w-full my-4 md:my-10">
@@ -80,7 +99,7 @@ function CategorySection({ categories, categoriesSettings }) {
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 via-neutral-900/30 to-transparent z-10" />
           <Image
             src={categoriesSettings?.images?.[0] || "/images/17.jpg"}
-            alt={categories[0].name}
+            alt={getLocalizedText(categories[0].name)}
             fill
             loading="lazy"
             className="object-cover transition-transform duration-500 ease-out"
@@ -91,7 +110,7 @@ function CategorySection({ categories, categoriesSettings }) {
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
             <div className="text-center font-gilroy transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2">
               <h3 className="text-xl font-normal transition-all duration-300 group-hover:tracking-wide">
-                {categories[0].name}
+                {getLocalizedText(categories[0].name)}
               </h3>
               <p className="text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] delay-75 mt-1">
                 {t("shop_now")}
@@ -149,7 +168,7 @@ function CategorySection({ categories, categoriesSettings }) {
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 via-neutral-900/30 to-transparent z-10" />
           <Image
             src={categoriesSettings?.images?.[1] || "/images/16.jpg"}
-            alt={categories[1].name}
+            alt={getLocalizedText(categories[1].name)}
             fill
             loading="lazy"
             className="object-cover transition-transform duration-500 ease-out"
@@ -160,7 +179,7 @@ function CategorySection({ categories, categoriesSettings }) {
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-6 z-20 text-white h-[40%]">
             <div className="text-center font-gilroy transform transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] group-hover:-translate-y-2">
               <h3 className="text-xl font-normal transition-all duration-300 group-hover:tracking-wide">
-                {categories[1].name}
+                {getLocalizedText(categories[1].name)}
               </h3>
               <p className="text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.2,0,0,1)] delay-75 mt-1">
                 {t("shop_now")}

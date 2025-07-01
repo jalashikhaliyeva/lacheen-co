@@ -345,15 +345,15 @@ function WomenShoesTable({ mockProducts }) {
     return value.toString();
   };
 
-  return (
-    <div className="pt-2">
+  return ( 
+    <div className="pt-2 text-neutral-800">
       <ActionsProductTable
         products={products}
         selectedCount={selectedRowKeys.length}
         onDeleteSelected={confirmDeleteSelected}
       />
 
-      <div className="p-4 my-5 border border-neutral-300 font-gilroy rounded-lg bg-white relative">
+      <div className="p-4 my-5 border border-neutral-300 text-neutral-800 font-gilroy rounded-lg bg-white relative">
         <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-4 gap-2">
           <div className="relative w-full sm:w-1/3">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">

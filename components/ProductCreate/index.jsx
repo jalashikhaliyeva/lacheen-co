@@ -123,7 +123,7 @@ function ProductCreateTabs() {
   };
 
   return (
-    <div>
+    <div className="text-neutral-800">
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-row gap-3">
           <button

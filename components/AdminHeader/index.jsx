@@ -133,7 +133,7 @@ function AdminHeader({ toggleSidebar, sidebarOpen }) {
   return (
     <>
       <div
-        className={`fixed top-0 z-50 shadow-xs border-b border-gray-200 bg-white transition-all duration-300 ${
+        className={`fixed  text-neutral-800 top-0 z-50 shadow-xs border-b border-gray-200 bg-white transition-all duration-300 ${
           sidebarOpen ? "left-[280px]" : "left-0"
         }`}
         style={{

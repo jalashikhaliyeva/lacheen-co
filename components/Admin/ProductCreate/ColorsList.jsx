@@ -160,7 +160,7 @@ function ColorsList() {
   }
 
   return (
-    <div className="p-5 font-sans mt-6">
+    <div className="p-5 font-sans mt-6  text-neutral-800">
       <div className="mt-5 flex justify-between items-center">
         <h1 className="text-2xl font-medium mb-4">Colors Management</h1>
         <button

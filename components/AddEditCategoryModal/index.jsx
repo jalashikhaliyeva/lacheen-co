@@ -132,7 +132,7 @@ export default function AddEditCategoryModal({
     >
       <div
         ref={modalRef}
-        className="bg-white font-gilroy rounded-lg shadow-xl max-w-md w-full p-6"
+        className="bg-white text-neutral-800 font-gilroy rounded-lg shadow-xl max-w-md w-full p-6"
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-800">

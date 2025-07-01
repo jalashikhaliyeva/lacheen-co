@@ -36,7 +36,7 @@ function DashboardOrders() {
           <SlBasket className="text-lightOrangeText text-2xl" />
         </div>
         <div className="flex flex-col gap-2">
-          <p className="text-base">{t("total_orders")}</p>
+          <p className="text-base text-neutral-800">{t("total_orders")}</p>
           <p className="text-2xl text-neutral-700 font-semibold">{orderCounts.total}</p>
         </div>
       </div>
@@ -45,7 +45,7 @@ function DashboardOrders() {
           <RiLoader2Line className="text-lightBlueeText text-2xl" />
         </div>
         <div className="flex flex-col gap-2">
-          <p className="text-base">{t("orders_pending")}</p>
+          <p className="text-base text-neutral-800">{t("orders_pending")}</p>
           <p className="text-2xl text-neutral-700 font-semibold">{orderCounts.pending}</p>
         </div>
       </div>
@@ -54,7 +54,7 @@ function DashboardOrders() {
           <RiEBike2Line className="text-lightGreenBoxText text-2xl" />
         </div>
         <div className="flex flex-col gap-2">
-          <p className="text-base">{t("orders_cancelled")}</p>
+          <p className="text-base text-neutral-800">{t("orders_cancelled")}</p>
           <p className="text-2xl text-neutral-700 font-semibold">{orderCounts.cancelled}</p>
         </div>
       </div>
@@ -63,7 +63,7 @@ function DashboardOrders() {
           <BsBagCheck className="text-lightGreenBoxText text-2xl" />
         </div>
         <div className="flex flex-col gap-2">
-          <p className="text-base">{t("orders_delivered")}</p>
+          <p className="text-base text-neutral-800">{t("orders_delivered")}</p>
           <p className="text-2xl text-neutral-700 font-semibold">{orderCounts.delivered}</p>
         </div>
       </div>

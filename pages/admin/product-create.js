@@ -32,13 +32,13 @@ function ProductEdit() {
   return (
     <ProtectedRoute>
       <AdminLayout>
-        <div className="bg-bodyGray h-full pb-20 ">
+        <div className="bg-bodyGray h-full pb-20  mt-10">
           <Container>
             <div className="pt-7">
               <Breadcrumbs />
             </div>
 
-            <h1 className="text-2xl font-helvetica font-medium mb-4">
+            <h1 className="text-2xl font-helvetica font-medium mb-4 text-neutral-800">
               Edit Product
             </h1>
 

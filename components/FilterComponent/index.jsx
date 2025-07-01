@@ -166,7 +166,7 @@ const FilterComponent = ({ onClose, onFilterChange, initialFilters }) => {
                       transition-all duration-300 ease-in-out
                       ${
                         openSection === section
-                          ? "max-h-60 opacity-100 translate-y-0"
+                          ? "max-h-60 opacity-100 translate-y-0 overflow-y-auto"
                           : "max-h-0 opacity-0 -translate-y-2"
                       }
                     `}

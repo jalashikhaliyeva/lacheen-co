@@ -69,7 +69,7 @@ function Products() {
   return (
     <ProtectedRoute>
       <AdminLayout>
-        <div className="bg-bodyGray">
+        <div className="bg-bodyGray mt-10">
           <Container>
             <div className="pt-7">
               <Breadcrumbs />
